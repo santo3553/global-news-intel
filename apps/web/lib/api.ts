@@ -233,6 +233,8 @@ export interface TimelineEntry {
   title: string;
   source_name: string;
   source_domain: string;
+  url?: string;
+  canonical_url?: string;
   published_at?: string;
   relationship_type: string;
   similarity_score: number;

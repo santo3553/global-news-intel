@@ -1013,11 +1013,35 @@ export default function HomePage() {
                         {a.processing_status}
                       </span>
                     </div>
-                    <h4 className="text-xs font-medium text-slate-200 line-clamp-2">{a.title}</h4>
+                    {a.url ? (
+                      <a
+                        href={a.url}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="group/art block"
+                      >
+                        <h4 className="text-xs font-semibold text-slate-200 group-hover/art:text-sky-300 transition-colors line-clamp-2 flex items-start justify-between gap-2">
+                          <span>{a.title}</span>
+                          <ExternalLink className="h-3 w-3 text-slate-500 group-hover/art:text-sky-400 shrink-0 mt-0.5" />
+                        </h4>
+                      </a>
+                    ) : (
+                      <h4 className="text-xs font-medium text-slate-200 line-clamp-2">{a.title}</h4>
+                    )}
                     {a.url && (
-                      <div className="mt-2 flex items-center gap-1 text-[10px] text-slate-400 truncate">
-                        <ExternalLink className="h-3 w-3 text-slate-500" />
-                        <span className="truncate">{a.url}</span>
+                      <div className="mt-2.5 flex items-center justify-between pt-2 border-t border-slate-800/60 text-[10px]">
+                        <span className="text-slate-500 font-mono truncate max-w-[200px]">
+                          {a.url.replace(/^https?:\/\//i, '').split('/')[0]}
+                        </span>
+                        <a
+                          href={a.url}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="inline-flex items-center gap-1 rounded bg-sky-500/10 hover:bg-sky-500/20 border border-sky-500/30 px-2 py-0.5 font-semibold text-sky-400 hover:text-white transition-all"
+                        >
+                          <ExternalLink className="h-2.5 w-2.5" />
+                          <span>Verify Story</span>
+                        </a>
                       </div>
                     )}
                   </div>

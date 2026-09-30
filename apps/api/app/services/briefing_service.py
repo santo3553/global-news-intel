@@ -162,6 +162,8 @@ class BriefingService:
                     title=art.title,
                     source_name=source_name,
                     source_domain=domain,
+                    url=art.url,
+                    canonical_url=art.canonical_url,
                     published_at=art.published_at,
                     relationship_type=assoc.relationship_type or "corroborating",
                     similarity_score=assoc.similarity_score or 1.0,

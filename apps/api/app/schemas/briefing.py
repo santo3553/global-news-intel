@@ -32,6 +32,8 @@ class TimelineEntry(BaseModel):
     title: str
     source_name: str
     source_domain: str
+    url: Optional[str] = None
+    canonical_url: Optional[str] = None
     published_at: Optional[datetime] = None
     relationship_type: str  # primary, corroborating, update
     similarity_score: float
