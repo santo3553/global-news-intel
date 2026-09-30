@@ -16,6 +16,7 @@ from workers.clustering.signals import (
     compute_category_similarity,
     compute_composite_cluster_score
 )
+from workers.ranking.ranking_worker import EventRankingWorker
 
 logger = logging.getLogger("gni.clusterer")
 
@@ -226,6 +227,8 @@ class EventClusterer:
             )
 
             article.processing_status = "clustered"
+            await session.flush()
+            await EventRankingWorker.update_event_ranking(session, event)
             await session.commit()
 
             logger.info(
@@ -287,6 +290,8 @@ class EventClusterer:
             session.add(link)
 
             article.processing_status = "clustered"
+            await session.flush()
+            await EventRankingWorker.update_event_ranking(session, new_event)
             await session.commit()
 
             logger.info(

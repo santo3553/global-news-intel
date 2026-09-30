@@ -39,6 +39,7 @@ class EventService:
         country: Optional[str] = None,
         min_importance: Optional[float] = None,
         status: Optional[str] = None,
+        sort_by: str = "importance",
         limit: int = 50,
         offset: int = 0
     ) -> List[Dict[str, Any]]:
@@ -75,7 +76,17 @@ class EventService:
         if conditions:
             stmt = stmt.where(and_(*conditions))
 
-        stmt = stmt.order_by(Event.importance_score.desc(), Event.last_updated_at.desc()).offset(offset).limit(limit)
+        # Dynamic Ordering
+        if sort_by == "confidence":
+            stmt = stmt.order_by(Event.confidence_score.desc(), Event.importance_score.desc())
+        elif sort_by == "velocity":
+            stmt = stmt.order_by(Event.development_velocity_score.desc(), Event.importance_score.desc())
+        elif sort_by == "recent":
+            stmt = stmt.order_by(Event.last_updated_at.desc())
+        else:
+            stmt = stmt.order_by(Event.importance_score.desc(), Event.last_updated_at.desc())
+
+        stmt = stmt.offset(offset).limit(limit)
 
         result = await session.execute(stmt)
         events = result.scalars().all()

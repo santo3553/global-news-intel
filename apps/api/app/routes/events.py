@@ -20,6 +20,7 @@ async def list_events(
     country: Optional[str] = Query(None, description="Country filter"),
     min_importance: Optional[float] = Query(None, ge=0.0, le=10.0, description="Minimum importance score"),
     status: Optional[str] = Query(None, description="Event lifecycle status (active, developing, resolved)"),
+    sort_by: str = Query("importance", description="Sort order (importance, confidence, velocity, recent)"),
     limit: int = Query(50, ge=1, le=200, description="Max events to return"),
     offset: int = Query(0, ge=0, description="Offset for pagination"),
     db: AsyncSession = Depends(get_db)
@@ -35,6 +36,7 @@ async def list_events(
         country=country,
         min_importance=min_importance,
         status=status,
+        sort_by=sort_by,
         limit=limit,
         offset=offset
     )
@@ -121,3 +123,20 @@ async def trigger_clustering(
         "articles_evaluated": len(articles),
         "results": results
     }
+
+
+@router.post("/decay", summary="Trigger periodic velocity decay and lifecycle status transitions")
+async def trigger_decay(
+    max_events: int = Query(50, ge=1, le=200, description="Max events to evaluate for decay"),
+    db: AsyncSession = Depends(get_db)
+):
+    """
+    Applies temporal decay to development velocity and transitions stale events.
+    """
+    from workers.ranking.ranking_worker import EventRankingWorker
+    updated = await EventRankingWorker.batch_decay_events(db, max_events=max_events)
+    return {
+        "status": "completed",
+        "events_updated": updated
+    }
+
