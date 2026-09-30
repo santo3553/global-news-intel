@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useState, useCallback } from "react";
+import dynamic from "next/dynamic";
 import { 
   Globe2, 
   Activity, 
@@ -20,24 +21,43 @@ import {
   Shield,
   CopyCheck,
   Zap,
-  Tag
+  Tag,
+  Compass,
+  Maximize2
 } from "lucide-react";
 import { 
   fetchHealth, 
   fetchSources, 
   fetchArticles, 
   fetchEvents, 
+  fetchEventsWithBbox,
   HealthResponse, 
   SourceItem, 
   ArticleItem, 
   EventItem 
 } from "@/lib/api";
+import EventDetailModal from "@/components/events/EventDetailModal";
+
+const IntelligenceMap = dynamic(
+  () => import("@/components/map/IntelligenceMap"),
+  { 
+    ssr: false,
+    loading: () => (
+      <div className="h-[560px] w-full rounded-2xl border border-slate-800 bg-[#060a14] flex items-center justify-center text-slate-400">
+        <Activity className="h-6 w-6 animate-spin text-sky-400 mr-2" />
+        <span>Loading Geospatial Tile Engine...</span>
+      </div>
+    )
+  }
+);
 
 export default function HomePage() {
   const [health, setHealth] = useState<HealthResponse | null>(null);
   const [sources, setSources] = useState<SourceItem[]>([]);
   const [articles, setArticles] = useState<ArticleItem[]>([]);
   const [events, setEvents] = useState<EventItem[]>([]);
+  const [selectedEventId, setSelectedEventId] = useState<string | null>(null);
+  const [mapBbox, setMapBbox] = useState<string>("");
   const [sortBy, setSortBy] = useState<string>("importance");
   const [loading, setLoading] = useState<boolean>(true);
   const [lastChecked, setLastChecked] = useState<string>("");
@@ -48,7 +68,7 @@ export default function HomePage() {
       fetchHealth(),
       fetchSources(),
       fetchArticles(15),
-      fetchEvents(10, sortBy)
+      fetchEvents(25, sortBy)
     ]);
     setHealth(healthData);
     setSources(sourcesData);
@@ -79,7 +99,7 @@ export default function HomePage() {
               <h1 className="text-lg font-bold tracking-tight text-white flex items-center gap-2">
                 GLOBAL NEWS INTELLIGENCE
                 <span className="rounded bg-emerald-500/10 px-2 py-0.5 text-xs font-semibold text-emerald-400 border border-emerald-500/20">
-                  PHASES 1 - 5 ACTIVE
+                  PHASES 1 - 6 ACTIVE
                 </span>
               </h1>
               <p className="text-xs text-slate-400">
@@ -318,25 +338,25 @@ export default function HomePage() {
             </div>
 
             {/* Phase 6 */}
-            <div className="rounded-xl border border-sky-500/30 bg-sky-950/10 p-4">
+            <div className="rounded-xl border border-emerald-500/30 bg-emerald-950/10 p-4">
               <div className="flex items-center justify-between mb-2">
-                <span className="text-xs font-bold text-sky-400">PHASE 6</span>
-                <span className="rounded-full bg-sky-500/20 px-2 py-0.5 text-[10px] font-semibold text-sky-300">
-                  UP NEXT
+                <span className="text-xs font-bold text-emerald-400">PHASE 6</span>
+                <span className="rounded-full bg-emerald-500/20 px-2 py-0.5 text-[10px] font-semibold text-emerald-300">
+                  COMPLETED
                 </span>
               </div>
               <h3 className="font-semibold text-white text-sm">Interactive World Map</h3>
               <p className="text-xs text-slate-400 mt-1">
-                MapLibre GL / Cesium 3D globe, zoom-density event clustering, bounding-box queries, event detail modal.
+                MapLibre GL dark tiles, zoom-density event clustering, bounding-box queries, event detail modal.
               </p>
             </div>
 
             {/* Phase 7 */}
-            <div className="rounded-xl border border-slate-800 bg-slate-900/60 p-4 opacity-75">
+            <div className="rounded-xl border border-sky-500/30 bg-sky-950/10 p-4">
               <div className="flex items-center justify-between mb-2">
-                <span className="text-xs font-bold text-slate-400">PHASE 7</span>
-                <span className="rounded-full bg-slate-800 px-2 py-0.5 text-[10px] font-semibold text-slate-400">
-                  PLANNED
+                <span className="text-xs font-bold text-sky-400">PHASE 7</span>
+                <span className="rounded-full bg-sky-500/20 px-2 py-0.5 text-[10px] font-semibold text-sky-300">
+                  UP NEXT
                 </span>
               </div>
               <h3 className="font-semibold text-white text-sm">AI Briefing & Search</h3>
@@ -359,6 +379,37 @@ export default function HomePage() {
               </p>
             </div>
           </div>
+        </div>
+
+        {/* Interactive World Map (Phase 6 Active) */}
+        <div className="space-y-4">
+          <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-2">
+            <div>
+              <div className="flex items-center gap-2">
+                <Globe2 className="h-5 w-5 text-sky-400" />
+                <h2 className="text-base font-bold text-white">
+                  Geospatial Event Intelligence Map
+                </h2>
+                <span className="rounded-full bg-emerald-500/20 px-2 py-0.5 text-[10px] font-semibold text-emerald-300 border border-emerald-500/30">
+                  Phase 6 Live
+                </span>
+              </div>
+              <p className="text-xs text-slate-400 mt-1">
+                MapLibre GL dark matter vector/raster engine with zoom-density clustering, spatial bounding-box querying, and dynamic event inspection.
+              </p>
+            </div>
+            <div className="flex items-center gap-2 text-xs text-slate-400">
+              <span className="rounded bg-slate-800/80 px-2.5 py-1 text-slate-300 border border-slate-700 font-mono">
+                Bbox: {mapBbox || "Global"}
+              </span>
+            </div>
+          </div>
+
+          <IntelligenceMap
+            events={events}
+            onSelectEvent={(id) => setSelectedEventId(id)}
+            onBoundsChange={(bbox) => setMapBbox(bbox)}
+          />
         </div>
 
         {/* Dynamic Clustered Events (Phase 4 & 5 Active) */}
@@ -505,7 +556,8 @@ export default function HomePage() {
             ] as EventItem[]).map((evt) => (
               <div 
                 key={evt.id}
-                className="rounded-xl border border-slate-800 bg-slate-900/80 p-4 shadow-md hover:border-sky-500/40 transition-all flex flex-col justify-between"
+                onClick={() => setSelectedEventId(evt.id)}
+                className="cursor-pointer rounded-xl border border-slate-800 bg-slate-900/80 p-4 shadow-md hover:border-sky-500/60 hover:bg-slate-900 transition-all flex flex-col justify-between"
               >
                 <div>
                   <div className="flex items-center justify-between gap-2 mb-2">
@@ -673,6 +725,13 @@ export default function HomePage() {
           </div>
         </div>
       </div>
+
+      {/* Event Detail Inspection Modal */}
+      <EventDetailModal
+        eventId={selectedEventId}
+        onClose={() => setSelectedEventId(null)}
+        onSelectEvent={(id) => setSelectedEventId(id)}
+      />
     </main>
   );
 }
