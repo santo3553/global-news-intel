@@ -13,9 +13,19 @@ import {
   Clock, 
   Globe2, 
   Compass,
-  AlertCircle
+  AlertCircle,
+  GitCommit,
+  History
 } from "lucide-react";
-import { EventItem, EventDetailItem, NearbyEventItem, fetchEventDetail, fetchNearbyEvents } from "@/lib/api";
+import { 
+  EventItem, 
+  EventDetailItem, 
+  NearbyEventItem, 
+  EventTimelineResponse,
+  fetchEventDetail, 
+  fetchNearbyEvents,
+  fetchEventTimeline 
+} from "@/lib/api";
 
 interface EventDetailModalProps {
   eventId: string | null;
@@ -30,6 +40,8 @@ export default function EventDetailModal({
 }: EventDetailModalProps) {
   const [detail, setDetail] = useState<EventDetailItem | null>(null);
   const [nearby, setNearby] = useState<NearbyEventItem[]>([]);
+  const [timeline, setTimeline] = useState<EventTimelineResponse | null>(null);
+  const [activeTab, setActiveTab] = useState<"timeline" | "articles">("timeline");
   const [loading, setLoading] = useState<boolean>(true);
 
   useEffect(() => {
@@ -39,9 +51,13 @@ export default function EventDetailModal({
     setLoading(true);
 
     async function loadData() {
-      const data = await fetchEventDetail(eventId!);
+      const [data, timelineData] = await Promise.all([
+        fetchEventDetail(eventId!),
+        fetchEventTimeline(eventId!)
+      ]);
       if (!isMounted) return;
       setDetail(data);
+      setTimeline(timelineData);
 
       if (data && data.latitude !== undefined && data.longitude !== undefined) {
         const nearbyEvents = await fetchNearbyEvents(data.latitude, data.longitude, 500);
@@ -191,52 +207,135 @@ export default function EventDetailModal({
               </div>
             </div>
 
-            {/* Corroborating Articles */}
+            {/* Tabbed Chronological Timeline & Corroborating Articles */}
             <div className="rounded-xl border border-slate-800 bg-slate-900/40 p-5">
-              <div className="flex items-center justify-between mb-3">
-                <h3 className="text-xs font-bold uppercase tracking-wider text-slate-400 flex items-center gap-2">
-                  <Layers className="h-4 w-4 text-purple-400" />
-                  Corroborating Reporting Articles ({detail.articles?.length || 0})
-                </h3>
-                <span className="text-[11px] text-slate-400">Section 14 & 15 Merged</span>
+              <div className="flex items-center justify-between mb-4 border-b border-slate-800 pb-3">
+                <div className="flex items-center gap-2">
+                  <button
+                    onClick={() => setActiveTab("timeline")}
+                    className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-semibold transition-all ${
+                      activeTab === "timeline"
+                        ? "bg-sky-500/20 text-sky-400 border border-sky-500/30"
+                        : "text-slate-400 hover:text-slate-200"
+                    }`}
+                  >
+                    <History className="h-3.5 w-3.5" />
+                    Evolution Timeline ({timeline?.total_articles || detail.articles?.length || 0})
+                  </button>
+                  <button
+                    onClick={() => setActiveTab("articles")}
+                    className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-semibold transition-all ${
+                      activeTab === "articles"
+                        ? "bg-purple-500/20 text-purple-400 border border-purple-500/30"
+                        : "text-slate-400 hover:text-slate-200"
+                    }`}
+                  >
+                    <Layers className="h-3.5 w-3.5" />
+                    Corroborating Dispatches ({detail.articles?.length || 0})
+                  </button>
+                </div>
+                <span className="text-[10px] font-mono text-slate-500 uppercase tracking-wider">
+                  Section 23
+                </span>
               </div>
 
-              <div className="space-y-2.5 max-h-56 overflow-y-auto pr-1">
-                {detail.articles && detail.articles.length > 0 ? (
-                  detail.articles.map((art) => (
-                    <div 
-                      key={art.id}
-                      className="rounded-lg border border-slate-800 bg-slate-900/80 p-3 hover:border-slate-700 transition-all"
-                    >
-                      <div className="flex items-center justify-between text-[11px] text-slate-400 mb-1">
-                        <span className="font-semibold text-sky-400">{art.source_id}</span>
-                        {art.published_at && (
-                          <span className="flex items-center gap-1 font-mono text-[10px]">
-                            <Clock className="h-3 w-3" />
-                            {new Date(art.published_at).toLocaleString()}
-                          </span>
+              {activeTab === "timeline" ? (
+                <div className="space-y-4 max-h-72 overflow-y-auto pr-2 relative">
+                  {timeline && timeline.timeline.length > 0 ? (
+                    <div className="relative pl-6 border-l-2 border-slate-800 space-y-4 ml-2">
+                      {timeline.timeline.map((entry, idx) => {
+                        const relBadge = 
+                          entry.relationship_type === "primary"
+                            ? "bg-emerald-500/10 text-emerald-400 border-emerald-500/30"
+                            : entry.relationship_type === "update"
+                            ? "bg-amber-500/10 text-amber-400 border-amber-500/30"
+                            : "bg-sky-500/10 text-sky-400 border-sky-500/30";
+
+                        return (
+                          <div key={entry.article_id || idx} className="relative group">
+                            <span 
+                              className={`absolute -left-[31px] top-1.5 h-3.5 w-3.5 rounded-full border-2 border-slate-950 ${
+                                entry.relationship_type === "primary" 
+                                  ? "bg-emerald-400" 
+                                  : entry.relationship_type === "update" 
+                                  ? "bg-amber-400" 
+                                  : "bg-sky-400"
+                              }`}
+                            />
+                            <div className="rounded-lg border border-slate-800 bg-slate-900/80 p-3 hover:border-slate-700 transition-all">
+                              <div className="flex items-center justify-between text-[11px] mb-1">
+                                <div className="flex items-center gap-2">
+                                  <span className="font-semibold text-slate-200">{entry.source_name}</span>
+                                  <span className={`text-[10px] px-1.5 py-0.5 rounded border uppercase font-mono ${relBadge}`}>
+                                    {entry.relationship_type}
+                                  </span>
+                                </div>
+                                {entry.published_at && (
+                                  <span className="flex items-center gap-1 font-mono text-[10px] text-slate-400">
+                                    <Clock className="h-3 w-3" />
+                                    {new Date(entry.published_at).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', month: 'short', day: 'numeric' })}
+                                  </span>
+                                )}
+                              </div>
+                              <h4 className="text-xs font-medium text-slate-100 mb-1">
+                                {entry.title}
+                              </h4>
+                              {entry.excerpt && (
+                                <p className="text-[11px] text-slate-400 line-clamp-2 leading-relaxed">
+                                  {entry.excerpt}
+                                </p>
+                              )}
+                              <div className="mt-2 flex items-center justify-between text-[10px] text-slate-500">
+                                <span>Domain: {entry.source_domain}</span>
+                                <span className="font-mono text-sky-400">Similarity: {(entry.similarity_score * 100).toFixed(0)}%</span>
+                              </div>
+                            </div>
+                          </div>
+                        );
+                      })}
+                    </div>
+                  ) : (
+                    <p className="text-xs text-slate-500 italic p-2">Chronological timeline synthesized from founding report.</p>
+                  )}
+                </div>
+              ) : (
+                <div className="space-y-2.5 max-h-72 overflow-y-auto pr-1">
+                  {detail.articles && detail.articles.length > 0 ? (
+                    detail.articles.map((art) => (
+                      <div 
+                        key={art.id}
+                        className="rounded-lg border border-slate-800 bg-slate-900/80 p-3 hover:border-slate-700 transition-all"
+                      >
+                        <div className="flex items-center justify-between text-[11px] text-slate-400 mb-1">
+                          <span className="font-semibold text-sky-400">{art.source_id}</span>
+                          {art.published_at && (
+                            <span className="flex items-center gap-1 font-mono text-[10px]">
+                              <Clock className="h-3 w-3" />
+                              {new Date(art.published_at).toLocaleString()}
+                            </span>
+                          )}
+                        </div>
+                        <h4 className="text-xs font-medium text-slate-200 line-clamp-2">
+                          {art.title}
+                        </h4>
+                        {art.url && (
+                          <a
+                            href={art.url}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            className="mt-2 inline-flex items-center gap-1 text-[10px] text-sky-400 hover:underline"
+                          >
+                            <ExternalLink className="h-3 w-3" />
+                            <span>View original dispatch</span>
+                          </a>
                         )}
                       </div>
-                      <h4 className="text-xs font-medium text-slate-200 line-clamp-2">
-                        {art.title}
-                      </h4>
-                      {art.url && (
-                        <a
-                          href={art.url}
-                          target="_blank"
-                          rel="noopener noreferrer"
-                          className="mt-2 inline-flex items-center gap-1 text-[10px] text-sky-400 hover:underline"
-                        >
-                          <ExternalLink className="h-3 w-3" />
-                          <span>View original dispatch</span>
-                        </a>
-                      )}
-                    </div>
-                  ))
-                ) : (
-                  <p className="text-xs text-slate-500 italic">Founding primary wire report linked.</p>
-                )}
-              </div>
+                    ))
+                  ) : (
+                    <p className="text-xs text-slate-500 italic">Founding primary wire report linked.</p>
+                  )}
+                </div>
+              )}
             </div>
 
             {/* Nearby Related Events */}

@@ -23,7 +23,12 @@ import {
   Zap,
   Tag,
   Compass,
-  Maximize2
+  Maximize2,
+  Search,
+  Sparkles,
+  TrendingUp,
+  FileText,
+  ChevronRight
 } from "lucide-react";
 import { 
   fetchHealth, 
@@ -31,10 +36,14 @@ import {
   fetchArticles, 
   fetchEvents, 
   fetchEventsWithBbox,
+  fetchBriefing,
+  searchEvents,
   HealthResponse, 
   SourceItem, 
   ArticleItem, 
-  EventItem 
+  EventItem,
+  IntelligenceBriefingResponse,
+  BriefingItem
 } from "@/lib/api";
 import EventDetailModal from "@/components/events/EventDetailModal";
 
@@ -56,31 +65,58 @@ export default function HomePage() {
   const [sources, setSources] = useState<SourceItem[]>([]);
   const [articles, setArticles] = useState<ArticleItem[]>([]);
   const [events, setEvents] = useState<EventItem[]>([]);
+  const [briefing, setBriefing] = useState<IntelligenceBriefingResponse | null>(null);
   const [selectedEventId, setSelectedEventId] = useState<string | null>(null);
   const [mapBbox, setMapBbox] = useState<string>("");
   const [sortBy, setSortBy] = useState<string>("importance");
+  const [searchQuery, setSearchQuery] = useState<string>("");
+  const [isSearching, setIsSearching] = useState<boolean>(false);
+  const [briefingTab, setBriefingTab] = useState<"breaking" | "geopolitical" | "hazards" | "economic">("breaking");
   const [loading, setLoading] = useState<boolean>(true);
   const [lastChecked, setLastChecked] = useState<string>("");
 
   const loadData = useCallback(async () => {
     setLoading(true);
-    const [healthData, sourcesData, articlesData, eventsData] = await Promise.all([
+    const [healthData, sourcesData, articlesData, eventsData, briefingData] = await Promise.all([
       fetchHealth(),
       fetchSources(),
       fetchArticles(15),
-      fetchEvents(25, sortBy)
+      searchQuery.trim() ? searchEvents(searchQuery.trim()) : fetchEvents(25, sortBy),
+      fetchBriefing()
     ]);
     setHealth(healthData);
     setSources(sourcesData);
     setArticles(articlesData);
     setEvents(eventsData);
+    setBriefing(briefingData);
     setLastChecked(new Date().toLocaleTimeString());
     setLoading(false);
-  }, [sortBy]);
+  }, [sortBy, searchQuery]);
+
+  const handleSearchSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!searchQuery.trim()) {
+      const data = await fetchEvents(25, sortBy);
+      setEvents(data);
+      return;
+    }
+    setIsSearching(true);
+    const results = await searchEvents(searchQuery.trim());
+    setEvents(results);
+    setIsSearching(false);
+  };
+
+  const handleClearSearch = async () => {
+    setSearchQuery("");
+    setIsSearching(true);
+    const data = await fetchEvents(25, sortBy);
+    setEvents(data);
+    setIsSearching(false);
+  };
 
   useEffect(() => {
     loadData();
-    const interval = setInterval(loadData, 15000);
+    const interval = setInterval(loadData, 20000);
     return () => clearInterval(interval);
   }, [loadData]);
 
@@ -352,33 +388,227 @@ export default function HomePage() {
             </div>
 
             {/* Phase 7 */}
-            <div className="rounded-xl border border-sky-500/30 bg-sky-950/10 p-4">
+            <div className="rounded-xl border border-emerald-500/30 bg-emerald-950/10 p-4">
               <div className="flex items-center justify-between mb-2">
-                <span className="text-xs font-bold text-sky-400">PHASE 7</span>
-                <span className="rounded-full bg-sky-500/20 px-2 py-0.5 text-[10px] font-semibold text-sky-300">
-                  UP NEXT
+                <span className="text-xs font-bold text-emerald-400">PHASE 7</span>
+                <span className="rounded-full bg-emerald-500/20 px-2 py-0.5 text-[10px] font-semibold text-emerald-300">
+                  COMPLETED
                 </span>
               </div>
               <h3 className="font-semibold text-white text-sm">AI Briefing & Search</h3>
               <p className="text-xs text-slate-400 mt-1">
-                "What should I read right now?", structured summaries (what happened, why it matters, what is known).
+                Executive "What should I read now?" briefing, instant semantic search, and chronological event timelines.
               </p>
             </div>
 
             {/* Phase 8 */}
-            <div className="rounded-xl border border-slate-800 bg-slate-900/60 p-4 opacity-75">
+            <div className="rounded-xl border border-sky-500/30 bg-sky-950/10 p-4">
               <div className="flex items-center justify-between mb-2">
-                <span className="text-xs font-bold text-slate-400">PHASE 8</span>
-                <span className="rounded-full bg-slate-800 px-2 py-0.5 text-[10px] font-semibold text-slate-400">
-                  PLANNED
+                <span className="text-xs font-bold text-sky-400">PHASE 8</span>
+                <span className="rounded-full bg-sky-500/20 px-2 py-0.5 text-[10px] font-semibold text-sky-300">
+                  IN PROGRESS
                 </span>
               </div>
               <h3 className="font-semibold text-white text-sm">Hardening & Production</h3>
               <p className="text-xs text-slate-400 mt-1">
-                Stress testing, bounding box caching, worker retries, seed data fixtures, admin observability dashboard.
+                Multi-country seed fixtures, full end-to-end integration verification, and production readiness.
               </p>
             </div>
           </div>
+        </div>
+
+        {/* Section 22: Executive Situation Report: "What Should I Read Right Now?" */}
+        {briefing && (
+          <div className="rounded-2xl border border-amber-500/30 bg-gradient-to-b from-amber-950/20 via-slate-900/60 to-slate-900/40 p-6 shadow-2xl backdrop-blur-md">
+            <div className="flex flex-col lg:flex-row items-start lg:items-center justify-between gap-4 pb-4 border-b border-slate-800">
+              <div>
+                <div className="flex items-center gap-2">
+                  <div className="flex h-7 w-7 items-center justify-center rounded-lg bg-amber-500/20 text-amber-400 border border-amber-500/30">
+                    <Sparkles className="h-4 w-4 animate-pulse" />
+                  </div>
+                  <h2 className="text-base font-bold text-white tracking-wide">
+                    EXECUTIVE SITUATION REPORT &bull; WHAT SHOULD I READ RIGHT NOW?
+                  </h2>
+                  <span className="rounded-full bg-amber-500/20 px-2 py-0.5 text-[10px] font-mono font-semibold text-amber-300 border border-amber-500/30">
+                    Section 22 AI Briefing
+                  </span>
+                </div>
+                <p className="text-xs text-slate-300 mt-2 max-w-4xl leading-relaxed">
+                  {briefing.executive_summary}
+                </p>
+              </div>
+              <div className="flex items-center gap-3 self-end lg:self-center">
+                <div className="rounded-xl border border-slate-800 bg-slate-900/80 px-3 py-1.5 text-right">
+                  <span className="text-[10px] text-slate-500 uppercase font-mono block">Events Synthesized</span>
+                  <span className="text-sm font-bold font-mono text-amber-400">{briefing.total_events_analyzed}</span>
+                </div>
+              </div>
+            </div>
+
+            {/* Briefing Category Selector Tabs */}
+            <div className="mt-4 flex flex-wrap items-center gap-2 border-b border-slate-800 pb-3">
+              <button
+                onClick={() => setBriefingTab("breaking")}
+                className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-semibold transition-all ${
+                  briefingTab === "breaking"
+                    ? "bg-rose-500/20 text-rose-400 border border-rose-500/30"
+                    : "text-slate-400 hover:text-slate-200"
+                }`}
+              >
+                <Flame className="h-3.5 w-3.5" />
+                Breaking High-Velocity Alerts ({briefing.breaking_alerts.length})
+              </button>
+              <button
+                onClick={() => setBriefingTab("geopolitical")}
+                className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-semibold transition-all ${
+                  briefingTab === "geopolitical"
+                    ? "bg-sky-500/20 text-sky-400 border border-sky-500/30"
+                    : "text-slate-400 hover:text-slate-200"
+                }`}
+              >
+                <Globe2 className="h-3.5 w-3.5" />
+                Geopolitical & Sovereignty ({briefing.critical_geopolitical.length})
+              </button>
+              <button
+                onClick={() => setBriefingTab("hazards")}
+                className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-semibold transition-all ${
+                  briefingTab === "hazards"
+                    ? "bg-amber-500/20 text-amber-400 border border-amber-500/30"
+                    : "text-slate-400 hover:text-slate-200"
+                }`}
+              >
+                <AlertTriangle className="h-3.5 w-3.5" />
+                Hazards & Human Impact ({briefing.humanitarian_hazards.length})
+              </button>
+              <button
+                onClick={() => setBriefingTab("economic")}
+                className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-semibold transition-all ${
+                  briefingTab === "economic"
+                    ? "bg-emerald-500/20 text-emerald-400 border border-emerald-500/30"
+                    : "text-slate-400 hover:text-slate-200"
+                }`}
+              >
+                <TrendingUp className="h-3.5 w-3.5" />
+                Economic Disruptions ({briefing.economic_disruptions.length})
+              </button>
+            </div>
+
+            {/* Briefing Cards Grid */}
+            <div className="mt-4 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+              {(() => {
+                const currentItems: BriefingItem[] = 
+                  briefingTab === "breaking" ? briefing.breaking_alerts :
+                  briefingTab === "geopolitical" ? briefing.critical_geopolitical :
+                  briefingTab === "hazards" ? briefing.humanitarian_hazards :
+                  briefing.economic_disruptions;
+
+                if (!currentItems || currentItems.length === 0) {
+                  return (
+                    <div className="col-span-full py-8 text-center text-xs text-slate-500 italic">
+                      No active alerts currently meeting high-urgency threshold in this sector.
+                    </div>
+                  );
+                }
+
+                return currentItems.map((item) => (
+                  <div
+                    key={item.event_id}
+                    onClick={() => setSelectedEventId(item.event_id)}
+                    className="group flex flex-col justify-between rounded-xl border border-slate-800 bg-slate-900/80 p-4 hover:border-amber-500/40 hover:bg-slate-900 transition-all cursor-pointer shadow-sm hover:shadow-md"
+                  >
+                    <div>
+                      <div className="flex items-center justify-between text-[11px] mb-2">
+                        <span className="font-mono text-amber-400 flex items-center gap-1">
+                          <MapPin className="h-3 w-3" />
+                          {item.location}
+                        </span>
+                        <div className="flex items-center gap-1.5 font-mono">
+                          <span className="text-[10px] text-slate-500">Imp:</span>
+                          <span className="font-bold text-sky-400">{item.importance.toFixed(1)}</span>
+                          <span className="text-[10px] text-slate-500 ml-1">Vel:</span>
+                          <span className="font-bold text-rose-400">{item.velocity.toFixed(1)}/h</span>
+                        </div>
+                      </div>
+
+                      <h3 className="text-sm font-semibold text-white group-hover:text-amber-300 transition-colors line-clamp-2">
+                        {item.title}
+                      </h3>
+
+                      <p className="text-xs text-slate-400 mt-2 line-clamp-2 leading-relaxed">
+                        {item.summary}
+                      </p>
+                    </div>
+
+                    <div className="mt-3 pt-3 border-t border-slate-800/80">
+                      <div className="flex items-start gap-1.5 text-[11px] text-slate-300">
+                        <span className="font-semibold text-amber-400 shrink-0">Why It Matters:</span>
+                        <span className="text-slate-400 line-clamp-2 italic">{item.key_takeaway}</span>
+                      </div>
+                      <div className="mt-2 flex items-center justify-end text-[10px] text-sky-400 group-hover:translate-x-0.5 transition-transform">
+                        <span>Inspect Dossier</span>
+                        <ChevronRight className="h-3 w-3 ml-0.5" />
+                      </div>
+                    </div>
+                  </div>
+                ));
+              })()}
+            </div>
+          </div>
+        )}
+
+        {/* Global Intelligence Search & Filter Bar */}
+        <div className="rounded-2xl border border-slate-800 bg-slate-900/30 p-4 shadow-lg backdrop-blur-sm">
+          <form onSubmit={handleSearchSubmit} className="flex flex-col sm:flex-row items-center gap-3">
+            <div className="relative flex-1 w-full">
+              <Search className="absolute left-3.5 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-400" />
+              <input
+                type="text"
+                value={searchQuery}
+                onChange={(e) => setSearchQuery(e.target.value)}
+                placeholder="Search events by keyword, city, country, or topic (e.g. 'Iceland', 'Taiwan', 'typhoon', 'treaty')..."
+                className="w-full rounded-xl border border-slate-800 bg-slate-950/80 py-2.5 pl-10 pr-4 text-xs text-slate-200 placeholder-slate-500 focus:border-sky-500 focus:outline-none focus:ring-1 focus:ring-sky-500 transition-all"
+              />
+              {searchQuery && (
+                <button
+                  type="button"
+                  onClick={handleClearSearch}
+                  className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-500 hover:text-slate-300 text-xs px-1"
+                >
+                  Clear
+                </button>
+              )}
+            </div>
+            <button
+              type="submit"
+              disabled={isSearching}
+              className="flex items-center gap-2 rounded-xl bg-sky-600 px-5 py-2.5 text-xs font-medium text-white hover:bg-sky-500 transition-all disabled:opacity-50 shrink-0 w-full sm:w-auto justify-center"
+            >
+              {isSearching ? (
+                <>
+                  <Activity className="h-3.5 w-3.5 animate-spin" />
+                  <span>Searching...</span>
+                </>
+              ) : (
+                <>
+                  <Search className="h-3.5 w-3.5" />
+                  <span>Search Intel</span>
+                </>
+              )}
+            </button>
+          </form>
+          {searchQuery && (
+            <div className="mt-2.5 flex items-center justify-between text-xs text-slate-400 px-1">
+              <span>
+                Filtering by query: <strong className="text-sky-300 font-mono">"{searchQuery}"</strong> ({events.length} match{events.length === 1 ? "" : "es"})
+              </span>
+              <button 
+                onClick={handleClearSearch}
+                className="text-sky-400 hover:underline text-[11px]"
+              >
+                Reset to all events
+              </button>
+            </div>
+          )}
         </div>
 
         {/* Interactive World Map (Phase 6 Active) */}

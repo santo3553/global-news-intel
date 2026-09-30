@@ -8,6 +8,7 @@ from apps.api.app.routes.sources import router as sources_router
 from apps.api.app.routes.articles import router as articles_router
 from apps.api.app.routes.extraction import router as extraction_router
 from apps.api.app.routes.events import router as events_router
+from apps.api.app.routes.briefing import router as briefing_router
 import logging
 
 logging.basicConfig(
@@ -56,6 +57,7 @@ app.include_router(sources_router)
 app.include_router(articles_router)
 app.include_router(extraction_router)
 app.include_router(events_router)
+app.include_router(briefing_router)
 
 
 @app.get("/", tags=["General"])

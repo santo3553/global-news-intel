@@ -6,6 +6,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from apps.api.app.database import get_db
 from apps.api.app.models import Article
 from apps.api.app.schemas.event import EventResponse, EventDetailResponse
+from apps.api.app.schemas.briefing import EventTimelineResponse
 from apps.api.app.services.event_service import EventService
 from workers.clustering.clusterer import EventClusterer
 from ai.providers.factory import get_ai_provider
@@ -77,6 +78,18 @@ async def get_nearby_events(
     )
 
 
+@router.get("/search", response_model=List[EventResponse], summary="Full-text search events")
+async def search_events(
+    q: str = Query(..., min_length=1, description="Search term for title, summary, location, or category"),
+    limit: int = Query(25, ge=1, le=100),
+    db: AsyncSession = Depends(get_db)
+):
+    """
+    Search events by keyword across titles, summaries, countries, and categories.
+    """
+    return await EventService.search_events(session=db, query=q, limit=limit)
+
+
 @router.get("/{event_id}", response_model=EventDetailResponse, summary="Get full event details with linked articles")
 async def get_event(event_id: str, db: AsyncSession = Depends(get_db)):
     """
@@ -89,6 +102,18 @@ async def get_event(event_id: str, db: AsyncSession = Depends(get_db)):
             detail=f"Event '{event_id}' not found"
         )
     return evt_detail
+
+
+@router.get("/{event_id}/timeline", response_model=EventTimelineResponse, summary="Get event chronological timeline")
+async def get_event_timeline(event_id: str, db: AsyncSession = Depends(get_db)):
+    """
+    Chronological progression of articles and updates that developed this event.
+    """
+    try:
+        from apps.api.app.services.briefing_service import BriefingService
+        return await BriefingService.get_event_timeline(db, event_id)
+    except ValueError as e:
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail=str(e))
 
 
 @router.post("/cluster", summary="Run clustering cycle over unclustered articles")

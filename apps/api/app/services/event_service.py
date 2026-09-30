@@ -1,6 +1,6 @@
 import logging
 from typing import List, Optional, Dict, Any, Tuple
-from sqlalchemy import select, and_, func
+from sqlalchemy import select, and_, or_, func
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.orm import selectinload
 
@@ -228,3 +228,64 @@ class EventService:
 
         nearby.sort(key=lambda x: x["distance_km"])
         return nearby[:limit]
+
+    @classmethod
+    async def search_events(
+        cls,
+        session: AsyncSession,
+        query: str,
+        limit: int = 25
+    ) -> List[Dict[str, Any]]:
+        """
+        Full-text search across canonical title, summary, country, and city.
+        """
+        q = f"%{query.strip()}%"
+        stmt = (
+            select(Event)
+            .options(selectinload(Event.article_associations))
+            .where(
+                or_(
+                    Event.canonical_title.ilike(q),
+                    Event.summary.ilike(q),
+                    Event.country.ilike(q),
+                    Event.city.ilike(q),
+                    Event.category.ilike(q)
+                )
+            )
+            .order_by(Event.importance_score.desc())
+            .limit(limit)
+        )
+        res = await session.execute(stmt)
+        events = res.scalars().all()
+
+        output = []
+        for evt in events:
+            evt_dict = {
+                "id": evt.id,
+                "canonical_title": evt.canonical_title,
+                "summary": evt.summary,
+                "category": evt.category,
+                "subcategory": evt.subcategory,
+                "latitude": evt.latitude,
+                "longitude": evt.longitude,
+                "country": evt.country,
+                "admin_region": evt.admin_region,
+                "city": evt.city,
+                "location_confidence": evt.location_confidence,
+                "importance_score": evt.importance_score,
+                "confidence_score": evt.confidence_score,
+                "human_impact_score": evt.human_impact_score,
+                "global_impact_score": evt.global_impact_score,
+                "economic_impact_score": evt.economic_impact_score,
+                "political_impact_score": evt.political_impact_score,
+                "novelty_score": evt.novelty_score,
+                "development_velocity_score": evt.development_velocity_score,
+                "source_coverage_score": evt.source_coverage_score,
+                "first_seen_at": evt.first_seen_at,
+                "last_updated_at": evt.last_updated_at,
+                "status": evt.status,
+                "article_count": len(evt.article_associations)
+            }
+            output.append(evt_dict)
+        return output
+
