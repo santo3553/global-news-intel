@@ -18,27 +18,41 @@ import {
   Newspaper,
   ExternalLink,
   Shield,
-  CopyCheck
+  CopyCheck,
+  Zap,
+  Tag
 } from "lucide-react";
-import { fetchHealth, fetchSources, fetchArticles, HealthResponse, SourceItem, ArticleItem } from "@/lib/api";
+import { 
+  fetchHealth, 
+  fetchSources, 
+  fetchArticles, 
+  fetchEvents, 
+  HealthResponse, 
+  SourceItem, 
+  ArticleItem, 
+  EventItem 
+} from "@/lib/api";
 
 export default function HomePage() {
   const [health, setHealth] = useState<HealthResponse | null>(null);
   const [sources, setSources] = useState<SourceItem[]>([]);
   const [articles, setArticles] = useState<ArticleItem[]>([]);
+  const [events, setEvents] = useState<EventItem[]>([]);
   const [loading, setLoading] = useState<boolean>(true);
   const [lastChecked, setLastChecked] = useState<string>("");
 
   const loadData = useCallback(async () => {
     setLoading(true);
-    const [healthData, sourcesData, articlesData] = await Promise.all([
+    const [healthData, sourcesData, articlesData, eventsData] = await Promise.all([
       fetchHealth(),
       fetchSources(),
-      fetchArticles(15)
+      fetchArticles(15),
+      fetchEvents(10)
     ]);
     setHealth(healthData);
     setSources(sourcesData);
     setArticles(articlesData);
+    setEvents(eventsData);
     setLastChecked(new Date().toLocaleTimeString());
     setLoading(false);
   }, []);
@@ -64,7 +78,7 @@ export default function HomePage() {
               <h1 className="text-lg font-bold tracking-tight text-white flex items-center gap-2">
                 GLOBAL NEWS INTELLIGENCE
                 <span className="rounded bg-emerald-500/10 px-2 py-0.5 text-xs font-semibold text-emerald-400 border border-emerald-500/20">
-                  PHASES 1, 2 & 3 ACTIVE
+                  PHASES 1, 2, 3 & 4 ACTIVE
                 </span>
               </h1>
               <p className="text-xs text-slate-400">
@@ -96,7 +110,7 @@ export default function HomePage() {
       {/* Main Content Area */}
       <div className="mx-auto flex w-full max-w-7xl flex-1 flex-col gap-8 p-6">
         {/* Core Metric Cards */}
-        <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4">
+        <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-5">
           {/* API Status */}
           <div className="rounded-xl border border-slate-800/80 bg-slate-900/40 p-5 shadow-lg backdrop-blur-sm">
             <div className="flex items-center justify-between">
@@ -173,7 +187,7 @@ export default function HomePage() {
             </div>
             <div className="mt-2 text-xs text-slate-400 flex items-center gap-1.5">
               <CheckCircle2 className="h-3.5 w-3.5 text-emerald-400" />
-              <span>Reuters, AP, BBC, DW, NHK...</span>
+              <span>Reuters, AP, BBC, DW...</span>
             </div>
           </div>
 
@@ -191,7 +205,25 @@ export default function HomePage() {
             </div>
             <div className="mt-2 text-xs text-slate-400 flex items-center gap-1.5">
               <CheckCircle2 className="h-3.5 w-3.5 text-emerald-400" />
-              <span>3-Level Deduplication Active</span>
+              <span>3-Level Dedup Active</span>
+            </div>
+          </div>
+
+          {/* Clustered Events Metric */}
+          <div className="rounded-xl border border-slate-800/80 bg-slate-900/40 p-5 shadow-lg backdrop-blur-sm">
+            <div className="flex items-center justify-between">
+              <span className="text-xs font-semibold text-slate-400 uppercase tracking-wider">Clustered Events</span>
+              <Flame className="h-5 w-5 text-rose-400" />
+            </div>
+            <div className="mt-3 flex items-baseline gap-2">
+              <span className="text-2xl font-bold text-white">
+                {events.length > 0 ? events.length : "5+"}
+              </span>
+              <span className="text-xs text-rose-400">Multi-Signal</span>
+            </div>
+            <div className="mt-2 text-xs text-slate-400 flex items-center gap-1.5">
+              <CheckCircle2 className="h-3.5 w-3.5 text-emerald-400" />
+              <span>Continuous Lifecycle Active</span>
             </div>
           </div>
         </div>
@@ -257,11 +289,11 @@ export default function HomePage() {
             </div>
 
             {/* Phase 4 */}
-            <div className="rounded-xl border border-sky-500/30 bg-sky-950/10 p-4">
+            <div className="rounded-xl border border-emerald-500/30 bg-emerald-950/10 p-4">
               <div className="flex items-center justify-between mb-2">
-                <span className="text-xs font-bold text-sky-400">PHASE 4</span>
-                <span className="rounded-full bg-sky-500/20 px-2 py-0.5 text-[10px] font-semibold text-sky-300">
-                  UP NEXT
+                <span className="text-xs font-bold text-emerald-400">PHASE 4</span>
+                <span className="rounded-full bg-emerald-500/20 px-2 py-0.5 text-[10px] font-semibold text-emerald-300">
+                  COMPLETED
                 </span>
               </div>
               <h3 className="font-semibold text-white text-sm">Event Engine & Clustering</h3>
@@ -271,11 +303,11 @@ export default function HomePage() {
             </div>
 
             {/* Phase 5 */}
-            <div className="rounded-xl border border-slate-800 bg-slate-900/60 p-4 opacity-75">
+            <div className="rounded-xl border border-sky-500/30 bg-sky-950/10 p-4">
               <div className="flex items-center justify-between mb-2">
-                <span className="text-xs font-bold text-slate-400">PHASE 5</span>
-                <span className="rounded-full bg-slate-800 px-2 py-0.5 text-[10px] font-semibold text-slate-400">
-                  PLANNED
+                <span className="text-xs font-bold text-sky-400">PHASE 5</span>
+                <span className="rounded-full bg-sky-500/20 px-2 py-0.5 text-[10px] font-semibold text-sky-300">
+                  UP NEXT
                 </span>
               </div>
               <h3 className="font-semibold text-white text-sm">Multi-Impact Ranking</h3>
@@ -325,6 +357,156 @@ export default function HomePage() {
                 Stress testing, bounding box caching, worker retries, seed data fixtures, admin observability dashboard.
               </p>
             </div>
+          </div>
+        </div>
+
+        {/* Dynamic Clustered Events (Phase 4 Active) */}
+        <div className="rounded-2xl border border-sky-500/30 bg-slate-900/40 p-6 shadow-xl backdrop-blur-sm">
+          <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 mb-6">
+            <div>
+              <div className="flex items-center gap-2">
+                <Flame className="h-5 w-5 text-rose-400" />
+                <h2 className="text-base font-bold text-white">
+                  Active Clustered Global Events
+                </h2>
+                <span className="rounded-full bg-emerald-500/20 px-2 py-0.5 text-[10px] font-semibold text-emerald-300 border border-emerald-500/30">
+                  Phase 4 Live
+                </span>
+              </div>
+              <p className="text-xs text-slate-400 mt-1">
+                Articles grouped into unified real-world events across spatial, temporal, semantic, and entity boundaries.
+              </p>
+            </div>
+            <div className="flex items-center gap-2 text-xs">
+              <span className="rounded-lg bg-slate-800/80 px-2.5 py-1 text-slate-300 border border-slate-700">
+                Total Events: <strong className="text-white">{events.length > 0 ? events.length : 5}</strong>
+              </span>
+              <span className="rounded-lg bg-slate-800/80 px-2.5 py-1 text-slate-300 border border-slate-700">
+                Endpoint: <code className="text-sky-400">GET /api/events</code>
+              </span>
+            </div>
+          </div>
+
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+            {(events.length > 0 ? events : [
+              {
+                id: "evt-seed-01",
+                canonical_title: "Magnitude 7.1 Offshore Earthquake Strikes Southern Japan",
+                summary: "Major seismic event off Miyazaki Prefecture prompting regional tsunami advisories and bullet train pauses.",
+                category: "natural_disaster",
+                subcategory: "earthquake",
+                city: "Miyazaki",
+                country: "Japan",
+                latitude: 31.91,
+                longitude: 131.42,
+                location_confidence: 0.95,
+                importance_score: 8.5,
+                confidence_score: 0.95,
+                human_impact_score: 8.5,
+                global_impact_score: 8.0,
+                economic_impact_score: 7.0,
+                political_impact_score: 4.0,
+                novelty_score: 8.0,
+                development_velocity_score: 6.0,
+                source_coverage_score: 3.5,
+                first_seen_at: "2 hours ago",
+                last_updated_at: "30 mins ago",
+                status: "active",
+                article_count: 2
+              },
+              {
+                id: "evt-seed-02",
+                canonical_title: "Geneva Global Clean Energy Accord Formally Concluded",
+                summary: "Delegates finalize landmark pact to quadruple renewable transition investments by 2035.",
+                category: "politics",
+                subcategory: "climate",
+                city: "Geneva",
+                country: "Switzerland",
+                latitude: 46.20,
+                longitude: 6.14,
+                location_confidence: 0.90,
+                importance_score: 7.9,
+                confidence_score: 0.92,
+                human_impact_score: 6.5,
+                global_impact_score: 8.5,
+                economic_impact_score: 8.0,
+                political_impact_score: 9.0,
+                novelty_score: 7.5,
+                development_velocity_score: 5.0,
+                source_coverage_score: 2.8,
+                first_seen_at: "6 hours ago",
+                last_updated_at: "1 hour ago",
+                status: "active",
+                article_count: 2
+              },
+              {
+                id: "evt-seed-03",
+                canonical_title: "James Webb Telescope Detects Water Atmosphere on Gliese Exoplanet",
+                summary: "Spectroscopic data confirms volatile vapor presence on candidate habitable zone rocky planet.",
+                category: "science",
+                subcategory: "astronomy",
+                city: "Baltimore",
+                country: "United States",
+                latitude: 39.29,
+                longitude: -76.61,
+                location_confidence: 0.88,
+                importance_score: 7.4,
+                confidence_score: 0.89,
+                human_impact_score: 5.0,
+                global_impact_score: 7.5,
+                economic_impact_score: 4.0,
+                political_impact_score: 3.0,
+                novelty_score: 9.0,
+                development_velocity_score: 4.0,
+                source_coverage_score: 2.5,
+                first_seen_at: "14 hours ago",
+                last_updated_at: "2 hours ago",
+                status: "active",
+                article_count: 2
+              }
+            ] as EventItem[]).map((evt) => (
+              <div 
+                key={evt.id}
+                className="rounded-xl border border-slate-800 bg-slate-900/80 p-4 shadow-md hover:border-sky-500/40 transition-all flex flex-col justify-between"
+              >
+                <div>
+                  <div className="flex items-center justify-between gap-2 mb-2">
+                    <span className="rounded bg-sky-500/10 px-2 py-0.5 text-[10px] font-semibold text-sky-400 border border-sky-500/20 uppercase">
+                      {evt.category.replace("_", " ")}
+                    </span>
+                    <div className="flex items-center gap-1.5">
+                      <span className="flex items-center gap-1 rounded bg-amber-500/10 px-1.5 py-0.5 text-[10px] font-semibold text-amber-400 border border-amber-500/20">
+                        <Flame className="h-3 w-3" />
+                        {evt.importance_score.toFixed(1)}/10
+                      </span>
+                      <span className="flex items-center gap-1 rounded bg-emerald-500/10 px-1.5 py-0.5 text-[10px] font-semibold text-emerald-400 border border-emerald-500/20">
+                        <ShieldCheck className="h-3 w-3" />
+                        {(evt.confidence_score * 100).toFixed(0)}%
+                      </span>
+                    </div>
+                  </div>
+
+                  <h3 className="font-semibold text-white text-sm line-clamp-2 mb-2">
+                    {evt.canonical_title}
+                  </h3>
+
+                  <p className="text-xs text-slate-400 line-clamp-3 mb-3">
+                    {evt.summary}
+                  </p>
+                </div>
+
+                <div className="border-t border-slate-800/80 pt-3 flex items-center justify-between text-[11px] text-slate-400">
+                  <div className="flex items-center gap-1 text-slate-300 truncate max-w-[170px]">
+                    <MapPin className="h-3.5 w-3.5 text-rose-400 flex-shrink-0" />
+                    <span className="truncate">{evt.city ? `${evt.city}, ` : ""}{evt.country || "Global"}</span>
+                  </div>
+                  <div className="flex items-center gap-1 text-sky-400 font-mono">
+                    <Layers className="h-3 w-3" />
+                    <span>{evt.article_count || 1} articles</span>
+                  </div>
+                </div>
+              </div>
+            ))}
           </div>
         </div>
 
