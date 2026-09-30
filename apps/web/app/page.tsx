@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState, useCallback } from "react";
+import { useEffect, useState, useCallback, useMemo } from "react";
 import dynamic from "next/dynamic";
 import { 
   Globe2, 
@@ -30,7 +30,8 @@ import {
   FileText,
   ChevronRight,
   Play,
-  CheckCircle
+  CheckCircle,
+  RotateCcw
 } from "lucide-react";
 import { 
   fetchHealth, 
@@ -74,6 +75,11 @@ export default function HomePage() {
   const [briefing, setBriefing] = useState<IntelligenceBriefingResponse | null>(null);
   const [selectedEventId, setSelectedEventId] = useState<string | null>(null);
   const [mapBbox, setMapBbox] = useState<string>("");
+  const [mapZoom, setMapZoom] = useState<number>(1.8);
+  const [isViewportSyncActive, setIsViewportSyncActive] = useState<boolean>(true);
+  const [selectedMapCategory, setSelectedMapCategory] = useState<string>("all");
+  const [resetViewTrigger, setResetViewTrigger] = useState<number>(0);
+  const [focusedEventCoords, setFocusedEventCoords] = useState<{ lng: number; lat: number } | null>(null);
   const [sortBy, setSortBy] = useState<string>("importance");
   const [searchQuery, setSearchQuery] = useState<string>("");
   const [isSearching, setIsSearching] = useState<boolean>(false);
@@ -90,7 +96,7 @@ export default function HomePage() {
       fetchHealth(),
       fetchSources(),
       fetchArticles(15),
-      searchQuery.trim() ? searchEvents(searchQuery.trim()) : fetchEvents(25, sortBy),
+      searchQuery.trim() ? searchEvents(searchQuery.trim(), 100) : fetchEvents(100, sortBy),
       fetchBriefing(),
       fetchPipelineStatus()
     ]);
@@ -115,12 +121,12 @@ export default function HomePage() {
   const handleSearchSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!searchQuery.trim()) {
-      const data = await fetchEvents(25, sortBy);
+      const data = await fetchEvents(100, sortBy);
       setEvents(data);
       return;
     }
     setIsSearching(true);
-    const results = await searchEvents(searchQuery.trim());
+    const results = await searchEvents(searchQuery.trim(), 100);
     setEvents(results);
     setIsSearching(false);
   };
@@ -128,9 +134,85 @@ export default function HomePage() {
   const handleClearSearch = async () => {
     setSearchQuery("");
     setIsSearching(true);
-    const data = await fetchEvents(25, sortBy);
+    const data = await fetchEvents(100, sortBy);
     setEvents(data);
     setIsSearching(false);
+  };
+
+  // Determine whether the map is currently zoomed into a region
+  const isZoomedIn = useMemo(() => {
+    if (!mapBbox) return false;
+    const parts = mapBbox.split(",").map(Number);
+    if (parts.length !== 4 || parts.some(isNaN)) return false;
+    const [w, s, e, n] = parts;
+    const lngSpan = Math.abs(e - w);
+    const latSpan = Math.abs(n - s);
+    return mapZoom >= 2.2 || lngSpan < 280 || latSpan < 130;
+  }, [mapBbox, mapZoom]);
+
+  // Compute the visible and ranked events for the news section
+  const visibleRankedEvents = useMemo(() => {
+    let list = [...events];
+
+    // Filter by map category if selected and not "all"
+    if (selectedMapCategory && selectedMapCategory !== "all") {
+      list = list.filter(e => e.category === selectedMapCategory);
+    }
+
+    // Filter by visible map bounding box when viewport sync is active and zoomed in
+    if (isViewportSyncActive && isZoomedIn && mapBbox) {
+      const parts = mapBbox.split(",").map(Number);
+      if (parts.length === 4 && !parts.some(isNaN)) {
+        const [w, s, e, n] = parts;
+        const minLat = Math.min(s, n);
+        const maxLat = Math.max(s, n);
+
+        list = list.filter(evt => {
+          const lat = evt.latitude;
+          const lng = evt.longitude;
+          if (lat < minLat || lat > maxLat) return false;
+          if (w > e) {
+            // Antimeridian crossing wrap
+            return lng >= w || lng <= e;
+          } else {
+            return lng >= w && lng <= e;
+          }
+        });
+      }
+    }
+
+    // Rank events by the chosen ranking dimension
+    list.sort((a, b) => {
+      if (sortBy === "importance") {
+        return (b.importance_score ?? 0) - (a.importance_score ?? 0);
+      }
+      if (sortBy === "confidence") {
+        return (b.confidence_score ?? 0) - (a.confidence_score ?? 0);
+      }
+      if (sortBy === "velocity") {
+        return (b.development_velocity_score ?? 0) - (a.development_velocity_score ?? 0);
+      }
+      if (sortBy === "recent") {
+        const timeA = new Date(a.last_updated_at || a.first_seen_at).getTime();
+        const timeB = new Date(b.last_updated_at || b.first_seen_at).getTime();
+        return timeB - timeA;
+      }
+      return 0;
+    });
+
+    return list;
+  }, [events, mapBbox, isZoomedIn, isViewportSyncActive, selectedMapCategory, sortBy]);
+
+  const handleResetToGlobal = () => {
+    setResetViewTrigger(prev => prev + 1);
+  };
+
+  const handleFocusEventOnMap = (lng: number, lat: number) => {
+    setFocusedEventCoords({ lng, lat });
+    const mapElement = document.getElementById("geospatial-map-section");
+    if (mapElement) {
+      mapElement.scrollIntoView({ behavior: "smooth", block: "center" });
+    }
   };
 
   useEffect(() => {
@@ -689,7 +771,7 @@ export default function HomePage() {
         </div>
 
         {/* Interactive World Map (Phase 6 Active) */}
-        <div className="space-y-4">
+        <div id="geospatial-map-section" className="space-y-4">
           <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-2">
             <div>
               <div className="flex items-center gap-2">
@@ -700,28 +782,50 @@ export default function HomePage() {
                 <span className="rounded-full bg-emerald-500/20 px-2 py-0.5 text-[10px] font-semibold text-emerald-300 border border-emerald-500/30">
                   Phase 6 Live
                 </span>
+                {isViewportSyncActive && (
+                  <span className="rounded-full bg-sky-500/20 px-2 py-0.5 text-[10px] font-semibold text-sky-300 border border-sky-500/30 flex items-center gap-1">
+                    <span className="h-1.5 w-1.5 rounded-full bg-sky-400 animate-pulse" />
+                    Viewport News Sync Active
+                  </span>
+                )}
               </div>
               <p className="text-xs text-slate-400 mt-1">
-                MapLibre GL dark matter vector/raster engine with zoom-density clustering, spatial bounding-box querying, and dynamic event inspection.
+                MapLibre GL dark matter vector/raster engine with zoom-density clustering, spatial bounding-box querying, and dynamic event inspection. Zoom or pan to rank visible news in real-time.
               </p>
             </div>
             <div className="flex items-center gap-2 text-xs text-slate-400">
-              <span className="rounded bg-slate-800/80 px-2.5 py-1 text-slate-300 border border-slate-700 font-mono">
-                Bbox: {mapBbox || "Global"}
+              <span className="rounded bg-slate-800/80 px-2.5 py-1 text-slate-300 border border-slate-700 font-mono text-[11px]">
+                Zoom: {mapZoom.toFixed(1)}x
               </span>
+              <button
+                type="button"
+                onClick={handleResetToGlobal}
+                className="flex items-center gap-1.5 rounded bg-slate-800/90 hover:bg-slate-700 px-2.5 py-1 text-slate-200 border border-slate-700 hover:border-sky-500/50 transition-all text-[11px]"
+                title="Reset map view to worldwide"
+              >
+                <RotateCcw className="h-3 w-3 text-sky-400" />
+                <span>Reset World View</span>
+              </button>
             </div>
           </div>
 
           <IntelligenceMap
             events={events}
             onSelectEvent={(id) => setSelectedEventId(id)}
-            onBoundsChange={(bbox) => setMapBbox(bbox)}
+            onBoundsChange={(bbox, zoom) => {
+              setMapBbox(bbox);
+              setMapZoom(zoom);
+            }}
+            selectedCategory={selectedMapCategory}
+            onCategoryChange={(cat) => setSelectedMapCategory(cat)}
+            resetViewTrigger={resetViewTrigger}
+            focusedEventCoords={focusedEventCoords}
           />
         </div>
 
         {/* Dynamic Clustered Events (Phase 4 & 5 Active) */}
         <div className="rounded-2xl border border-sky-500/30 bg-slate-900/40 p-6 shadow-xl backdrop-blur-sm">
-          <div className="flex flex-col lg:flex-row items-start lg:items-center justify-between gap-4 mb-6">
+          <div className="flex flex-col lg:flex-row items-start lg:items-center justify-between gap-4 mb-4">
             <div>
               <div className="flex items-center gap-2">
                 <Flame className="h-5 w-5 text-rose-400" />
@@ -731,14 +835,48 @@ export default function HomePage() {
                 <span className="rounded-full bg-emerald-500/20 px-2 py-0.5 text-[10px] font-semibold text-emerald-300 border border-emerald-500/30">
                   Phases 4 & 5 Live
                 </span>
+                {isViewportSyncActive && isZoomedIn && (
+                  <span className="rounded-full bg-sky-500/20 px-2 py-0.5 text-[10px] font-semibold text-sky-300 border border-sky-500/30 flex items-center gap-1">
+                    <span className="h-1.5 w-1.5 rounded-full bg-sky-400 animate-ping" />
+                    Spatial Bbox Filtered ({visibleRankedEvents.length} in view)
+                  </span>
+                )}
               </div>
               <p className="text-xs text-slate-400 mt-1">
                 8-dimension impact ranking, multi-source reliability confidence, and continuous lifecycle clustering.
               </p>
             </div>
 
-            {/* Interactive Sort Dimension Controls */}
+            {/* Interactive Controls & Viewport Sync Toggle */}
             <div className="flex flex-wrap items-center gap-2 text-xs">
+              {/* Viewport Sync Toggle */}
+              <button
+                type="button"
+                onClick={() => setIsViewportSyncActive(!isViewportSyncActive)}
+                className={`flex items-center gap-1.5 rounded-lg px-2.5 py-1 text-xs font-medium border transition-all ${
+                  isViewportSyncActive
+                    ? "bg-sky-500/20 text-sky-300 border-sky-500/40 hover:bg-sky-500/30"
+                    : "bg-slate-800/80 text-slate-400 border-slate-700 hover:text-slate-200"
+                }`}
+                title={isViewportSyncActive ? "Map sync active: only showing events in visible map viewport" : "Map sync disabled: showing all global events"}
+              >
+                <span className={`h-2 w-2 rounded-full ${isViewportSyncActive ? "bg-sky-400" : "bg-slate-500"}`} />
+                <span>Map Sync: {isViewportSyncActive ? "ON" : "OFF"}</span>
+              </button>
+
+              {isViewportSyncActive && isZoomedIn && (
+                <button
+                  type="button"
+                  onClick={handleResetToGlobal}
+                  className="flex items-center gap-1 rounded-lg bg-slate-800/90 hover:bg-slate-800 text-slate-300 hover:text-white px-2.5 py-1 text-xs border border-slate-700 transition-all"
+                >
+                  <RotateCcw className="h-3 w-3 text-sky-400" />
+                  <span>Reset to Worldwide</span>
+                </button>
+              )}
+
+              <div className="h-4 w-px bg-slate-800 mx-1 hidden sm:block" />
+
               <span className="text-slate-400 mr-1 text-[11px]">Rank by:</span>
               <button
                 onClick={() => setSortBy("importance")}
@@ -783,148 +921,143 @@ export default function HomePage() {
             </div>
           </div>
 
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-            {(events.length > 0 ? events : [
-              {
-                id: "evt-seed-01",
-                canonical_title: "Magnitude 7.1 Offshore Earthquake Strikes Southern Japan",
-                summary: "Major seismic event off Miyazaki Prefecture prompting regional tsunami advisories and bullet train pauses.",
-                category: "natural_disaster",
-                subcategory: "earthquake",
-                city: "Miyazaki",
-                country: "Japan",
-                latitude: 31.91,
-                longitude: 131.42,
-                location_confidence: 0.95,
-                importance_score: 8.5,
-                confidence_score: 0.95,
-                human_impact_score: 8.5,
-                global_impact_score: 8.0,
-                economic_impact_score: 7.0,
-                political_impact_score: 4.0,
-                novelty_score: 8.0,
-                development_velocity_score: 6.0,
-                source_coverage_score: 3.5,
-                first_seen_at: "2 hours ago",
-                last_updated_at: "30 mins ago",
-                status: "active",
-                article_count: 2
-              },
-              {
-                id: "evt-seed-02",
-                canonical_title: "Geneva Global Clean Energy Accord Formally Concluded",
-                summary: "Delegates finalize landmark pact to quadruple renewable transition investments by 2035.",
-                category: "politics",
-                subcategory: "climate",
-                city: "Geneva",
-                country: "Switzerland",
-                latitude: 46.20,
-                longitude: 6.14,
-                location_confidence: 0.90,
-                importance_score: 7.9,
-                confidence_score: 0.92,
-                human_impact_score: 6.5,
-                global_impact_score: 8.5,
-                economic_impact_score: 8.0,
-                political_impact_score: 9.0,
-                novelty_score: 7.5,
-                development_velocity_score: 5.0,
-                source_coverage_score: 2.8,
-                first_seen_at: "6 hours ago",
-                last_updated_at: "1 hour ago",
-                status: "active",
-                article_count: 2
-              },
-              {
-                id: "evt-seed-03",
-                canonical_title: "James Webb Telescope Detects Water Atmosphere on Gliese Exoplanet",
-                summary: "Spectroscopic data confirms volatile vapor presence on candidate habitable zone rocky planet.",
-                category: "science",
-                subcategory: "astronomy",
-                city: "Baltimore",
-                country: "United States",
-                latitude: 39.29,
-                longitude: -76.61,
-                location_confidence: 0.88,
-                importance_score: 7.4,
-                confidence_score: 0.89,
-                human_impact_score: 5.0,
-                global_impact_score: 7.5,
-                economic_impact_score: 4.0,
-                political_impact_score: 3.0,
-                novelty_score: 9.0,
-                development_velocity_score: 4.0,
-                source_coverage_score: 2.5,
-                first_seen_at: "14 hours ago",
-                last_updated_at: "2 hours ago",
-                status: "active",
-                article_count: 2
-              }
-            ] as EventItem[]).map((evt) => (
-              <div 
-                key={evt.id}
-                onClick={() => setSelectedEventId(evt.id)}
-                className="cursor-pointer rounded-xl border border-slate-800 bg-slate-900/80 p-4 shadow-md hover:border-sky-500/60 hover:bg-slate-900 transition-all flex flex-col justify-between"
-              >
-                <div>
-                  <div className="flex items-center justify-between gap-2 mb-2">
-                    <span className="rounded bg-sky-500/10 px-2 py-0.5 text-[10px] font-semibold text-sky-400 border border-sky-500/20 uppercase">
-                      {evt.category.replace("_", " ")}
-                    </span>
-                    <div className="flex items-center gap-1.5">
-                      <span className="flex items-center gap-1 rounded bg-amber-500/10 px-1.5 py-0.5 text-[10px] font-semibold text-amber-400 border border-amber-500/20">
-                        <Flame className="h-3 w-3" />
-                        {evt.importance_score.toFixed(1)}/10
-                      </span>
-                      <span className="flex items-center gap-1 rounded bg-emerald-500/10 px-1.5 py-0.5 text-[10px] font-semibold text-emerald-400 border border-emerald-500/20">
-                        <ShieldCheck className="h-3 w-3" />
-                        {(evt.confidence_score * 100).toFixed(0)}%
-                      </span>
-                    </div>
-                  </div>
-
-                  <h3 className="font-semibold text-white text-sm line-clamp-2 mb-2">
-                    {evt.canonical_title}
-                  </h3>
-
-                  <p className="text-xs text-slate-400 line-clamp-3 mb-3">
-                    {evt.summary}
-                  </p>
-
-                  {/* Impact Dimensions Strip */}
-                  <div className="grid grid-cols-4 gap-1.5 py-2 px-2.5 rounded-lg bg-slate-950/50 border border-slate-800/60 mb-3 text-[10px]">
-                    <div className="flex flex-col">
-                      <span className="text-slate-500">Human</span>
-                      <span className="font-semibold text-rose-300">{evt.human_impact_score?.toFixed(1) || "5.0"}</span>
-                    </div>
-                    <div className="flex flex-col">
-                      <span className="text-slate-500">Global</span>
-                      <span className="font-semibold text-sky-300">{evt.global_impact_score?.toFixed(1) || "5.0"}</span>
-                    </div>
-                    <div className="flex flex-col">
-                      <span className="text-slate-500">Velocity</span>
-                      <span className="font-semibold text-amber-300">{evt.development_velocity_score?.toFixed(1) || "4.0"}</span>
-                    </div>
-                    <div className="flex flex-col">
-                      <span className="text-slate-500">Coverage</span>
-                      <span className="font-semibold text-purple-300">{evt.source_coverage_score?.toFixed(1) || "3.3"}</span>
-                    </div>
-                  </div>
-                </div>
-
-                <div className="border-t border-slate-800/80 pt-3 flex items-center justify-between text-[11px] text-slate-400">
-                  <div className="flex items-center gap-1 text-slate-300 truncate max-w-[170px]">
-                    <MapPin className="h-3.5 w-3.5 text-rose-400 flex-shrink-0" />
-                    <span className="truncate">{evt.city ? `${evt.city}, ` : ""}{evt.country || "Global"}</span>
-                  </div>
-                  <div className="flex items-center gap-1 text-sky-400 font-mono">
-                    <Layers className="h-3 w-3" />
-                    <span>{evt.article_count || 1} articles</span>
-                  </div>
-                </div>
-              </div>
-            ))}
+          {/* Viewport Info Sub-bar */}
+          <div className="flex items-center justify-between py-2 px-3 rounded-lg bg-slate-950/60 border border-slate-800/80 text-xs mb-4">
+            <div className="flex items-center gap-2">
+              <span className="text-slate-400">
+                {isViewportSyncActive && isZoomedIn ? (
+                  <>
+                    Showing <strong className="text-sky-300">{visibleRankedEvents.length}</strong> visible events in current map area, ranked by <strong className="text-white capitalize">{sortBy === "importance" ? "Highest Impact" : sortBy}</strong>
+                  </>
+                ) : (
+                  <>
+                    Showing <strong className="text-sky-300">{visibleRankedEvents.length}</strong> events worldwide, ranked by <strong className="text-white capitalize">{sortBy === "importance" ? "Highest Impact" : sortBy}</strong>
+                  </>
+                )}
+              </span>
+              {selectedMapCategory && selectedMapCategory !== "all" && (
+                <span className="rounded bg-sky-500/10 px-2 py-0.5 text-[10px] font-semibold text-sky-400 border border-sky-500/20 uppercase">
+                  Category: {selectedMapCategory.replace("_", " ")}
+                </span>
+              )}
+            </div>
+            {isViewportSyncActive && isZoomedIn && (
+              <span className="text-[11px] text-slate-500 hidden sm:inline">
+                Pan or zoom map above to update ranking
+              </span>
+            )}
           </div>
+
+          {visibleRankedEvents.length === 0 ? (
+            <div className="py-12 px-4 text-center rounded-xl border border-dashed border-slate-800 bg-slate-950/40">
+              <Globe2 className="h-10 w-10 text-slate-600 mx-auto mb-3" />
+              <h4 className="text-sm font-semibold text-slate-300">No Events in Current Map Viewport</h4>
+              <p className="text-xs text-slate-500 max-w-md mx-auto mt-1 mb-4">
+                No active clustered news events were detected within this geographic area. Pan or zoom out the map above to view events in other regions.
+              </p>
+              <div className="flex items-center justify-center gap-3">
+                <button
+                  type="button"
+                  onClick={handleResetToGlobal}
+                  className="inline-flex items-center gap-2 px-3 py-1.5 rounded-lg bg-sky-600 text-xs font-medium text-white hover:bg-sky-500 transition-all shadow-sm"
+                >
+                  <RotateCcw className="h-3.5 w-3.5" />
+                  Reset to Worldwide View
+                </button>
+                <button
+                  type="button"
+                  onClick={() => setIsViewportSyncActive(false)}
+                  className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-slate-800 text-xs font-medium text-slate-300 hover:bg-slate-700 transition-all"
+                >
+                  Disable Viewport Sync
+                </button>
+              </div>
+            </div>
+          ) : (
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+              {visibleRankedEvents.map((evt, idx) => (
+                <div 
+                  key={evt.id}
+                  onClick={() => setSelectedEventId(evt.id)}
+                  className="cursor-pointer rounded-xl border border-slate-800 bg-slate-900/80 p-4 shadow-md hover:border-sky-500/60 hover:bg-slate-900 transition-all flex flex-col justify-between group"
+                >
+                  <div>
+                    <div className="flex items-center justify-between gap-2 mb-2">
+                      <div className="flex items-center gap-2">
+                        <span className="flex items-center justify-center h-5 w-5 rounded bg-sky-500/20 text-sky-400 font-mono font-bold text-[10px] border border-sky-500/30">
+                          #{idx + 1}
+                        </span>
+                        <span className="rounded bg-sky-500/10 px-2 py-0.5 text-[10px] font-semibold text-sky-400 border border-sky-500/20 uppercase">
+                          {evt.category.replace("_", " ")}
+                        </span>
+                      </div>
+                      <div className="flex items-center gap-1.5">
+                        <span className="flex items-center gap-1 rounded bg-amber-500/10 px-1.5 py-0.5 text-[10px] font-semibold text-amber-400 border border-amber-500/20">
+                          <Flame className="h-3 w-3" />
+                          {evt.importance_score.toFixed(1)}/10
+                        </span>
+                        <span className="flex items-center gap-1 rounded bg-emerald-500/10 px-1.5 py-0.5 text-[10px] font-semibold text-emerald-400 border border-emerald-500/20">
+                          <ShieldCheck className="h-3 w-3" />
+                          {(evt.confidence_score * 100).toFixed(0)}%
+                        </span>
+                      </div>
+                    </div>
+
+                    <h3 className="font-semibold text-white text-sm line-clamp-2 mb-2 group-hover:text-sky-300 transition-colors">
+                      {evt.canonical_title}
+                    </h3>
+
+                    <p className="text-xs text-slate-400 line-clamp-3 mb-3">
+                      {evt.summary}
+                    </p>
+
+                    {/* Impact Dimensions Strip */}
+                    <div className="grid grid-cols-4 gap-1.5 py-2 px-2.5 rounded-lg bg-slate-950/50 border border-slate-800/60 mb-3 text-[10px]">
+                      <div className="flex flex-col">
+                        <span className="text-slate-500">Human</span>
+                        <span className="font-semibold text-rose-300">{evt.human_impact_score?.toFixed(1) || "5.0"}</span>
+                      </div>
+                      <div className="flex flex-col">
+                        <span className="text-slate-500">Global</span>
+                        <span className="font-semibold text-sky-300">{evt.global_impact_score?.toFixed(1) || "5.0"}</span>
+                      </div>
+                      <div className="flex flex-col">
+                        <span className="text-slate-500">Velocity</span>
+                        <span className="font-semibold text-amber-300">{evt.development_velocity_score?.toFixed(1) || "4.0"}</span>
+                      </div>
+                      <div className="flex flex-col">
+                        <span className="text-slate-500">Coverage</span>
+                        <span className="font-semibold text-purple-300">{evt.source_coverage_score?.toFixed(1) || "3.3"}</span>
+                      </div>
+                    </div>
+                  </div>
+
+                  <div className="border-t border-slate-800/80 pt-3 flex items-center justify-between text-[11px] text-slate-400">
+                    <button
+                      type="button"
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        if (evt.longitude !== undefined && evt.latitude !== undefined) {
+                          handleFocusEventOnMap(evt.longitude, evt.latitude);
+                        }
+                      }}
+                      title="Focus on map"
+                      className="flex items-center gap-1 text-slate-300 hover:text-sky-300 transition-colors truncate max-w-[170px] group/loc"
+                    >
+                      <MapPin className="h-3.5 w-3.5 text-rose-400 flex-shrink-0 group-hover/loc:scale-110 transition-transform" />
+                      <span className="truncate underline decoration-slate-600 hover:decoration-sky-400 underline-offset-2">
+                        {evt.city ? `${evt.city}, ` : ""}{evt.country || "Global"}
+                      </span>
+                    </button>
+                    <div className="flex items-center gap-1 text-sky-400 font-mono">
+                      <Layers className="h-3 w-3" />
+                      <span>{evt.article_count || 1} articles</span>
+                    </div>
+                  </div>
+                </div>
+              ))}
+            </div>
+          )}
         </div>
 
         {/* Curated Sources & Ingested Articles Grids */}

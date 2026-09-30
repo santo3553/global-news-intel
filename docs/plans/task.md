@@ -12,3 +12,4 @@
 | TASK-08 | Phase 8: Hardening & Production Polish | Completed | 15-scenario deterministic seed suite across 6 continents, 52/52 pytest passed, Next.js build exit 0, zero-regression full stack verification |
 | TASK-09 | Phase 9: Autonomous Ingestion Daemon & Live Pipeline | Completed | 55/55 pytest passed, background pipeline orchestrator, POST /api/pipeline/run, live web ingestion button, Next.js build exit 0 |
 | TASK-10 | Human News Verification Links & Real-World Article Sources | Completed | 55/55 pytest passed, Next.js build exit 0, real news links on Reuters/BBC/AP/DW/Al Jazeera/Euronews/NASA, clickable verification buttons in Timeline, Dossier & Live stream |
+| TASK-11 | Dynamic Map-to-News Viewport Connection & Real-Time Spatial Ranking | Completed | MapLibre GL zoom/pan viewport bounds reactively filter and rank visible news in real-time, rank badges (#1..#N), reset to worldwide view, focus on map buttons, 55/55 pytest passed, Next.js build exit 0 |

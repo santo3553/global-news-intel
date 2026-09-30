@@ -19,9 +19,11 @@ import "maplibre-gl/dist/maplibre-gl.css";
 interface IntelligenceMapProps {
   events: EventItem[];
   onSelectEvent: (eventId: string) => void;
-  onBoundsChange?: (bbox: string) => void;
+  onBoundsChange?: (bbox: string, zoom: number) => void;
   selectedCategory?: string;
   onCategoryChange?: (category: string) => void;
+  resetViewTrigger?: number;
+  focusedEventCoords?: { lng: number; lat: number } | null;
 }
 
 const REGION_PRESETS = [
@@ -38,7 +40,9 @@ export default function IntelligenceMap({
   onSelectEvent,
   onBoundsChange,
   selectedCategory = "all",
-  onCategoryChange
+  onCategoryChange,
+  resetViewTrigger,
+  focusedEventCoords
 }: IntelligenceMapProps) {
   const mapContainer = useRef<HTMLDivElement>(null);
   const mapRef = useRef<any>(null);
@@ -250,14 +254,19 @@ export default function IntelligenceMap({
         });
 
         // Viewport bounding box listener
-        map.on("moveend", () => {
-          setZoomLevel(Math.round(map.getZoom() * 10) / 10);
+        const emitBounds = () => {
+          const currentZoom = Math.round(map.getZoom() * 10) / 10;
+          setZoomLevel(currentZoom);
           if (onBoundsChange) {
             const bounds = map.getBounds();
             const bbox = `${bounds.getWest().toFixed(3)},${bounds.getSouth().toFixed(3)},${bounds.getEast().toFixed(3)},${bounds.getNorth().toFixed(3)}`;
-            onBoundsChange(bbox);
+            onBoundsChange(bbox, currentZoom);
           }
-        });
+        };
+
+        map.on("moveend", emitBounds);
+        // Call immediately on load to establish baseline bounds
+        emitBounds();
       });
     }
 
@@ -270,6 +279,37 @@ export default function IntelligenceMap({
       }
     };
   }, []);
+
+  // Handle external reset to global view
+  useEffect(() => {
+    if (resetViewTrigger && mapRef.current) {
+      mapRef.current.flyTo({
+        center: [15, 25],
+        zoom: 1.8,
+        essential: true,
+        duration: 1400
+      });
+    }
+  }, [resetViewTrigger]);
+
+  // Handle focusing map to a specific event's coordinates
+  useEffect(() => {
+    if (focusedEventCoords && mapRef.current) {
+      mapRef.current.flyTo({
+        center: [focusedEventCoords.lng, focusedEventCoords.lat],
+        zoom: 5.5,
+        essential: true,
+        duration: 1500
+      });
+    }
+  }, [focusedEventCoords]);
+
+  // Sync category if controlled from parent
+  useEffect(() => {
+    if (selectedCategory && selectedCategory !== activeCategory) {
+      setActiveCategory(selectedCategory);
+    }
+  }, [selectedCategory]);
 
   // Update source data when events or category changes
   useEffect(() => {
