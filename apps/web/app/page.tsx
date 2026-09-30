@@ -28,7 +28,9 @@ import {
   Sparkles,
   TrendingUp,
   FileText,
-  ChevronRight
+  ChevronRight,
+  Play,
+  CheckCircle
 } from "lucide-react";
 import { 
   fetchHealth, 
@@ -38,12 +40,16 @@ import {
   fetchEventsWithBbox,
   fetchBriefing,
   searchEvents,
+  triggerPipelineRun,
+  fetchPipelineStatus,
   HealthResponse, 
   SourceItem, 
   ArticleItem, 
   EventItem,
   IntelligenceBriefingResponse,
-  BriefingItem
+  BriefingItem,
+  PipelineTelemetry,
+  PipelineStatusResponse
 } from "@/lib/api";
 import EventDetailModal from "@/components/events/EventDetailModal";
 
@@ -74,24 +80,37 @@ export default function HomePage() {
   const [briefingTab, setBriefingTab] = useState<"breaking" | "geopolitical" | "hazards" | "economic">("breaking");
   const [loading, setLoading] = useState<boolean>(true);
   const [lastChecked, setLastChecked] = useState<string>("");
+  const [isRunningPipeline, setIsRunningPipeline] = useState<boolean>(false);
+  const [pipelineTelemetry, setPipelineTelemetry] = useState<PipelineTelemetry | null>(null);
+  const [pipelineStatus, setPipelineStatus] = useState<PipelineStatusResponse | null>(null);
 
   const loadData = useCallback(async () => {
     setLoading(true);
-    const [healthData, sourcesData, articlesData, eventsData, briefingData] = await Promise.all([
+    const [healthData, sourcesData, articlesData, eventsData, briefingData, pipeStatus] = await Promise.all([
       fetchHealth(),
       fetchSources(),
       fetchArticles(15),
       searchQuery.trim() ? searchEvents(searchQuery.trim()) : fetchEvents(25, sortBy),
-      fetchBriefing()
+      fetchBriefing(),
+      fetchPipelineStatus()
     ]);
     setHealth(healthData);
     setSources(sourcesData);
     setArticles(articlesData);
     setEvents(eventsData);
     setBriefing(briefingData);
+    setPipelineStatus(pipeStatus);
     setLastChecked(new Date().toLocaleTimeString());
     setLoading(false);
   }, [sortBy, searchQuery]);
+
+  const handleTriggerPipeline = async () => {
+    setIsRunningPipeline(true);
+    const telemetry = await triggerPipelineRun(5);
+    setPipelineTelemetry(telemetry);
+    await loadData();
+    setIsRunningPipeline(false);
+  };
 
   const handleSearchSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -135,22 +154,42 @@ export default function HomePage() {
               <h1 className="text-lg font-bold tracking-tight text-white flex items-center gap-2">
                 GLOBAL NEWS INTELLIGENCE
                 <span className="rounded bg-emerald-500/10 px-2 py-0.5 text-xs font-semibold text-emerald-400 border border-emerald-500/20">
-                  PHASES 1 - 6 ACTIVE
+                  ALL 9 PHASES OPERATIONAL
                 </span>
               </h1>
               <p className="text-xs text-slate-400">
-                Local-first Global Event Detection, Geospatial Clustering & Ranking
+                Local-first Global Event Detection, Geospatial Clustering & Autonomous Ingestion
               </p>
             </div>
           </div>
 
-          <div className="flex items-center gap-4">
+          <div className="flex items-center gap-3">
             <div className="flex items-center gap-2 rounded-full border border-slate-800 bg-slate-900/80 px-3 py-1 text-xs">
               <span className={`h-2 w-2 rounded-full ${isConnected ? "bg-emerald-400 animate-pulse" : "bg-rose-400"}`} />
               <span className="text-slate-300">
                 API: <strong className={isConnected ? "text-emerald-400" : "text-rose-400"}>{health?.status || "Checking..."}</strong>
               </span>
             </div>
+
+            {/* Run Pipeline Ingestion Button */}
+            <button
+              onClick={handleTriggerPipeline}
+              disabled={isRunningPipeline}
+              className="flex items-center gap-1.5 rounded-lg border border-sky-500/40 bg-sky-500/10 px-3.5 py-1.5 text-xs font-semibold text-sky-300 transition-all hover:bg-sky-500/20 hover:text-white disabled:opacity-50 shadow-sm"
+              title="Trigger live feed collection, deduplication, AI extraction, and clustering"
+            >
+              {isRunningPipeline ? (
+                <>
+                  <RefreshCw className="h-3.5 w-3.5 animate-spin text-sky-400" />
+                  <span>Processing Feeds...</span>
+                </>
+              ) : (
+                <>
+                  <Play className="h-3.5 w-3.5 fill-sky-400 text-sky-400" />
+                  <span>Run Live Ingestion</span>
+                </>
+              )}
+            </button>
 
             <button
               onClick={loadData}
@@ -163,6 +202,30 @@ export default function HomePage() {
           </div>
         </div>
       </header>
+
+      {/* Live Pipeline Telemetry Banner */}
+      {pipelineTelemetry && (
+        <div className="bg-sky-950/60 border-b border-sky-500/30 px-6 py-2.5 backdrop-blur-md">
+          <div className="mx-auto flex max-w-7xl items-center justify-between text-xs">
+            <div className="flex items-center gap-2 text-sky-300 font-mono">
+              <CheckCircle className="h-4 w-4 text-emerald-400 shrink-0" />
+              <span>
+                Pipeline Completed in <strong>{pipelineTelemetry.duration_seconds}s</strong> &bull; 
+                Polled <strong>{pipelineTelemetry.sources_checked}</strong> feeds &bull; 
+                Inserted <strong>{pipelineTelemetry.articles_inserted}</strong> articles &bull; 
+                Skipped <strong>{pipelineTelemetry.duplicates_skipped}</strong> duplicates &bull; 
+                <strong>+{pipelineTelemetry.events_created}</strong> new events, <strong>{pipelineTelemetry.events_updated}</strong> merged
+              </span>
+            </div>
+            <button
+              onClick={() => setPipelineTelemetry(null)}
+              className="text-slate-400 hover:text-white text-[11px] underline ml-4"
+            >
+              Dismiss
+            </button>
+          </div>
+        </div>
+      )}
 
       {/* Main Content Area */}
       <div className="mx-auto flex w-full max-w-7xl flex-1 flex-col gap-8 p-6">
@@ -402,16 +465,30 @@ export default function HomePage() {
             </div>
 
             {/* Phase 8 */}
-            <div className="rounded-xl border border-sky-500/30 bg-sky-950/10 p-4">
+            <div className="rounded-xl border border-emerald-500/30 bg-emerald-950/10 p-4">
               <div className="flex items-center justify-between mb-2">
-                <span className="text-xs font-bold text-sky-400">PHASE 8</span>
-                <span className="rounded-full bg-sky-500/20 px-2 py-0.5 text-[10px] font-semibold text-sky-300">
-                  IN PROGRESS
+                <span className="text-xs font-bold text-emerald-400">PHASE 8</span>
+                <span className="rounded-full bg-emerald-500/20 px-2 py-0.5 text-[10px] font-semibold text-emerald-300">
+                  COMPLETED
                 </span>
               </div>
-              <h3 className="font-semibold text-white text-sm">Hardening & Production</h3>
+              <h3 className="font-semibold text-white text-sm">Hardening & Polish</h3>
               <p className="text-xs text-slate-400 mt-1">
-                Multi-country seed fixtures, full end-to-end integration verification, and production readiness.
+                15-scenario global seed dataset, 55 pytest tests, and end-to-end integration verification.
+              </p>
+            </div>
+
+            {/* Phase 9 */}
+            <div className="rounded-xl border border-sky-500/30 bg-sky-950/10 p-4">
+              <div className="flex items-center justify-between mb-2">
+                <span className="text-xs font-bold text-sky-400">PHASE 9</span>
+                <span className="rounded-full bg-emerald-500/20 px-2 py-0.5 text-[10px] font-semibold text-emerald-300">
+                  LIVE & ACTIVE
+                </span>
+              </div>
+              <h3 className="font-semibold text-white text-sm">Autonomous Ingestion</h3>
+              <p className="text-xs text-slate-400 mt-1">
+                Continuous background daemon, on-demand live pipeline execution, and cycle telemetry.
               </p>
             </div>
           </div>

@@ -4,6 +4,7 @@ from apps.api.app.routes.articles import router as articles_router
 from apps.api.app.routes.extraction import router as extraction_router
 from apps.api.app.routes.events import router as events_router
 from apps.api.app.routes.briefing import router as briefing_router
+from apps.api.app.routes.pipeline import router as pipeline_router
 
 __all__ = [
     "health_router",
@@ -11,5 +12,6 @@ __all__ = [
     "articles_router",
     "extraction_router",
     "events_router",
-    "briefing_router"
+    "briefing_router",
+    "pipeline_router"
 ]

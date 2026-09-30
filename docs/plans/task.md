@@ -10,3 +10,4 @@
 | TASK-06 | Phase 6: Interactive World Map | Completed | MapLibre GL dark tiles, zoom-density clustering, spatial bbox querying, event detail inspection modal, Next.js build exit 0 |
 | TASK-07 | Phase 7: Real-time Updates & Dynamic Timeline | Completed | 52/52 pytest passed, executive situation report (Section 22), instant search endpoint, chronological timeline (Section 23), Next.js build exit 0 |
 | TASK-08 | Phase 8: Hardening & Production Polish | Completed | 15-scenario deterministic seed suite across 6 continents, 52/52 pytest passed, Next.js build exit 0, zero-regression full stack verification |
+| TASK-09 | Phase 9: Autonomous Ingestion Daemon & Live Pipeline | Completed | 55/55 pytest passed, background pipeline orchestrator, POST /api/pipeline/run, live web ingestion button, Next.js build exit 0 |

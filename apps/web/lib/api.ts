@@ -284,4 +284,57 @@ export async function fetchEventTimeline(eventId: string): Promise<EventTimeline
   }
 }
 
+export interface PipelineTelemetry {
+  started_at: string;
+  completed_at: string;
+  duration_seconds: number;
+  sources_checked: number;
+  articles_fetched: number;
+  articles_inserted: number;
+  duplicates_skipped: number;
+  articles_processed: number;
+  events_created: number;
+  events_updated: number;
+  events_decayed: number;
+  status: string;
+  errors: string[];
+}
+
+export interface PipelineStatusResponse {
+  daemon_active: boolean;
+  interval_seconds: number;
+  total_cycles_run: number;
+  last_run_at: string | null;
+  last_telemetry: PipelineTelemetry | null;
+}
+
+export async function triggerPipelineRun(maxFeeds?: number): Promise<PipelineTelemetry | null> {
+  try {
+    const url = maxFeeds 
+      ? `${API_BASE_URL}/api/pipeline/run?max_feeds=${maxFeeds}`
+      : `${API_BASE_URL}/api/pipeline/run`;
+
+    const res = await fetch(url, {
+      method: "POST",
+      cache: "no-store",
+    });
+    if (!res.ok) return null;
+    return await res.json();
+  } catch {
+    return null;
+  }
+}
+
+export async function fetchPipelineStatus(): Promise<PipelineStatusResponse | null> {
+  try {
+    const res = await fetch(`${API_BASE_URL}/api/pipeline/status`, {
+      cache: "no-store",
+    });
+    if (!res.ok) return null;
+    return await res.json();
+  } catch {
+    return null;
+  }
+}
+
 
