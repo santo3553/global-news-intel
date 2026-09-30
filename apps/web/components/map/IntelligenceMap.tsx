@@ -85,6 +85,8 @@ export default function IntelligenceMap({
       const maplibreglModule: any = await import("maplibre-gl");
       const maplibregl = maplibreglModule.default || maplibreglModule;
 
+      const cartoKey = process.env.NEXT_PUBLIC_CARTO_API_KEY || "cb1_45at_1_455a79593c372358fd20425c";
+
       map = new maplibregl.Map({
         container: mapContainer.current,
         style: {
@@ -93,12 +95,13 @@ export default function IntelligenceMap({
             "carto-dark": {
               type: "raster",
               tiles: [
-                "https://a.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}@2x.png",
-                "https://b.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}@2x.png",
-                "https://c.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}@2x.png"
+                `https://a.basemaps.cartocdn.com/rastertiles/dark_all/{z}/{x}/{y}@2x.png?key=${cartoKey}`,
+                `https://b.basemaps.cartocdn.com/rastertiles/dark_all/{z}/{x}/{y}@2x.png?key=${cartoKey}`,
+                `https://c.basemaps.cartocdn.com/rastertiles/dark_all/{z}/{x}/{y}@2x.png?key=${cartoKey}`,
+                `https://d.basemaps.cartocdn.com/rastertiles/dark_all/{z}/{x}/{y}@2x.png?key=${cartoKey}`
               ],
               tileSize: 256,
-              attribution: "&copy; OpenStreetMap contributors &copy; CARTO"
+              attribution: '&copy; <a href="https://carto.com/attributions" target="_blank" rel="noopener noreferrer">CARTO</a> &copy; <a href="https://www.openstreetmap.org/copyright" target="_blank" rel="noopener noreferrer">OpenStreetMap</a> contributors'
             }
           },
           layers: [
