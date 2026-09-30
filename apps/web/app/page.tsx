@@ -79,7 +79,15 @@ export default function HomePage() {
   const [isViewportSyncActive, setIsViewportSyncActive] = useState<boolean>(true);
   const [selectedMapCategory, setSelectedMapCategory] = useState<string>("all");
   const [resetViewTrigger, setResetViewTrigger] = useState<number>(0);
-  const [focusedEventCoords, setFocusedEventCoords] = useState<{ lng: number; lat: number } | null>(null);
+  const [focusedEventCoords, setFocusedEventCoords] = useState<{
+    lng: number;
+    lat: number;
+    id?: string;
+    title?: string;
+    city?: string;
+    country?: string;
+    category?: string;
+  } | null>(null);
   const [sortBy, setSortBy] = useState<string>("importance");
   const [searchQuery, setSearchQuery] = useState<string>("");
   const [isSearching, setIsSearching] = useState<boolean>(false);
@@ -207,8 +215,16 @@ export default function HomePage() {
     setResetViewTrigger(prev => prev + 1);
   };
 
-  const handleFocusEventOnMap = (lng: number, lat: number) => {
-    setFocusedEventCoords({ lng, lat });
+  const handleFocusEventOnMap = (evt: EventItem) => {
+    setFocusedEventCoords({
+      lng: evt.longitude,
+      lat: evt.latitude,
+      id: evt.id,
+      title: evt.canonical_title,
+      city: evt.city || "",
+      country: evt.country || "",
+      category: evt.category
+    });
     const mapElement = document.getElementById("geospatial-map-section");
     if (mapElement) {
       mapElement.scrollIntoView({ behavior: "smooth", block: "center" });
@@ -1038,14 +1054,16 @@ export default function HomePage() {
                       onClick={(e) => {
                         e.stopPropagation();
                         if (evt.longitude !== undefined && evt.latitude !== undefined) {
-                          handleFocusEventOnMap(evt.longitude, evt.latitude);
+                          handleFocusEventOnMap(evt);
                         }
                       }}
-                      title="Focus on map"
-                      className="flex items-center gap-1 text-slate-300 hover:text-sky-300 transition-colors truncate max-w-[170px] group/loc"
+                      title="Pinpoint actual location on map"
+                      className="flex items-center gap-1.5 text-slate-300 hover:text-sky-300 transition-colors truncate max-w-[190px] group/loc"
                     >
-                      <MapPin className="h-3.5 w-3.5 text-rose-400 flex-shrink-0 group-hover/loc:scale-110 transition-transform" />
-                      <span className="truncate underline decoration-slate-600 hover:decoration-sky-400 underline-offset-2">
+                      <span className="flex h-5 w-5 items-center justify-center rounded-full bg-rose-500/10 text-rose-400 group-hover/loc:bg-rose-500/20 group-hover/loc:scale-110 transition-all border border-rose-500/20 flex-shrink-0">
+                        <MapPin className="h-3 w-3" />
+                      </span>
+                      <span className="truncate underline decoration-slate-600 hover:decoration-sky-400 underline-offset-2 font-medium">
                         {evt.city ? `${evt.city}, ` : ""}{evt.country || "Global"}
                       </span>
                     </button>
