@@ -102,6 +102,7 @@ export default function HomePage() {
   const getSourceRegion = useCallback((country?: string): string => {
     if (!country) return "Global";
     const c = country.toUpperCase();
+    if (["KZ", "UZ", "KG", "TJ", "TM", "AZ", "GE", "AM", "AF", "TR"].includes(c)) return "Central Asia & Caucasus";
     if (["IN", "PK", "BD", "LK", "NP", "SG", "ID", "TH", "PH", "VN", "MY", "JP", "KR", "TW", "HK", "AU", "NZ", "FJ", "PG"].includes(c)) return "Asia & Pacific";
     if (["SA", "AE", "QA", "IL", "EG", "JO", "LB", "MA", "KE", "NG", "ZA", "GH", "SD", "ET", "LY", "CD"].includes(c)) return "Middle East & Africa";
     if (["GB", "DE", "FR", "UA", "PL", "LV", "EE", "LT", "GR", "IS", "NO", "CH", "NL", "BE", "IT", "ES", "AT", "SE", "DK", "FI", "CZ", "RO", "RU"].includes(c)) return "Europe";
@@ -1116,6 +1117,7 @@ export default function HomePage() {
               <div className="flex items-center gap-1.5 flex-wrap mb-3">
                 {[
                   { id: "all", label: "All Regions" },
+                  { id: "Central Asia & Caucasus", label: "Central Asia & Caucasus" },
                   { id: "Asia & Pacific", label: "Asia & Pacific" },
                   { id: "Middle East & Africa", label: "Mid East & Africa" },
                   { id: "Americas", label: "Americas" },
@@ -1180,7 +1182,7 @@ export default function HomePage() {
 
             <div className="border-t border-slate-800/80 pt-3 mt-4 flex items-center justify-between text-xs text-slate-400">
               <span>Endpoint: <code>GET /api/sources</code></span>
-              <span className="text-emerald-400 font-medium">66 Feeds Ingested & Calibrated</span>
+              <span className="text-emerald-400 font-medium">{sources.length} Feeds Ingested & Calibrated</span>
             </div>
           </div>
 

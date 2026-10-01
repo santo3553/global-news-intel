@@ -53,11 +53,17 @@ class EventService:
         if bbox:
             parsed = cls.parse_bbox(bbox)
             if parsed:
-                min_lng, min_lat, max_lng, max_lat = parsed
-                conditions.append(Event.latitude >= min_lat)
-                conditions.append(Event.latitude <= max_lat)
-                conditions.append(Event.longitude >= min_lng)
-                conditions.append(Event.longitude <= max_lng)
+                w, s, e, n = parsed
+                actual_min_lat = min(s, n)
+                actual_max_lat = max(s, n)
+                conditions.append(Event.latitude >= actual_min_lat)
+                conditions.append(Event.latitude <= actual_max_lat)
+                if w > e:
+                    # Antimeridian crossing wrap
+                    conditions.append(or_(Event.longitude >= w, Event.longitude <= e))
+                else:
+                    conditions.append(Event.longitude >= w)
+                    conditions.append(Event.longitude <= e)
 
         # 2. Category & Country Filter
         if category:

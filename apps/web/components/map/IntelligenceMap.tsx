@@ -49,6 +49,7 @@ interface IntelligenceMapProps {
 
 const REGION_PRESETS = [
   { name: "Global", center: [10, 20], zoom: 1.5 },
+  { name: "Central Asia & Caspian", center: [58, 42], zoom: 3.2 },
   { name: "Europe", center: [15, 50], zoom: 3.8 },
   { name: "Middle East", center: [45, 28], zoom: 4.0 },
   { name: "Asia-Pacific", center: [115, 20], zoom: 3.2 },

@@ -6,7 +6,7 @@ varying importance scores, uncertain/developing reports, deduplication, and name
 
 import asyncio
 from datetime import datetime, timezone, timedelta
-from sqlalchemy import select
+from sqlalchemy import select, or_
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from apps.api.app.database import AsyncSessionLocal, async_engine, Base
@@ -1300,6 +1300,400 @@ async def seed_database():
                         "relationship_type": "primary"
                     }
                 ]
+            },
+
+            # SCENARIO 24: Kazakhstan - Trans-Caspian Middle Corridor Rail Electrification (Astana, Kazakhstan)
+            {
+                "event": {
+                    "id": "evt-trans-caspian-middle-corridor-2026",
+                    "canonical_title": "Trans-Caspian Middle Corridor Rail Electrification Pact Inked in Astana",
+                    "summary": "Kazakhstan, Azerbaijan, and Georgia finalized a joint investment pact in Astana to electrify 1,400 km of freight railways and expand container terminal capacity at Aktau and Kuryk ports, doubling Trans-Caspian trade throughput between Asia and Europe.",
+                    "category": "economy",
+                    "subcategory": "transport_corridor",
+                    "latitude": 51.17,
+                    "longitude": 71.45,
+                    "country": "Kazakhstan",
+                    "admin_region": "Akmola",
+                    "city": "Astana",
+                    "location_confidence": 0.99,
+                    "importance_score": 8.4,
+                    "confidence_score": 0.95,
+                    "human_impact_score": 7.5,
+                    "global_impact_score": 8.5,
+                    "economic_impact_score": 9.4,
+                    "political_impact_score": 8.0,
+                    "novelty_score": 8.2,
+                    "development_velocity_score": 7.1,
+                    "source_coverage_score": 8.8,
+                    "first_seen_at": now - timedelta(hours=5),
+                    "last_updated_at": now - timedelta(hours=1),
+                    "status": "active"
+                },
+                "entities": [
+                    {"name": "Kazakhstan Temir Zholy (KTZ)", "type": "organization"},
+                    {"name": "Middle Corridor Association", "type": "organization"},
+                    {"name": "Port of Aktau Authority", "type": "organization"}
+                ],
+                "articles": [
+                    {
+                        "id": "art-astanatimes-corridor-01",
+                        "source_id": "src-astanatimes-kz",
+                        "title": "Astana signs landmark agreement to double Trans-Caspian cargo rail throughput",
+                        "url": "https://astanatimes.com/middle-corridor-rail-electrification",
+                        "author": "Aigerim Seisembayeva",
+                        "published_at": now - timedelta(hours=5),
+                        "raw_content": "The Middle Corridor transport alliance ratified plans to deploy computerized block signaling and rapid container cranes across Caspian ferry docks.",
+                        "relationship_type": "primary"
+                    },
+                    {
+                        "id": "art-eurasianet-corridor-02",
+                        "source_id": "src-eurasianet-regional",
+                        "title": "Central Asia accelerates bypass routes as Trans-Caspian cargo volumes surge",
+                        "url": "https://eurasianet.org/central-asia-trans-caspian-rail",
+                        "author": "Almaz Kumenov",
+                        "published_at": now - timedelta(hours=3, minutes=30),
+                        "raw_content": "Freight operators reported average transit times between China border dry ports and European hubs fell to under 12 days following initial electrification.",
+                        "relationship_type": "corroborating"
+                    }
+                ]
+            },
+
+            # SCENARIO 25: Uzbekistan - Transboundary Aral Sea & River Water Sharing Accord (Tashkent, Uzbekistan)
+            {
+                "event": {
+                    "id": "evt-central-asia-water-pact-2026",
+                    "canonical_title": "Central Asian Republics Ratify Syr Darya & Amu Darya Transboundary Water Sharing Accord in Tashkent",
+                    "summary": "Ministers of water resources from Uzbekistan, Kazakhstan, Kyrgyzstan, and Tajikistan signed an automated telemetry monitoring protocol in Tashkent, establishing algorithmic seasonal flow quotas and unified reservoir release schedules to prevent regional drought and mitigate Aral Sea soil salinity.",
+                    "category": "environment",
+                    "subcategory": "water_security",
+                    "latitude": 41.30,
+                    "longitude": 69.24,
+                    "country": "Uzbekistan",
+                    "admin_region": "Tashkent",
+                    "city": "Tashkent",
+                    "location_confidence": 0.99,
+                    "importance_score": 8.3,
+                    "confidence_score": 0.94,
+                    "human_impact_score": 8.8,
+                    "global_impact_score": 7.8,
+                    "economic_impact_score": 8.4,
+                    "political_impact_score": 8.2,
+                    "novelty_score": 8.0,
+                    "development_velocity_score": 6.9,
+                    "source_coverage_score": 8.6,
+                    "first_seen_at": now - timedelta(hours=7),
+                    "last_updated_at": now - timedelta(hours=2),
+                    "status": "active"
+                },
+                "entities": [
+                    {"name": "Interstate Commission for Water Coordination", "type": "organization"},
+                    {"name": "Uzbekistan Ministry of Water Resources", "type": "organization"},
+                    {"name": "International Fund for Saving the Aral Sea", "type": "organization"}
+                ],
+                "articles": [
+                    {
+                        "id": "art-timesca-water-01",
+                        "source_id": "src-timesca-centralasia",
+                        "title": "Central Asian nations reach historic automated water allocation pact in Tashkent",
+                        "url": "https://timesca.com/central-asia-water-pact-tashkent",
+                        "author": "Rustam Mirzaev",
+                        "published_at": now - timedelta(hours=7),
+                        "raw_content": "Smart river flow sensor arrays along the Syr Darya and Amu Darya will provide real-time public telemetry to eliminate allocation disputes among upstream and downstream nations.",
+                        "relationship_type": "primary"
+                    },
+                    {
+                        "id": "art-uzdaily-water-02",
+                        "source_id": "src-uzdaily-uz",
+                        "title": "Tashkent summit implements algorithmic reservoir coordination to safeguard agrarian harvest",
+                        "url": "https://www.uzdaily.uz/en/central-asia-water-sharing-accord",
+                        "author": "Dilshod Karimov",
+                        "published_at": now - timedelta(hours=4),
+                        "raw_content": "The agreement incorporates remote sensing imagery from EU Copernicus satellites to audit soil moisture and minimize irrigation loss.",
+                        "relationship_type": "corroborating"
+                    }
+                ]
+            },
+
+            # SCENARIO 26: Azerbaijan & Caspian Sea - 1,100 km Subsea Renewable Power Cable (Baku, Azerbaijan)
+            {
+                "event": {
+                    "id": "evt-caspian-green-energy-cable-2026",
+                    "canonical_title": "Baku Inaugurates 1,100 km Subsea Caspian Renewable Power Cable Project",
+                    "summary": "Energy executives and state delegates gathered at the Baku Maritime Terminal to commence laying a high-voltage direct current (HVDC) subsea power line under the Caspian Sea, connecting western Kazakhstan's wind fields to the South Caucasus transmission grid.",
+                    "category": "science_technology",
+                    "subcategory": "clean_energy",
+                    "latitude": 40.41,
+                    "longitude": 49.87,
+                    "country": "Azerbaijan",
+                    "admin_region": "Absheron",
+                    "city": "Baku",
+                    "location_confidence": 0.98,
+                    "importance_score": 8.1,
+                    "confidence_score": 0.93,
+                    "human_impact_score": 7.3,
+                    "global_impact_score": 8.3,
+                    "economic_impact_score": 8.9,
+                    "political_impact_score": 7.9,
+                    "novelty_score": 8.3,
+                    "development_velocity_score": 6.8,
+                    "source_coverage_score": 8.5,
+                    "first_seen_at": now - timedelta(hours=9),
+                    "last_updated_at": now - timedelta(hours=2, minutes=30),
+                    "status": "active"
+                },
+                "entities": [
+                    {"name": "Azerenerji", "type": "organization"},
+                    {"name": "Samruk-Energy", "type": "organization"},
+                    {"name": "Caspian Subsea Energy Grid", "type": "organization"}
+                ],
+                "articles": [
+                    {
+                        "id": "art-azernews-cable-01",
+                        "source_id": "src-azernews-az",
+                        "title": "Baku begins cable-laying operations for landmark trans-Caspian green energy artery",
+                        "url": "https://www.azernews.az/energy/caspian-green-power-cable",
+                        "author": "Farid Mammadov",
+                        "published_at": now - timedelta(hours=9),
+                        "raw_content": "The 2-gigawatt underwater transmission link will transmit clean steppe wind energy across the Caspian Sea directly into regional interconnections.",
+                        "relationship_type": "primary"
+                    },
+                    {
+                        "id": "art-eurasianet-cable-02",
+                        "source_id": "src-eurasianet-regional",
+                        "title": "Caspian states unite around subsea electricity highway linking Central Asia and Caucasus",
+                        "url": "https://eurasianet.org/azerbaijan-caspian-subsea-power-cable",
+                        "author": "Nurlan Aliyev",
+                        "published_at": now - timedelta(hours=6),
+                        "raw_content": "The ambitious subsea infrastructure cements the Caspian basin as an emerging exporter of zero-emission electricity.",
+                        "relationship_type": "corroborating"
+                    }
+                ]
+            },
+
+            # SCENARIO 27: Kyrgyzstan & Tajikistan - Tian Shan Alpine Glacier Preservation Network (Bishkek, Kyrgyzstan)
+            {
+                "event": {
+                    "id": "evt-tian-shan-glacier-preservation-2026",
+                    "canonical_title": "Tian Shan Glacier Preservation & Alpine Hydroelectric Network Deployed Across Bishkek and Dushanbe",
+                    "summary": "Glaciologists and power grid operators in Bishkek deployed a 40-station laser-ranging radar network across the Tian Shan mountain range to forecast glacial melt runoff and optimize peak hydropower generation for the Central Asian energy ring.",
+                    "category": "environment",
+                    "subcategory": "glaciology",
+                    "latitude": 42.87,
+                    "longitude": 74.59,
+                    "country": "Kyrgyzstan",
+                    "admin_region": "Chuy",
+                    "city": "Bishkek",
+                    "location_confidence": 0.98,
+                    "importance_score": 7.9,
+                    "confidence_score": 0.92,
+                    "human_impact_score": 8.1,
+                    "global_impact_score": 7.6,
+                    "economic_impact_score": 7.7,
+                    "political_impact_score": 7.2,
+                    "novelty_score": 8.1,
+                    "development_velocity_score": 6.5,
+                    "source_coverage_score": 8.3,
+                    "first_seen_at": now - timedelta(hours=11),
+                    "last_updated_at": now - timedelta(hours=3),
+                    "status": "active"
+                },
+                "entities": [
+                    {"name": "Central Asian Institute for Applied Geosciences", "type": "organization"},
+                    {"name": "Kyrgyz National Academy of Sciences", "type": "organization"},
+                    {"name": "Toktogul Hydropower Cascade", "type": "organization"}
+                ],
+                "articles": [
+                    {
+                        "id": "art-timesca-glacier-01",
+                        "source_id": "src-timesca-centralasia",
+                        "title": "Bishkek deploys high-altitude radar network to monitor Tian Shan glacier stability",
+                        "url": "https://timesca.com/tian-shan-glacier-preservation-network",
+                        "author": "Bakyt Asanov",
+                        "published_at": now - timedelta(hours=11),
+                        "raw_content": "Solar-powered alpine telemetry stations anchored at 4,000 meters elevation stream real-time snowpack depth and melt velocity data to flood-control authorities.",
+                        "relationship_type": "primary"
+                    }
+                ]
+            },
+
+            # SCENARIO 28: Georgia & Caucasus - Black Sea High-Bandwidth Terabit Fiber Link (Tbilisi, Georgia)
+            {
+                "event": {
+                    "id": "evt-caucasus-digital-arterial-2026",
+                    "canonical_title": "Georgia and Black Sea Partners Complete High-Bandwidth Subsea Terabit Fiber Link in Tbilisi",
+                    "summary": "Telecommunication consortiums in Tbilisi and Batumi activated the Black Sea Terabit Submarine Cable, establishing a fault-tolerant ultra-low-latency digital bridge connecting Central Asian data centers to European internet exchange hubs in Frankfurt and Sofia.",
+                    "category": "science_technology",
+                    "subcategory": "telecommunications",
+                    "latitude": 41.72,
+                    "longitude": 44.78,
+                    "country": "Georgia",
+                    "admin_region": "Tbilisi",
+                    "city": "Tbilisi",
+                    "location_confidence": 0.98,
+                    "importance_score": 7.8,
+                    "confidence_score": 0.93,
+                    "human_impact_score": 6.8,
+                    "global_impact_score": 8.0,
+                    "economic_impact_score": 8.6,
+                    "political_impact_score": 7.7,
+                    "novelty_score": 8.0,
+                    "development_velocity_score": 6.2,
+                    "source_coverage_score": 8.4,
+                    "first_seen_at": now - timedelta(hours=13),
+                    "last_updated_at": now - timedelta(hours=4),
+                    "status": "active"
+                },
+                "entities": [
+                    {"name": "Georgian National Communications Commission", "type": "organization"},
+                    {"name": "Black Sea Subsea Cable Consortium", "type": "organization"}
+                ],
+                "articles": [
+                    {
+                        "id": "art-agenda-fiber-01",
+                        "source_id": "src-agenda-ge",
+                        "title": "Tbilisi celebrates activation of Black Sea submarine fiber cable connecting Caucasus to Europe",
+                        "url": "https://agenda.ge/en/black-sea-submarine-fiber-cable",
+                        "author": "Nino Kalandadze",
+                        "published_at": now - timedelta(hours=13),
+                        "raw_content": "The 1,200 km deep-water optical fiber line secures digital sovereignty and redundant internet connectivity for millions across the South Caucasus and Central Asia.",
+                        "relationship_type": "primary"
+                    }
+                ]
+            },
+
+            # SCENARIO 29: Turkmenistan - Trans-Caspian Methane Abatement & Infrastructure Framework (Ashgabat, Turkmenistan)
+            {
+                "event": {
+                    "id": "evt-trans-caspian-gas-interconnect-2026",
+                    "canonical_title": "Ashgabat Greenlights Methane Abatement & Caspian Infrastructure Modernization Framework",
+                    "summary": "Turkmen energy authorities in Ashgabat ratified a $1.8B environmental transition roadmap installing zero-emission vapor-recovery compressors across the Galkynysh and Caspian offshore fields to capture flare gas and feed regional distribution grids.",
+                    "category": "economy",
+                    "subcategory": "energy_transition",
+                    "latitude": 37.96,
+                    "longitude": 58.33,
+                    "country": "Turkmenistan",
+                    "admin_region": "Ahal",
+                    "city": "Ashgabat",
+                    "location_confidence": 0.97,
+                    "importance_score": 7.7,
+                    "confidence_score": 0.91,
+                    "human_impact_score": 7.2,
+                    "global_impact_score": 7.9,
+                    "economic_impact_score": 8.3,
+                    "political_impact_score": 7.5,
+                    "novelty_score": 7.8,
+                    "development_velocity_score": 6.0,
+                    "source_coverage_score": 8.2,
+                    "first_seen_at": now - timedelta(hours=14),
+                    "last_updated_at": now - timedelta(hours=4, minutes=30),
+                    "status": "active"
+                },
+                "entities": [
+                    {"name": "Turkmengaz", "type": "organization"},
+                    {"name": "Caspian Environmental Protection Council", "type": "organization"}
+                ],
+                "articles": [
+                    {
+                        "id": "art-timesca-methane-01",
+                        "source_id": "src-timesca-centralasia",
+                        "title": "Turkmenistan launches sweeping methane capture overhaul across Caspian energy fields",
+                        "url": "https://timesca.com/turkmenistan-methane-abatement-caspian",
+                        "author": "Myrat Orazov",
+                        "published_at": now - timedelta(hours=14),
+                        "raw_content": "The modernization program eliminates legacy flaring stacks, routing re-compressed natural gas into regional domestic heating grids.",
+                        "relationship_type": "primary"
+                    }
+                ]
+            },
+
+            # SCENARIO 30: Turkey & Black Sea - Maritime Radar Net Modernization (Istanbul, Turkey)
+            {
+                "event": {
+                    "id": "evt-blacksea-maritime-surveillance-2026",
+                    "canonical_title": "Turkey and Black Sea Littoral Command Expand Automated Maritime Radar Net",
+                    "summary": "Turkish coast guard and port authorities in Istanbul integrated synthetic aperture coastal radar domes across the Bosphorus Strait and Black Sea maritime zones, providing 24/7 autonomous vessel tracking and uncrewed drone collision avoidance.",
+                    "category": "security_defense",
+                    "subcategory": "maritime_security",
+                    "latitude": 41.00,
+                    "longitude": 28.97,
+                    "country": "Turkey",
+                    "admin_region": "Marmara",
+                    "city": "Istanbul",
+                    "location_confidence": 0.99,
+                    "importance_score": 8.0,
+                    "confidence_score": 0.94,
+                    "human_impact_score": 7.4,
+                    "global_impact_score": 8.2,
+                    "economic_impact_score": 8.6,
+                    "political_impact_score": 8.1,
+                    "novelty_score": 8.0,
+                    "development_velocity_score": 7.0,
+                    "source_coverage_score": 8.7,
+                    "first_seen_at": now - timedelta(hours=10),
+                    "last_updated_at": now - timedelta(hours=2),
+                    "status": "active"
+                },
+                "entities": [
+                    {"name": "Turkish Coast Guard Command", "type": "organization"},
+                    {"name": "Bosphorus Vessel Traffic Services", "type": "organization"}
+                ],
+                "articles": [
+                    {
+                        "id": "art-hurriyet-bosphorus-01",
+                        "source_id": "src-hurriyet-tr",
+                        "title": "Turkey deploys next-generation coastal radar system to monitor Bosphorus and Black Sea transit",
+                        "url": "https://www.hurriyetdailynews.com/turkey-black-sea-maritime-radar",
+                        "author": "Emre Aydin",
+                        "published_at": now - timedelta(hours=10),
+                        "raw_content": "The high-precision phased array sensors ensure collision-free transit for crude carriers and bulk grain freighters navigating congested straits.",
+                        "relationship_type": "primary"
+                    }
+                ]
+            },
+
+            # SCENARIO 31: Afghanistan & Central Asian Border - Salang Commercial Transit Safety Protocol (Kabul, Afghanistan)
+            {
+                "event": {
+                    "id": "evt-afghan-trans-hindu-kush-rail-2026",
+                    "canonical_title": "Kabul and Central Asian Neighbors Sign Trans-Afghan Commercial Transit Safety Protocol",
+                    "summary": "Regional commercial delegations in Kabul agreed on unified customs clearance and freight security standards for truck and rail convoys transiting the Salang corridor connecting Uzbekistan with South Asian trade routes.",
+                    "category": "economy",
+                    "subcategory": "trade_logistics",
+                    "latitude": 34.53,
+                    "longitude": 69.17,
+                    "country": "Afghanistan",
+                    "admin_region": "Kabul",
+                    "city": "Kabul",
+                    "location_confidence": 0.96,
+                    "importance_score": 7.6,
+                    "confidence_score": 0.90,
+                    "human_impact_score": 7.8,
+                    "global_impact_score": 7.2,
+                    "economic_impact_score": 8.1,
+                    "political_impact_score": 7.6,
+                    "novelty_score": 7.7,
+                    "development_velocity_score": 6.3,
+                    "source_coverage_score": 8.1,
+                    "first_seen_at": now - timedelta(hours=16),
+                    "last_updated_at": now - timedelta(hours=5),
+                    "status": "active"
+                },
+                "entities": [
+                    {"name": "Afghanistan Chamber of Commerce and Investment", "type": "organization"},
+                    {"name": "Central Asian Freight Operators Alliance", "type": "organization"}
+                ],
+                "articles": [
+                    {
+                        "id": "art-tolonews-transit-01",
+                        "source_id": "src-tolonews-af",
+                        "title": "Kabul signs multilateral transit security pact to unlock Northern trade corridor with Central Asia",
+                        "url": "https://tolonews.com/afghan-central-asia-transit-protocol",
+                        "author": "Zabihullah Ghazi",
+                        "published_at": now - timedelta(hours=16),
+                        "raw_content": "The protocol standardizes weigh station fees and introduces biometric clearance to expedite food grain and fuel transport across border crossings.",
+                        "relationship_type": "primary"
+                    }
+                ]
             }
         ]
 
@@ -1362,7 +1756,11 @@ async def seed_database():
                 clean_c = clean_text(art_data["raw_content"])
                 t_hash, c_hash = compute_hashes(clean_t, clean_c)
 
-                existing_article = (await session.execute(select(Article).where(Article.id == art_data["id"]))).scalar_one_or_none()
+                existing_article = (await session.execute(
+                    select(Article).where(
+                        or_(Article.id == art_data["id"], Article.url == art_data["url"])
+                    )
+                )).scalar_one_or_none()
                 if not existing_article:
                     article = Article(
                         id=art_data["id"],

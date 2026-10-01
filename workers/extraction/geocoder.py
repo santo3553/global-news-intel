@@ -240,7 +240,21 @@ GAZETTEER_CITIES: Dict[str, Dict[str, Any]] = {
     # Europe (Local additions)
     "gdansk": {"lat": 54.35, "lng": 18.64, "country": "Poland", "region": "Pomerania", "name": "Gdansk, Poland"},
     "thessaloniki": {"lat": 40.64, "lng": 22.94, "country": "Greece", "region": "Central Macedonia", "name": "Thessaloniki, Greece"},
-    "klaipeda": {"lat": 55.70, "lng": 21.14, "country": "Lithuania", "region": "Klaipeda", "name": "Klaipeda, Lithuania"}
+    "klaipeda": {"lat": 55.70, "lng": 21.14, "country": "Lithuania", "region": "Klaipeda", "name": "Klaipeda, Lithuania"},
+
+    # Central Asia, Caspian & Caucasus (Matching ss1)
+    "astana": {"lat": 51.17, "lng": 71.45, "country": "Kazakhstan", "region": "Akmola", "name": "Astana, Kazakhstan"},
+    "almaty": {"lat": 43.24, "lng": 76.91, "country": "Kazakhstan", "region": "Almaty", "name": "Almaty, Kazakhstan"},
+    "tashkent": {"lat": 41.30, "lng": 69.24, "country": "Uzbekistan", "region": "Tashkent", "name": "Tashkent, Uzbekistan"},
+    "samarkand": {"lat": 39.65, "lng": 66.96, "country": "Uzbekistan", "region": "Samarkand", "name": "Samarkand, Uzbekistan"},
+    "bishkek": {"lat": 42.87, "lng": 74.59, "country": "Kyrgyzstan", "region": "Chuy", "name": "Bishkek, Kyrgyzstan"},
+    "dushanbe": {"lat": 38.56, "lng": 68.78, "country": "Tajikistan", "region": "Dushanbe", "name": "Dushanbe, Tajikistan"},
+    "ashgabat": {"lat": 37.96, "lng": 58.33, "country": "Turkmenistan", "region": "Ahal", "name": "Ashgabat, Turkmenistan"},
+    "baku": {"lat": 40.41, "lng": 49.87, "country": "Azerbaijan", "region": "Absheron", "name": "Baku, Azerbaijan"},
+    "tbilisi": {"lat": 41.72, "lng": 44.78, "country": "Georgia", "region": "Tbilisi", "name": "Tbilisi, Georgia"},
+    "yerevan": {"lat": 40.18, "lng": 44.51, "country": "Armenia", "region": "Yerevan", "name": "Yerevan, Armenia"},
+    "kabul": {"lat": 34.53, "lng": 69.17, "country": "Afghanistan", "region": "Kabul", "name": "Kabul, Afghanistan"},
+    "caspian sea": {"lat": 41.93, "lng": 50.67, "country": "Azerbaijan/Kazakhstan", "region": "Caspian", "name": "Caspian Sea Maritime Basin"}
 }
 
 # Regional Centroids (avoids inventing false city precision when only a province/island is mentioned)
@@ -251,7 +265,10 @@ GAZETTEER_REGIONS: Dict[str, Dict[str, Any]] = {
     "baltic": {"lat": 57.00, "lng": 24.50, "country": "Latvia", "region": "Baltic Region", "name": "Baltic Region"},
     "scandinavia": {"lat": 62.00, "lng": 15.00, "country": "Sweden", "region": "Scandinavia", "name": "Scandinavia"},
     "crimea": {"lat": 45.30, "lng": 34.40, "country": "Ukraine", "region": "Crimea", "name": "Crimea"},
-    "donbas": {"lat": 48.00, "lng": 38.00, "country": "Ukraine", "region": "Donbas", "name": "Donbas, Ukraine"}
+    "donbas": {"lat": 48.00, "lng": 38.00, "country": "Ukraine", "region": "Donbas", "name": "Donbas, Ukraine"},
+    "caspian": {"lat": 41.93, "lng": 50.67, "country": "Azerbaijan/Kazakhstan", "region": "Caspian Basin", "name": "Caspian Sea Basin"},
+    "central asia": {"lat": 44.00, "lng": 67.00, "country": "Kazakhstan", "region": "Central Asia", "name": "Central Asia Region"},
+    "caucasus": {"lat": 42.00, "lng": 45.00, "country": "Georgia", "region": "Caucasus", "name": "Caucasus Region"}
 }
 
 # Country Centroids (for country-level precision without hallucinated exact points)
@@ -304,7 +321,17 @@ GAZETTEER_COUNTRIES: Dict[str, Dict[str, Any]] = {
     "jamaica": {"lat": 18.10, "lng": -77.29, "country": "Jamaica", "name": "Jamaica"},
     "poland": {"lat": 51.91, "lng": 19.14, "country": "Poland", "name": "Poland"},
     "greece": {"lat": 39.07, "lng": 21.82, "country": "Greece", "name": "Greece"},
-    "canada": {"lat": 56.13, "lng": -106.34, "country": "Canada", "name": "Canada"}
+    "canada": {"lat": 56.13, "lng": -106.34, "country": "Canada", "name": "Canada"},
+    "kazakhstan": {"lat": 48.02, "lng": 66.92, "country": "Kazakhstan", "name": "Kazakhstan"},
+    "uzbekistan": {"lat": 41.38, "lng": 64.59, "country": "Uzbekistan", "name": "Uzbekistan"},
+    "kyrgyzstan": {"lat": 41.20, "lng": 74.77, "country": "Kyrgyzstan", "name": "Kyrgyzstan"},
+    "tajikistan": {"lat": 38.86, "lng": 71.28, "country": "Tajikistan", "name": "Tajikistan"},
+    "turkmenistan": {"lat": 38.97, "lng": 59.56, "country": "Turkmenistan", "name": "Turkmenistan"},
+    "azerbaijan": {"lat": 40.14, "lng": 47.58, "country": "Azerbaijan", "name": "Azerbaijan"},
+    "georgia": {"lat": 42.32, "lng": 43.36, "country": "Georgia", "name": "Georgia"},
+    "armenia": {"lat": 40.07, "lng": 45.04, "country": "Armenia", "name": "Armenia"},
+    "afghanistan": {"lat": 33.94, "lng": 67.71, "country": "Afghanistan", "name": "Afghanistan"},
+    "turkey": {"lat": 38.96, "lng": 35.24, "country": "Turkey", "name": "Turkey"}
 }
 
 

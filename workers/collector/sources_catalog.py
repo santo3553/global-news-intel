@@ -306,6 +306,98 @@ CURATED_SOURCES: List[Dict[str, Any]] = [
     },
 
     # ==========================================
+    # Central Asia, Caspian & Caucasus (Local & Regional)
+    # ==========================================
+    {
+        "id": "src-astanatimes-kz",
+        "name": "The Astana Times (Kazakhstan)",
+        "domain": "astanatimes.com",
+        "feed_url": "https://astanatimes.com/feed/",
+        "source_type": "rss",
+        "country": "KZ",
+        "language": "en",
+        "reliability_score": 0.86,
+        "active": True
+    },
+    {
+        "id": "src-timesca-centralasia",
+        "name": "The Times of Central Asia",
+        "domain": "timesca.com",
+        "feed_url": "https://timesca.com/feed/",
+        "source_type": "rss",
+        "country": "KZ",
+        "language": "en",
+        "reliability_score": 0.85,
+        "active": True
+    },
+    {
+        "id": "src-eurasianet-regional",
+        "name": "Eurasianet (Central Asia & Caucasus)",
+        "domain": "eurasianet.org",
+        "feed_url": "https://eurasianet.org/feed",
+        "source_type": "rss",
+        "country": "GE",
+        "language": "en",
+        "reliability_score": 0.88,
+        "active": True
+    },
+    {
+        "id": "src-uzdaily-uz",
+        "name": "UzDaily (Uzbekistan)",
+        "domain": "uzdaily.uz",
+        "feed_url": "https://www.uzdaily.uz/en/rss",
+        "source_type": "rss",
+        "country": "UZ",
+        "language": "en",
+        "reliability_score": 0.84,
+        "active": True
+    },
+    {
+        "id": "src-azernews-az",
+        "name": "Azernews (Azerbaijan & Caspian)",
+        "domain": "azernews.az",
+        "feed_url": "https://www.azernews.az/rss/",
+        "source_type": "rss",
+        "country": "AZ",
+        "language": "en",
+        "reliability_score": 0.83,
+        "active": True
+    },
+    {
+        "id": "src-agenda-ge",
+        "name": "Agenda.ge (Georgia & Caucasus)",
+        "domain": "agenda.ge",
+        "feed_url": "https://agenda.ge/en/feed",
+        "source_type": "rss",
+        "country": "GE",
+        "language": "en",
+        "reliability_score": 0.85,
+        "active": True
+    },
+    {
+        "id": "src-hurriyet-tr",
+        "name": "Hürriyet Daily News (Turkey)",
+        "domain": "hurriyetdailynews.com",
+        "feed_url": "https://www.hurriyetdailynews.com/rss",
+        "source_type": "rss",
+        "country": "TR",
+        "language": "en",
+        "reliability_score": 0.84,
+        "active": True
+    },
+    {
+        "id": "src-tolonews-af",
+        "name": "TOLOnews (Afghanistan)",
+        "domain": "tolonews.com",
+        "feed_url": "https://tolonews.com/rss/all",
+        "source_type": "rss",
+        "country": "AF",
+        "language": "en",
+        "reliability_score": 0.82,
+        "active": True
+    },
+
+    # ==========================================
     # Middle East & North Africa (Local & Regional)
     # ==========================================
     {
