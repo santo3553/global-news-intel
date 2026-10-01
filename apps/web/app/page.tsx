@@ -97,6 +97,22 @@ export default function HomePage() {
   const [isRunningPipeline, setIsRunningPipeline] = useState<boolean>(false);
   const [pipelineTelemetry, setPipelineTelemetry] = useState<PipelineTelemetry | null>(null);
   const [pipelineStatus, setPipelineStatus] = useState<PipelineStatusResponse | null>(null);
+  const [selectedSourceRegion, setSelectedSourceRegion] = useState<string>("all");
+
+  const getSourceRegion = useCallback((country?: string): string => {
+    if (!country) return "Global";
+    const c = country.toUpperCase();
+    if (["IN", "PK", "BD", "LK", "NP", "SG", "ID", "TH", "PH", "VN", "MY", "JP", "KR", "TW", "HK", "AU", "NZ", "FJ", "PG"].includes(c)) return "Asia & Pacific";
+    if (["SA", "AE", "QA", "IL", "EG", "JO", "LB", "MA", "KE", "NG", "ZA", "GH", "SD", "ET", "LY", "CD"].includes(c)) return "Middle East & Africa";
+    if (["GB", "DE", "FR", "UA", "PL", "LV", "EE", "LT", "GR", "IS", "NO", "CH", "NL", "BE", "IT", "ES", "AT", "SE", "DK", "FI", "CZ", "RO", "RU"].includes(c)) return "Europe";
+    if (["US", "CA", "MX", "BR", "AR", "CO", "CL", "JM", "UY", "PE", "VE", "PA", "CU", "TT"].includes(c)) return "Americas";
+    return "Global / UN";
+  }, []);
+
+  const filteredSources = useMemo(() => {
+    if (selectedSourceRegion === "all") return sources;
+    return sources.filter(s => getSourceRegion(s.country) === selectedSourceRegion);
+  }, [sources, selectedSourceRegion, getSourceRegion]);
 
   const loadData = useCallback(async () => {
     setLoading(true);
@@ -399,13 +415,13 @@ export default function HomePage() {
             </div>
             <div className="mt-3 flex items-baseline gap-2">
               <span className="text-2xl font-bold text-white">
-                {sources.length > 0 ? sources.length : "20+"}
+                {sources.length > 0 ? sources.length : "65+"}
               </span>
-              <span className="text-xs text-slate-400">Global Feeds</span>
+              <span className="text-xs text-amber-400 font-medium">Global & Local</span>
             </div>
             <div className="mt-2 text-xs text-slate-400 flex items-center gap-1.5">
               <CheckCircle2 className="h-3.5 w-3.5 text-emerald-400" />
-              <span>Reuters, AP, BBC, DW...</span>
+              <span>Worldwide regional feeds</span>
             </div>
           </div>
 
@@ -1083,40 +1099,75 @@ export default function HomePage() {
           {/* Curated Sources List */}
           <div className="rounded-2xl border border-slate-800 bg-slate-900/30 p-6 shadow-xl flex flex-col justify-between">
             <div>
-              <div className="flex items-center justify-between mb-4">
+              <div className="flex items-center justify-between mb-2">
                 <div className="flex items-center gap-2">
                   <Rss className="h-5 w-5 text-amber-400" />
-                  <h3 className="font-bold text-white text-sm">Curated Global News Sources</h3>
+                  <h3 className="font-bold text-white text-sm">Curated Global & Local News Sources</h3>
                 </div>
-                <span className="text-xs text-slate-400">
-                  {sources.length > 0 ? `${sources.length} active feeds` : "20 feeds configured"}
+                <span className="text-xs text-amber-300 font-mono font-medium bg-amber-500/10 px-2 py-0.5 rounded border border-amber-500/20">
+                  {sources.length > 0 ? `${sources.length} active feeds` : "66 feeds configured"}
                 </span>
               </div>
-              <p className="text-xs text-slate-400 mb-4">
-                Reliability-weighted feeds monitored across continents without paywall or authentication bypass.
+              <p className="text-xs text-slate-400 mb-3">
+                Local newspapers, domestic publishers, and international wires across 6 continents without paywall or auth bypass.
               </p>
 
-              <div className="space-y-2.5 max-h-[360px] overflow-y-auto pr-1">
-                {(sources.length > 0 ? sources.slice(0, 7) : [
-                  { id: "1", name: "Reuters World", domain: "reuters.com", country: "GB", reliability_score: 0.95 },
-                  { id: "2", name: "Associated Press Top News", domain: "apnews.com", country: "US", reliability_score: 0.95 },
-                  { id: "3", name: "BBC News World", domain: "bbc.com", country: "GB", reliability_score: 0.92 },
-                  { id: "4", name: "NHK World Japan", domain: "nhk.or.jp", country: "JP", reliability_score: 0.92 },
-                  { id: "5", name: "Deutsche Welle World", domain: "dw.com", country: "DE", reliability_score: 0.90 },
-                  { id: "6", name: "France 24 English", domain: "france24.com", country: "FR", reliability_score: 0.88 },
-                  { id: "7", name: "Al Jazeera English", domain: "aljazeera.com", country: "QA", reliability_score: 0.84 }
-                ]).map((s) => (
-                  <div key={s.id} className="flex items-center justify-between rounded-lg border border-slate-800/80 bg-slate-900/60 p-3 hover:border-slate-700 transition-all">
-                    <div className="flex items-center gap-3">
-                      <div className="flex h-8 w-8 items-center justify-center rounded bg-slate-800 text-xs font-bold text-slate-300">
+              {/* Regional Filter Tabs */}
+              <div className="flex items-center gap-1.5 flex-wrap mb-3">
+                {[
+                  { id: "all", label: "All Regions" },
+                  { id: "Asia & Pacific", label: "Asia & Pacific" },
+                  { id: "Middle East & Africa", label: "Mid East & Africa" },
+                  { id: "Americas", label: "Americas" },
+                  { id: "Europe", label: "Europe" },
+                  { id: "Global / UN", label: "Global Wires" }
+                ].map((tab) => {
+                  const count = tab.id === "all" 
+                    ? sources.length 
+                    : sources.filter(s => getSourceRegion(s.country) === tab.id).length;
+                  return (
+                    <button
+                      key={tab.id}
+                      type="button"
+                      onClick={() => setSelectedSourceRegion(tab.id)}
+                      className={`px-2.5 py-1 text-[11px] rounded-md font-medium transition-all ${
+                        selectedSourceRegion === tab.id
+                          ? "bg-amber-500 text-slate-950 font-semibold shadow-sm"
+                          : "bg-slate-800/80 text-slate-300 hover:bg-slate-700 hover:text-white"
+                      }`}
+                    >
+                      {tab.label} ({count})
+                    </button>
+                  );
+                })}
+              </div>
+
+              <div className="space-y-2 max-h-[380px] overflow-y-auto pr-1">
+                {filteredSources.map((s) => (
+                  <div key={s.id} className="flex items-center justify-between rounded-lg border border-slate-800/80 bg-slate-900/60 p-2.5 hover:border-slate-700 hover:bg-slate-800/40 transition-all">
+                    <div className="flex items-center gap-2.5 min-w-0">
+                      <div className="flex h-7 w-7 items-center justify-center rounded bg-slate-800 text-[11px] font-bold text-slate-200 border border-slate-700/60 shrink-0">
                         {s.country || "GL"}
                       </div>
-                      <div>
-                        <h4 className="text-xs font-semibold text-white">{s.name}</h4>
-                        <span className="text-[11px] text-slate-400">{s.domain}</span>
+                      <div className="truncate">
+                        <div className="flex items-center gap-1.5">
+                          <h4 className="text-xs font-semibold text-white truncate">{s.name}</h4>
+                          <span className="text-[10px] text-slate-500 font-mono px-1 rounded bg-slate-800/60">
+                            {getSourceRegion(s.country)}
+                          </span>
+                        </div>
+                        <a
+                          href={`https://${s.domain}`}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="text-[11px] text-slate-400 hover:text-sky-400 transition-colors flex items-center gap-1"
+                        >
+                          <span>{s.domain}</span>
+                          <ExternalLink className="h-2.5 w-2.5 opacity-60" />
+                        </a>
                       </div>
                     </div>
-                    <div className="flex items-center gap-2">
+                    <div className="flex items-center gap-2 shrink-0">
                       <div className="flex items-center gap-1 rounded bg-amber-500/10 px-2 py-0.5 text-[11px] font-medium text-amber-400 border border-amber-500/20">
                         <Shield className="h-3 w-3" />
                         <span>{(s.reliability_score * 100).toFixed(0)}%</span>
@@ -1129,7 +1180,7 @@ export default function HomePage() {
 
             <div className="border-t border-slate-800/80 pt-3 mt-4 flex items-center justify-between text-xs text-slate-400">
               <span>Endpoint: <code>GET /api/sources</code></span>
-              <span className="text-emerald-400 font-medium">Auto-Ingest Ready</span>
+              <span className="text-emerald-400 font-medium">66 Feeds Ingested & Calibrated</span>
             </div>
           </div>
 

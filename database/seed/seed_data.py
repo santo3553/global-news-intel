@@ -862,6 +862,444 @@ async def seed_database():
                         "relationship_type": "primary"
                     }
                 ]
+            },
+
+            # SCENARIO 16: South Asia - Bay of Bengal Climate & Coastal Resilience Accord (Dhaka, Bangladesh)
+            {
+                "event": {
+                    "id": "evt-south-asia-monsoon-2026",
+                    "canonical_title": "South Asian Coastal Defense & Monsoon Early Warning Accord Inked in Dhaka",
+                    "summary": "Environmental ministers from Bangladesh, India, and Sri Lanka ratified a historic joint disaster-mitigation framework in Dhaka, deploying shared tidal radars, sea wall fortification standards, and real-time storm data synchronization across the Bay of Bengal.",
+                    "category": "environment",
+                    "subcategory": "climate_resilience",
+                    "latitude": 23.81,
+                    "longitude": 90.41,
+                    "country": "Bangladesh",
+                    "admin_region": "Dhaka",
+                    "city": "Dhaka",
+                    "location_confidence": 0.98,
+                    "importance_score": 8.1,
+                    "confidence_score": 0.94,
+                    "human_impact_score": 8.6,
+                    "global_impact_score": 7.4,
+                    "economic_impact_score": 7.8,
+                    "political_impact_score": 8.0,
+                    "novelty_score": 7.9,
+                    "development_velocity_score": 7.2,
+                    "source_coverage_score": 8.8,
+                    "first_seen_at": now - timedelta(hours=6),
+                    "last_updated_at": now - timedelta(hours=1),
+                    "status": "active"
+                },
+                "entities": [
+                    {"name": "Bangladesh Meteorological Department", "type": "organization"},
+                    {"name": "India Meteorological Department", "type": "organization"},
+                    {"name": "Bay of Bengal Initiative", "type": "organization"}
+                ],
+                "articles": [
+                    {
+                        "id": "art-dailystar-monsoon-01",
+                        "source_id": "src-dailystar-bd",
+                        "title": "South Asian littoral nations sign landmark Bay of Bengal storm resilience pact in Dhaka",
+                        "url": "https://www.thedailystar.net/frontpage/",
+                        "author": "Rezaul Karim",
+                        "published_at": now - timedelta(hours=6),
+                        "raw_content": "A high-level climate adaptation treaty was ratified in Dhaka today, establishing a synchronized coastal radar net and multi-nation storm response teams.",
+                        "relationship_type": "primary"
+                    },
+                    {
+                        "id": "art-thehindu-monsoon-02",
+                        "source_id": "src-thehindu-in",
+                        "title": "India and regional partners activate unified maritime cyclone telemetry grid",
+                        "url": "https://www.thehindu.com/news/national/",
+                        "author": "Sujatha Prasad",
+                        "published_at": now - timedelta(hours=4, minutes=30),
+                        "raw_content": "Meteorological authorities confirmed integration of Chennai and Chittagong Doppler radar feeds into the unified regional early warning network.",
+                        "relationship_type": "corroborating"
+                    }
+                ]
+            },
+
+            # SCENARIO 17: Southeast Asia - Pan-ASEAN High-Speed Transit Corridor (Bangkok, Thailand)
+            {
+                "event": {
+                    "id": "evt-asean-rail-corridor-2026",
+                    "canonical_title": "ASEAN Finalizes High-Speed Transit Corridor Linking Bangkok, Kuala Lumpur, and Singapore",
+                    "summary": "Transport ministers gathered at the Bangkok Grand Central Terminal to finalize the interoperability protocol for the unified Pan-ASEAN electrified high-speed rail corridor, slating direct transit from Bangkok to Singapore within seven hours.",
+                    "category": "economy",
+                    "subcategory": "infrastructure",
+                    "latitude": 13.75,
+                    "longitude": 100.50,
+                    "country": "Thailand",
+                    "admin_region": "Bangkok",
+                    "city": "Bangkok",
+                    "location_confidence": 0.99,
+                    "importance_score": 8.0,
+                    "confidence_score": 0.93,
+                    "human_impact_score": 7.6,
+                    "global_impact_score": 7.9,
+                    "economic_impact_score": 9.1,
+                    "political_impact_score": 7.8,
+                    "novelty_score": 8.3,
+                    "development_velocity_score": 6.8,
+                    "source_coverage_score": 8.9,
+                    "first_seen_at": now - timedelta(hours=9),
+                    "last_updated_at": now - timedelta(hours=2),
+                    "status": "active"
+                },
+                "entities": [
+                    {"name": "State Railway of Thailand", "type": "organization"},
+                    {"name": "Keretapi Tanah Melayu", "type": "organization"},
+                    {"name": "ASEAN Transport Secretariat", "type": "organization"}
+                ],
+                "articles": [
+                    {
+                        "id": "art-bangkokpost-rail-01",
+                        "source_id": "src-bangkokpost-th",
+                        "title": "Bangkok transit summit approves unified standard gauge for Pan-ASEAN rail link",
+                        "url": "https://www.bangkokpost.com/business/",
+                        "author": "Somchai Nimit",
+                        "published_at": now - timedelta(hours=9),
+                        "raw_content": "Transport chiefs from Thailand, Malaysia, and Singapore signed a historic tripartite agreement synchronizing signals and customs for the high-speed line.",
+                        "relationship_type": "primary"
+                    },
+                    {
+                        "id": "art-straitstimes-rail-02",
+                        "source_id": "src-straitstimes-sg",
+                        "title": "Seamless cross-border express trains move closer as Bangkok-Singapore rail accord clears",
+                        "url": "https://www.straitstimes.com/asia/se-asia",
+                        "author": "Tan Boon Seng",
+                        "published_at": now - timedelta(hours=7),
+                        "raw_content": "The unified rail corridor is expected to slash logistics costs and aviation emissions across Southeast Asia once passenger trials commence.",
+                        "relationship_type": "corroborating"
+                    }
+                ]
+            },
+
+            # SCENARIO 18: Middle East - World's Largest Solar Desalination Array (Riyadh, Saudi Arabia)
+            {
+                "event": {
+                    "id": "evt-gulf-green-hydrogen-2026",
+                    "canonical_title": "Saudi Arabia and UAE Inaugurate World's Largest Solar Desalination Complex",
+                    "summary": "Officials in Riyadh cut the ribbon on a 4.5 GW solar-powered reverse osmosis seawater desalination facility capable of generating 1.2 million cubic meters of potable water daily, setting a benchmark for water security across arid regions.",
+                    "category": "science_technology",
+                    "subcategory": "clean_energy",
+                    "latitude": 24.71,
+                    "longitude": 46.67,
+                    "country": "Saudi Arabia",
+                    "admin_region": "Riyadh",
+                    "city": "Riyadh",
+                    "location_confidence": 0.99,
+                    "importance_score": 8.2,
+                    "confidence_score": 0.95,
+                    "human_impact_score": 8.7,
+                    "global_impact_score": 8.2,
+                    "economic_impact_score": 8.6,
+                    "political_impact_score": 7.4,
+                    "novelty_score": 8.4,
+                    "development_velocity_score": 6.5,
+                    "source_coverage_score": 8.7,
+                    "first_seen_at": now - timedelta(hours=8),
+                    "last_updated_at": now - timedelta(hours=1, minutes=45),
+                    "status": "active"
+                },
+                "entities": [
+                    {"name": "Saline Water Conversion Corporation", "type": "organization"},
+                    {"name": "ACWA Power", "type": "organization"},
+                    {"name": "Masdar Clean Energy", "type": "organization"}
+                ],
+                "articles": [
+                    {
+                        "id": "art-arabnews-solar-01",
+                        "source_id": "src-arabnews-sa",
+                        "title": "Riyadh unveils state-of-the-art solar water desalination plant powering 3 million residents",
+                        "url": "https://www.arabnews.com/saudi-arabia",
+                        "author": "Tariq Al-Harbi",
+                        "published_at": now - timedelta(hours=8),
+                        "raw_content": "The zero-carbon facility leverages high-efficiency photovoltaic cells to power ultra-filtration membranes, dramatically lowering municipal energy footprints.",
+                        "relationship_type": "primary"
+                    },
+                    {
+                        "id": "art-thenational-solar-02",
+                        "source_id": "src-thenational-ae",
+                        "title": "Gulf clean water transition accelerates as Riyadh mega-desalination project begins operations",
+                        "url": "https://www.thenationalnews.com/business/energy/",
+                        "author": "Nadia Salem",
+                        "published_at": now - timedelta(hours=6, minutes=15),
+                        "raw_content": "Regional energy ministers lauded the facility as a blueprint for drought-prone nations globally seeking fossil-free municipal water independence.",
+                        "relationship_type": "corroborating"
+                    }
+                ]
+            },
+
+            # SCENARIO 19: Sub-Saharan Africa - Silicon Savannah Instant Payment Grid (Nairobi, Kenya)
+            {
+                "event": {
+                    "id": "evt-africa-silicon-savannah-2026",
+                    "canonical_title": "Pan-African Instant Cross-Border Payment System Launched in Nairobi",
+                    "summary": "Central bank governors from Kenya, Nigeria, South Africa, and Ghana unveiled a unified mobile settlement switch in Nairobi, eliminating foreign currency intermediaries for trade across 24 African economies.",
+                    "category": "economy",
+                    "subcategory": "fintech",
+                    "latitude": -1.29,
+                    "longitude": 36.82,
+                    "country": "Kenya",
+                    "admin_region": "Nairobi",
+                    "city": "Nairobi",
+                    "location_confidence": 0.98,
+                    "importance_score": 8.0,
+                    "confidence_score": 0.94,
+                    "human_impact_score": 8.4,
+                    "global_impact_score": 8.0,
+                    "economic_impact_score": 9.2,
+                    "political_impact_score": 7.7,
+                    "novelty_score": 8.5,
+                    "development_velocity_score": 7.0,
+                    "source_coverage_score": 8.9,
+                    "first_seen_at": now - timedelta(hours=10),
+                    "last_updated_at": now - timedelta(hours=2),
+                    "status": "active"
+                },
+                "entities": [
+                    {"name": "Central Bank of Kenya", "type": "organization"},
+                    {"name": "African Continental Free Trade Area", "type": "organization"},
+                    {"name": "PAPSS Payment Network", "type": "organization"}
+                ],
+                "articles": [
+                    {
+                        "id": "art-dailynation-fintech-01",
+                        "source_id": "src-dailynation-ke",
+                        "title": "Nairobi launches cross-border digital shilling and intra-Africa instant settlement network",
+                        "url": "https://nation.africa/kenya/business",
+                        "author": "Mwangi Gikonyo",
+                        "published_at": now - timedelta(hours=10),
+                        "raw_content": "Small traders and businesses can now send payments directly in local currencies within seconds across East and West Africa without routing through overseas dollars.",
+                        "relationship_type": "primary"
+                    },
+                    {
+                        "id": "art-theeastafrican-fintech-02",
+                        "source_id": "src-theeastafrican-ke",
+                        "title": "African trade gets digital boost as intra-continental payment switch goes live",
+                        "url": "https://www.theeastafrican.co.ke/tea/business",
+                        "author": "Alice Mutua",
+                        "published_at": now - timedelta(hours=7, minutes=30),
+                        "raw_content": "Economists predict transaction fee reductions of up to 80% for cross-border commerce as mobile payment interoperability takes effect.",
+                        "relationship_type": "corroborating"
+                    }
+                ]
+            },
+
+            # SCENARIO 20: Latin America - Amazon Biodiversity Protection & Satellite Monitoring Compact (São Paulo, Brazil)
+            {
+                "event": {
+                    "id": "evt-amazon-bioeconomy-pact-2026",
+                    "canonical_title": "Brazil and Colombia Launch Joint Satellite Monitoring Task Force to Safeguard Amazon Basin",
+                    "summary": "Environmental agencies from Brazil, Colombia, and Peru established a joint aerospace command in São Paulo utilizing synthetic aperture radar to detect unauthorized deforestation and protect indigenous reserve boundaries in real time.",
+                    "category": "environment",
+                    "subcategory": "conservation",
+                    "latitude": -23.55,
+                    "longitude": -46.63,
+                    "country": "Brazil",
+                    "admin_region": "Sao Paulo",
+                    "city": "Sao Paulo",
+                    "location_confidence": 0.98,
+                    "importance_score": 8.3,
+                    "confidence_score": 0.94,
+                    "human_impact_score": 8.2,
+                    "global_impact_score": 8.9,
+                    "economic_impact_score": 7.3,
+                    "political_impact_score": 8.1,
+                    "novelty_score": 8.0,
+                    "development_velocity_score": 6.8,
+                    "source_coverage_score": 8.7,
+                    "first_seen_at": now - timedelta(hours=11),
+                    "last_updated_at": now - timedelta(hours=3),
+                    "status": "active"
+                },
+                "entities": [
+                    {"name": "INPE Space Agency", "type": "organization"},
+                    {"name": "IBAMA Environmental Enforcement", "type": "organization"},
+                    {"name": "Amazon Conservation Treaty Organization", "type": "organization"}
+                ],
+                "articles": [
+                    {
+                        "id": "art-riotimes-amazon-01",
+                        "source_id": "src-riotimes-br",
+                        "title": "Brazil, Colombia launch coordinated radar constellation to patrol Amazon rainforest canopy",
+                        "url": "https://riotimesonline.com/brazil-news/",
+                        "author": "Gabriela Silva",
+                        "published_at": now - timedelta(hours=11),
+                        "raw_content": "The cloud-piercing radar network provides continuous day-and-night surveillance over dense rainforest canopies, triggering immediate ranger dispatches upon disturbance.",
+                        "relationship_type": "primary"
+                    },
+                    {
+                        "id": "art-bogotapost-amazon-02",
+                        "source_id": "src-bogotapost-co",
+                        "title": "Cross-border environmental enforcement unites Andean and Amazonian nations",
+                        "url": "https://thebogotapost.com/",
+                        "author": "Camilo Restrepo",
+                        "published_at": now - timedelta(hours=8),
+                        "raw_content": "Colombian environment officials highlighted the critical importance of coordinated telemetry to halt illicit logging networks operating along border rivers.",
+                        "relationship_type": "corroborating"
+                    }
+                ]
+            },
+
+            # SCENARIO 21: Eastern & Northern Europe - Baltic Offshore Wind Supergrid Interconnection (Gdansk, Poland)
+            {
+                "event": {
+                    "id": "evt-baltic-wind-supergrid-2026",
+                    "canonical_title": "Poland and Baltic States Commission 3.2 GW Offshore Wind Supergrid Array",
+                    "summary": "Energy ministers from Poland, Lithuania, and Latvia gathered in Gdansk to inaugurate the Baltic offshore HVDC interconnection hub, linking 3.2 gigawatts of deepwater wind generation into the unified European transmission grid.",
+                    "category": "economy",
+                    "subcategory": "energy_security",
+                    "latitude": 54.35,
+                    "longitude": 18.64,
+                    "country": "Poland",
+                    "admin_region": "Pomerania",
+                    "city": "Gdansk",
+                    "location_confidence": 0.98,
+                    "importance_score": 7.9,
+                    "confidence_score": 0.93,
+                    "human_impact_score": 7.1,
+                    "global_impact_score": 8.1,
+                    "economic_impact_score": 8.7,
+                    "political_impact_score": 8.2,
+                    "novelty_score": 7.8,
+                    "development_velocity_score": 6.4,
+                    "source_coverage_score": 8.6,
+                    "first_seen_at": now - timedelta(hours=13),
+                    "last_updated_at": now - timedelta(hours=4),
+                    "status": "active"
+                },
+                "entities": [
+                    {"name": "PGE Polska Grupa Energetyczna", "type": "organization"},
+                    {"name": "Litgrid", "type": "organization"},
+                    {"name": "Baltic Offshore Wind Initiative", "type": "organization"}
+                ],
+                "articles": [
+                    {
+                        "id": "art-notesfrompoland-wind-01",
+                        "source_id": "src-notesfrompoland-pl",
+                        "title": "Poland connects massive Baltic offshore wind cluster to national power network",
+                        "url": "https://notesfrompoland.com/",
+                        "author": "Mateusz Wozniak",
+                        "published_at": now - timedelta(hours=13),
+                        "raw_content": "The offshore substation off Gdansk marks Poland's single largest renewable power asset, displacing over 4 million tons of coal emissions annually.",
+                        "relationship_type": "primary"
+                    },
+                    {
+                        "id": "art-baltictimes-wind-02",
+                        "source_id": "src-baltictimes-lv",
+                        "title": "Baltic states celebrate milestone in regional energy independence with offshore grid launch",
+                        "url": "https://www.baltictimes.com/news/",
+                        "author": "Janis Berzins",
+                        "published_at": now - timedelta(hours=10),
+                        "raw_content": "The synchronized HVDC link solidifies the complete desynchronization of the Baltic power network from legacy eastern grids.",
+                        "relationship_type": "corroborating"
+                    }
+                ]
+            },
+
+            # SCENARIO 22: Oceania & Pacific Islands - Ocean Buoy Sensor Grid for Tsunami Tracking (Suva, Fiji)
+            {
+                "event": {
+                    "id": "evt-pacific-early-warning-2026",
+                    "canonical_title": "Pacific Islands Forum Deploys Deep-Ocean Acoustic Sensor Grid for Real-Time Tsunami Tracking",
+                    "summary": "Representatives from Fiji, Samoa, Tonga, and New Zealand activated an expansive deep-ocean DART buoy array centered in Suva, delivering sub-minute seismic shock wave detection and coastal storm surge predictions across the South Pacific.",
+                    "category": "science_technology",
+                    "subcategory": "disaster_prevention",
+                    "latitude": -18.14,
+                    "longitude": 178.44,
+                    "country": "Fiji",
+                    "admin_region": "Central",
+                    "city": "Suva",
+                    "location_confidence": 0.97,
+                    "importance_score": 7.8,
+                    "confidence_score": 0.92,
+                    "human_impact_score": 8.5,
+                    "global_impact_score": 7.2,
+                    "economic_impact_score": 6.8,
+                    "political_impact_score": 7.0,
+                    "novelty_score": 8.1,
+                    "development_velocity_score": 7.4,
+                    "source_coverage_score": 8.4,
+                    "first_seen_at": now - timedelta(hours=15),
+                    "last_updated_at": now - timedelta(hours=5),
+                    "status": "active"
+                },
+                "entities": [
+                    {"name": "Pacific Community (SPC)", "type": "organization"},
+                    {"name": "Fiji Mineral Resources Department", "type": "organization"},
+                    {"name": "GNS Science New Zealand", "type": "organization"}
+                ],
+                "articles": [
+                    {
+                        "id": "art-islandsbusiness-tsunami-01",
+                        "source_id": "src-islandsbusiness-fj",
+                        "title": "Pacific nations unveil multi-million-dollar deep ocean tsunami sensor shield in Suva",
+                        "url": "https://islandsbusiness.com/",
+                        "author": "Vilimoni Bainimarama",
+                        "published_at": now - timedelta(hours=15),
+                        "raw_content": "Deep seafloor pressure sensors linked via acoustic modems will give vulnerable coastal atolls vital evacuation warnings before tidal crests hit shores.",
+                        "relationship_type": "primary"
+                    },
+                    {
+                        "id": "art-rnz-tsunami-02",
+                        "source_id": "src-rnz-nz",
+                        "title": "NZ scientists collaborate with Pacific neighbours to deploy real-time seabed warning network",
+                        "url": "https://www.rnz.co.nz/international/pacific-news",
+                        "author": "Moana Ellis",
+                        "published_at": now - timedelta(hours=12),
+                        "raw_content": "Wellington and Pacific island governments confirmed the first batch of operational telemetry was successfully received at regional hazard centers.",
+                        "relationship_type": "corroborating"
+                    }
+                ]
+            },
+
+            # SCENARIO 23: Caribbean - Island Solar Microgrid Resilience Architecture (Kingston, Jamaica)
+            {
+                "event": {
+                    "id": "evt-caribbean-microgrid-2026",
+                    "canonical_title": "CARICOM Unveils Hurricane-Resilient Island Solar Microgrid Grid Architecture",
+                    "summary": "Caribbean energy authorities convened in Kingston to launch a 350 MW distributed solar and battery storage architecture engineered to withstand Category 5 wind speeds, ensuring hospital and emergency communication uptime during tropical cyclones.",
+                    "category": "environment",
+                    "subcategory": "resilience",
+                    "latitude": 17.97,
+                    "longitude": -76.79,
+                    "country": "Jamaica",
+                    "admin_region": "Surrey",
+                    "city": "Kingston",
+                    "location_confidence": 0.98,
+                    "importance_score": 7.7,
+                    "confidence_score": 0.92,
+                    "human_impact_score": 8.3,
+                    "global_impact_score": 7.0,
+                    "economic_impact_score": 7.6,
+                    "political_impact_score": 7.2,
+                    "novelty_score": 8.2,
+                    "development_velocity_score": 6.7,
+                    "source_coverage_score": 8.3,
+                    "first_seen_at": now - timedelta(hours=14),
+                    "last_updated_at": now - timedelta(hours=3, minutes=30),
+                    "status": "active"
+                },
+                "entities": [
+                    {"name": "CARICOM Energy Directorate", "type": "organization"},
+                    {"name": "Jamaica Public Service Company", "type": "organization"},
+                    {"name": "Caribbean Development Bank", "type": "organization"}
+                ],
+                "articles": [
+                    {
+                        "id": "art-jamaicagleaner-microgrid-01",
+                        "source_id": "src-jamaicagleaner-jm",
+                        "title": "Jamaica and CARICOM roll out hardened solar microgrids to bulletproof critical utilities",
+                        "url": "https://jamaica-gleaner.com/",
+                        "author": "Althea Crawford",
+                        "published_at": now - timedelta(hours=14),
+                        "raw_content": "Engineered with reinforced aerodynamic tracking mounts and subterranean battery vaults, the microgrid nodes are built to resist extreme hurricane gusts.",
+                        "relationship_type": "primary"
+                    }
+                ]
             }
         ]
 
