@@ -2132,6 +2132,644 @@ async def seed_database():
                         "relationship_type": "primary"
                     }
                 ]
+            },
+
+            # SCENARIO 41: Bangladesh (Dhaka) - Metro Feeder Bus Network & Ward Canal Telemetry
+            {
+                "event": {
+                    "id": "evt-dhaka-metro-motijheel-2026",
+                    "canonical_title": "Dhaka Mass Transit Authority Integrates 120 Feeder Shuttles and Ward-Level Storm Canal Telemetry Across Mirpur-Motijheel Corridor",
+                    "summary": "Dhaka North and South City Corporations partner with DMTCL to eliminate monsoon waterlogging in Farmgate and Karwan Bazar while launching synchronized electric feeder shuttles across 16 stations.",
+                    "category": "infrastructure",
+                    "subcategory": "smart_transit",
+                    "country": "Bangladesh",
+                    "admin_region": "Dhaka Division",
+                    "city": "Dhaka",
+                    "latitude": 23.81,
+                    "longitude": 90.41,
+                    "location_confidence": 0.98,
+                    "importance_score": 8.3,
+                    "confidence_score": 0.94,
+                    "source_coverage_score": 8.5,
+                    "development_velocity_score": 7.6,
+                    "novelty_score": 8.2,
+                    "economic_impact_score": 8.2,
+                    "political_impact_score": 7.5,
+                    "human_impact_score": 8.8,
+                    "global_impact_score": 7.4,
+                    "first_seen_at": now - timedelta(hours=18),
+                    "last_updated_at": now - timedelta(hours=3, minutes=15),
+                    "status": "active"
+                },
+                "entities": [
+                    {"name": "Dhaka Mass Transit Company Limited", "type": "organization"},
+                    {"name": "Dhaka North City Corporation", "type": "organization"},
+                    {"name": "Mirpur-Motijheel Corridor", "type": "location"}
+                ],
+                "articles": [
+                    {
+                        "id": "art-ds-dhaka-01",
+                        "source_id": "src-dailystar-bd",
+                        "title": "MRT Line-6 launches dedicated municipal feeder shuttles to ease Karwan Bazar and Farmgate congestion",
+                        "url": "https://www.thedailystar.net/news/bangladesh/transport/dhaka-metro-feeder-shuttle-launch",
+                        "author": "Rashidul Hasan",
+                        "published_at": now - timedelta(hours=18),
+                        "raw_content": "Commuters across Mirpur, Agargaon and Motijheel can now access air-conditioned electric feeder loops timed to metro train arrivals.",
+                        "relationship_type": "primary"
+                    },
+                    {
+                        "id": "art-dt-dhaka-02",
+                        "source_id": "src-dhakatribune-bd",
+                        "title": "DNCC deploys automated IoT drainage sluices along Kalyanpur canal to curb flash waterlogging",
+                        "url": "https://www.dhakatribune.com/bangladesh/dhaka/dncc-kalyanpur-drainage-telemetry",
+                        "author": "Mamun Abdullah",
+                        "published_at": now - timedelta(hours=10),
+                        "raw_content": "Real-time acoustic depth monitors provide ward councilors with early alerts during heavy pre-monsoon downpours.",
+                        "relationship_type": "supporting"
+                    }
+                ]
+            },
+
+            # SCENARIO 42: Bangladesh (Chittagong) - Bay Terminal Automated Container Berths
+            {
+                "event": {
+                    "id": "evt-chittagong-bay-terminal-2026",
+                    "canonical_title": "Chattogram Port Authority Commissions Automated Container Yard at Bay Terminal to Quadruple Maritime Throughput",
+                    "summary": "The Patenga coastal terminal opens automated quay cranes with direct freight rail link to Dhaka, relieving vessel waiting times across the Karnaphuli river navigation channel.",
+                    "category": "economy",
+                    "subcategory": "maritime_logistics",
+                    "country": "Bangladesh",
+                    "admin_region": "Chattogram Division",
+                    "city": "Chittagong",
+                    "latitude": 22.35,
+                    "longitude": 91.78,
+                    "location_confidence": 0.97,
+                    "importance_score": 8.5,
+                    "confidence_score": 0.95,
+                    "source_coverage_score": 8.6,
+                    "development_velocity_score": 7.8,
+                    "novelty_score": 8.1,
+                    "economic_impact_score": 9.1,
+                    "political_impact_score": 7.8,
+                    "human_impact_score": 7.4,
+                    "global_impact_score": 8.0,
+                    "first_seen_at": now - timedelta(hours=22),
+                    "last_updated_at": now - timedelta(hours=4, minutes=40),
+                    "status": "active"
+                },
+                "entities": [
+                    {"name": "Chattogram Port Authority", "type": "organization"},
+                    {"name": "Bangladesh Railway", "type": "organization"},
+                    {"name": "Bay Terminal Patenga", "type": "location"}
+                ],
+                "articles": [
+                    {
+                        "id": "art-pa-ctg-01",
+                        "source_id": "src-prothomalo-bd",
+                        "title": "Chattogram Bay Terminal initiates trial docking for deep-draft panamax container vessels",
+                        "url": "https://en.prothomalo.com/business/local/chattogram-bay-terminal-deep-draft-trial",
+                        "author": "Rezaul Karim",
+                        "published_at": now - timedelta(hours=22),
+                        "raw_content": "With 12-meter draft access free from tidal dependency, the terminal will directly connect Bangladeshi garment exporters to European trunk shipping routes.",
+                        "relationship_type": "primary"
+                    }
+                ]
+            },
+
+            # SCENARIO 43: Bangladesh (Sylhet) - Surma Basin Riverine Flash Flood Early Warning
+            {
+                "event": {
+                    "id": "evt-sylhet-surma-flood-grid-2026",
+                    "canonical_title": "Sylhet City Corporation Deploys 45 Ultrasonic Water Telemetry Sensors Along Surma Basin for Ward-Level Flood Alerts",
+                    "summary": "Hydrologists and ward disaster units integrate IoT river-depth buoys to provide 6-hour advance warnings for low-lying neighborhoods in Osmani Medical and Shahjalal Upazila.",
+                    "category": "natural_disaster",
+                    "subcategory": "flood_early_warning",
+                    "country": "Bangladesh",
+                    "admin_region": "Sylhet Division",
+                    "city": "Sylhet",
+                    "latitude": 24.89,
+                    "longitude": 91.86,
+                    "location_confidence": 0.98,
+                    "importance_score": 8.2,
+                    "confidence_score": 0.93,
+                    "source_coverage_score": 8.3,
+                    "development_velocity_score": 7.9,
+                    "novelty_score": 8.4,
+                    "economic_impact_score": 7.8,
+                    "political_impact_score": 7.2,
+                    "human_impact_score": 9.0,
+                    "global_impact_score": 7.3,
+                    "first_seen_at": now - timedelta(hours=14),
+                    "last_updated_at": now - timedelta(hours=2, minutes=20),
+                    "status": "active"
+                },
+                "entities": [
+                    {"name": "Sylhet City Corporation", "type": "organization"},
+                    {"name": "Bangladesh Water Development Board", "type": "organization"},
+                    {"name": "Surma River Basin", "type": "location"}
+                ],
+                "articles": [
+                    {
+                        "id": "art-bd24-sylhet-01",
+                        "source_id": "src-bdnews24-bd",
+                        "title": "Sylhet civic authorities complete automated river sensors to combat sudden upstream hill runoff",
+                        "url": "https://bdnews24.com/bangladesh/sylhet-surma-river-sensors-early-warning",
+                        "author": "Anisur Rahman",
+                        "published_at": now - timedelta(hours=14),
+                        "raw_content": "Solar-powered ultrasonic sensors transmit live water elevation metrics to disaster shelters across 27 municipal wards.",
+                        "relationship_type": "primary"
+                    }
+                ]
+            },
+
+            # SCENARIO 44: Sri Lanka (Colombo) - Port City Transit Link & Beira Lake Sluice Automation
+            {
+                "event": {
+                    "id": "evt-colombo-port-city-light-rail-2026",
+                    "canonical_title": "Colombo Municipal Council and UDA Inaugurate Fort-to-Port City Clean Shuttle Link and Beira Lake Stormwater Gates",
+                    "summary": "Western Province engineers commission automated floodgate sluices at Beira Lake while launching zero-emission transit shuttles connecting Slave Island, Pettah, and Colombo Port City.",
+                    "category": "infrastructure",
+                    "subcategory": "urban_infrastructure",
+                    "country": "Sri Lanka",
+                    "admin_region": "Western Province",
+                    "city": "Colombo",
+                    "latitude": 6.92,
+                    "longitude": 79.86,
+                    "location_confidence": 0.98,
+                    "importance_score": 8.4,
+                    "confidence_score": 0.94,
+                    "source_coverage_score": 8.5,
+                    "development_velocity_score": 7.7,
+                    "novelty_score": 8.3,
+                    "economic_impact_score": 8.7,
+                    "political_impact_score": 7.9,
+                    "human_impact_score": 8.2,
+                    "global_impact_score": 7.8,
+                    "first_seen_at": now - timedelta(hours=19),
+                    "last_updated_at": now - timedelta(hours=5, minutes=10),
+                    "status": "active"
+                },
+                "entities": [
+                    {"name": "Colombo Municipal Council", "type": "organization"},
+                    {"name": "Urban Development Authority Sri Lanka", "type": "organization"},
+                    {"name": "Colombo Port City", "type": "location"}
+                ],
+                "articles": [
+                    {
+                        "id": "art-dm-colombo-01",
+                        "source_id": "src-dailymirror-lk",
+                        "title": "Colombo municipal authorities launch zero-emission transit shuttles linking Pettah rail terminal to Port City financial district",
+                        "url": "https://www.dailymirror.lk/news/colombo-port-city-shuttle-launch",
+                        "author": "Kelum Bandara",
+                        "published_at": now - timedelta(hours=19),
+                        "raw_content": "The transit loops aim to eliminate gridlock across Galle Face and Fort while utilizing dedicated bus priority lanes.",
+                        "relationship_type": "primary"
+                    },
+                    {
+                        "id": "art-ad-colombo-02",
+                        "source_id": "src-adaderana-lk",
+                        "title": "Automated Beira Lake sluice gates commissioned to protect Slave Island from monsoon storm surge",
+                        "url": "http://www.adaderana.lk/news/beira-lake-stormwater-sluice-gates-colombo",
+                        "author": "Sunil Jayasuriya",
+                        "published_at": now - timedelta(hours=8),
+                        "raw_content": "SCADA-connected water pumps discharge up to 30,000 liters per second directly into the Indian Ocean during sudden cloudbursts.",
+                        "relationship_type": "supporting"
+                    }
+                ]
+            },
+
+            # SCENARIO 45: Sri Lanka (Kandy) - Highland Rail Geotechnical Slope Sensor Grid
+            {
+                "event": {
+                    "id": "evt-kandy-hill-country-rail-2026",
+                    "canonical_title": "Sri Lanka Railways Activates Geotechnical Acoustic Grid to Safeguard Kandy Highland Rail Corridor Against Landslips",
+                    "summary": "National Building Research Organisation completes borehole inclinometer telemetry along Kandy-Nanu Oya tea country rail tracks following intense monsoon precipitation.",
+                    "category": "safety",
+                    "subcategory": "civil_engineering",
+                    "country": "Sri Lanka",
+                    "admin_region": "Central Province",
+                    "city": "Kandy",
+                    "latitude": 7.29,
+                    "longitude": 80.63,
+                    "location_confidence": 0.96,
+                    "importance_score": 7.9,
+                    "confidence_score": 0.92,
+                    "source_coverage_score": 8.0,
+                    "development_velocity_score": 7.4,
+                    "novelty_score": 8.0,
+                    "economic_impact_score": 7.6,
+                    "political_impact_score": 6.8,
+                    "human_impact_score": 8.5,
+                    "global_impact_score": 7.0,
+                    "first_seen_at": now - timedelta(hours=16),
+                    "last_updated_at": now - timedelta(hours=6, minutes=45),
+                    "status": "active"
+                },
+                "entities": [
+                    {"name": "Sri Lanka Railways", "type": "organization"},
+                    {"name": "National Building Research Organisation", "type": "organization"},
+                    {"name": "Kandy Highland Rail Line", "type": "location"}
+                ],
+                "articles": [
+                    {
+                        "id": "art-isl-kandy-01",
+                        "source_id": "src-island-lk",
+                        "title": "NBRO installs real-time slope stability sensors along Kandy-Badulla mainline after torrential mountain rains",
+                        "url": "https://island.lk/kandy-rail-corridor-slope-monitoring",
+                        "author": "Neville de Silva",
+                        "published_at": now - timedelta(hours=16),
+                        "raw_content": "Automated warning signals integrate directly with railway cabin dispatchers, automatically slowing trains if micro-earth movement exceeds 2 millimeters.",
+                        "relationship_type": "primary"
+                    }
+                ]
+            },
+
+            # SCENARIO 46: Sri Lanka (Galle) - Offshore Marine Renewable Microgrid & Coral Sanctuary
+            {
+                "event": {
+                    "id": "evt-galle-southern-maritime-hub-2026",
+                    "canonical_title": "Southern Provincial Council Commissions 120MW Marine Microgrid and Coral Sanctuary Telemetry off Galle Harbor",
+                    "summary": "Sri Lanka Sustainable Energy Authority integrates offshore turbine clusters with Galle Port electrical substations and Southern Expressway EV charging stations.",
+                    "category": "energy",
+                    "subcategory": "clean_energy",
+                    "country": "Sri Lanka",
+                    "admin_region": "Southern Province",
+                    "city": "Galle",
+                    "latitude": 6.05,
+                    "longitude": 80.22,
+                    "location_confidence": 0.97,
+                    "importance_score": 8.1,
+                    "confidence_score": 0.93,
+                    "source_coverage_score": 8.2,
+                    "development_velocity_score": 7.5,
+                    "novelty_score": 8.3,
+                    "economic_impact_score": 8.3,
+                    "political_impact_score": 7.4,
+                    "human_impact_score": 7.7,
+                    "global_impact_score": 7.6,
+                    "first_seen_at": now - timedelta(hours=21),
+                    "last_updated_at": now - timedelta(hours=7, minutes=30),
+                    "status": "active"
+                },
+                "entities": [
+                    {"name": "Sri Lanka Sustainable Energy Authority", "type": "organization"},
+                    {"name": "Galle Harbor Port Authority", "type": "organization"},
+                    {"name": "Southern Maritime Microgrid", "type": "location"}
+                ],
+                "articles": [
+                    {
+                        "id": "art-nf-galle-01",
+                        "source_id": "src-newsfirst-lk",
+                        "title": "Galle commissions Southern Province's first offshore coastal hybrid wind and tidal microgrid",
+                        "url": "https://www.newsfirst.lk/news/galle-offshore-clean-energy-microgrid",
+                        "author": "Chaminda Senaratne",
+                        "published_at": now - timedelta(hours=21),
+                        "raw_content": "The floating array feeds up to 120 megawatts into the southern transmission loop while hosting an artificial reef nursery.",
+                        "relationship_type": "primary"
+                    }
+                ]
+            },
+
+            # SCENARIO 47: Nepal (Kathmandu) - Valley EV Transit & 32-Ward Air Quality Telemetry
+            {
+                "event": {
+                    "id": "evt-kathmandu-valley-electric-bus-2026",
+                    "canonical_title": "Kathmandu Metropolitan City Deploys 100 Electric Bus Fleet and 32-Ward Real-Time Air Quality Sensor Grid",
+                    "summary": "Mayor of Kathmandu and Sajha Yatayat launch synchronized Valley EV corridors across Ring Road and Lalitpur while deploying ward-level particulate monitors to combat winter thermal inversions.",
+                    "category": "environment",
+                    "subcategory": "air_quality",
+                    "country": "Nepal",
+                    "admin_region": "Bagmati Province",
+                    "city": "Kathmandu",
+                    "latitude": 27.71,
+                    "longitude": 85.32,
+                    "location_confidence": 0.98,
+                    "importance_score": 8.4,
+                    "confidence_score": 0.95,
+                    "source_coverage_score": 8.6,
+                    "development_velocity_score": 7.8,
+                    "novelty_score": 8.5,
+                    "economic_impact_score": 8.1,
+                    "political_impact_score": 7.7,
+                    "human_impact_score": 9.1,
+                    "global_impact_score": 7.6,
+                    "first_seen_at": now - timedelta(hours=20),
+                    "last_updated_at": now - timedelta(hours=4, minutes=15),
+                    "status": "active"
+                },
+                "entities": [
+                    {"name": "Kathmandu Metropolitan City", "type": "organization"},
+                    {"name": "Sajha Yatayat", "type": "organization"},
+                    {"name": "Kathmandu Valley Ring Road", "type": "location"}
+                ],
+                "articles": [
+                    {
+                        "id": "art-kp-ktm-01",
+                        "source_id": "src-kathmandupost-np",
+                        "title": "Kathmandu unveils 100 new zero-emission buses to eliminate smoke corridors along Valley Ring Road",
+                        "url": "https://kathmandupost.com/valley/kathmandu-electric-bus-rollout-ring-road",
+                        "author": "Anup Ojha",
+                        "published_at": now - timedelta(hours=20),
+                        "raw_content": "The fleet links Balaju, Koteshwor, Kalanki and Chabahil with subsidized low-floor smart ticketing.",
+                        "relationship_type": "primary"
+                    },
+                    {
+                        "id": "art-tht-ktm-02",
+                        "source_id": "src-thehimalayantimes-np",
+                        "title": "KMC installs municipal PM2.5 air pollution monitors across all 32 wards to enforce localized burn bans",
+                        "url": "https://thehimalayantimes.com/kathmandu/kmc-air-quality-sensors-32-wards",
+                        "author": "Rajan Pokhrel",
+                        "published_at": now - timedelta(hours=11),
+                        "raw_content": "Ward-level sensor telemetry feeds directly into digital billboard warnings across New Road, Thamel and Asan bazaar.",
+                        "relationship_type": "supporting"
+                    }
+                ]
+            },
+
+            # SCENARIO 48: Nepal (Pokhara) - Annapurna GLOF Satellite Early Warning Grid
+            {
+                "event": {
+                    "id": "evt-pokhara-annapurna-glacier-sensor-2026",
+                    "canonical_title": "Department of Hydrology Activates Satellite Telemetry GLOF Warning Sensors in Annapurna Range Above Pokhara",
+                    "summary": "Glaciologists and Gandaki provincial authorities install seismic-acoustic detectors at high-altitude moraine lakes to safeguard Seti River settlements against sudden glacial outburst surges.",
+                    "category": "natural_disaster",
+                    "subcategory": "flood_early_warning",
+                    "country": "Nepal",
+                    "admin_region": "Gandaki Province",
+                    "city": "Pokhara",
+                    "latitude": 28.20,
+                    "longitude": 83.98,
+                    "location_confidence": 0.97,
+                    "importance_score": 8.5,
+                    "confidence_score": 0.94,
+                    "source_coverage_score": 8.4,
+                    "development_velocity_score": 7.7,
+                    "novelty_score": 8.6,
+                    "economic_impact_score": 7.9,
+                    "political_impact_score": 7.3,
+                    "human_impact_score": 9.2,
+                    "global_impact_score": 8.1,
+                    "first_seen_at": now - timedelta(hours=17),
+                    "last_updated_at": now - timedelta(hours=3, minutes=50),
+                    "status": "active"
+                },
+                "entities": [
+                    {"name": "Department of Hydrology and Meteorology Nepal", "type": "organization"},
+                    {"name": "Gandaki Provincial Disaster Council", "type": "organization"},
+                    {"name": "Annapurna Seti Basin", "type": "location"}
+                ],
+                "articles": [
+                    {
+                        "id": "art-rep-pokhara-01",
+                        "source_id": "src-myrepublica-np",
+                        "title": "High-altitude satellite early-warning sirens installed at Annapurna glacial lakes to protect downstream Pokhara valley",
+                        "url": "https://myrepublica.nagariknetwork.com/news/annapurna-glof-sensors-pokhara-seti",
+                        "author": "Santosh Pokharel",
+                        "published_at": now - timedelta(hours=17),
+                        "raw_content": "The system monitors thermal moraine melting and acoustic fracture waves, granting downstream towns up to 45 minutes of critical evacuation time.",
+                        "relationship_type": "primary"
+                    }
+                ]
+            },
+
+            # SCENARIO 49: Nepal (Birgunj) - Cross-Border High-Capacity Container Dry Port Terminal
+            {
+                "event": {
+                    "id": "evt-birgunj-icp-freight-rail-2026",
+                    "canonical_title": "Nepal Intermodal Board Opens Automated High-Capacity Dry Port Terminal at Birgunj Integrated Check Post",
+                    "summary": "Customs digitalization and electric freight handling eliminate bilateral cargo turnaround delays along the Kolkata-Raxaul-Birgunj trade lifeline.",
+                    "category": "economy",
+                    "subcategory": "trade_logistics",
+                    "country": "Nepal",
+                    "admin_region": "Madhesh Province",
+                    "city": "Birgunj",
+                    "latitude": 27.01,
+                    "longitude": 84.88,
+                    "location_confidence": 0.97,
+                    "importance_score": 8.2,
+                    "confidence_score": 0.93,
+                    "source_coverage_score": 8.3,
+                    "development_velocity_score": 7.6,
+                    "novelty_score": 8.0,
+                    "economic_impact_score": 8.9,
+                    "political_impact_score": 7.6,
+                    "human_impact_score": 7.5,
+                    "global_impact_score": 7.8,
+                    "first_seen_at": now - timedelta(hours=23),
+                    "last_updated_at": now - timedelta(hours=6, minutes=10),
+                    "status": "active"
+                },
+                "entities": [
+                    {"name": "Nepal Intermodal Transport Development Board", "type": "organization"},
+                    {"name": "Birgunj Integrated Check Post", "type": "location"},
+                    {"name": "Kolkata-Raxaul Freight Artery", "type": "location"}
+                ],
+                "articles": [
+                    {
+                        "id": "art-ok-birgunj-01",
+                        "source_id": "src-onlinekhabar-np",
+                        "title": "Birgunj Integrated Check Post initiates automated cargo scanning to fast-track container clearance",
+                        "url": "https://english.onlinekhabar.com/birgunj-icp-dry-port-automation.html",
+                        "author": "Shankar Acharya",
+                        "published_at": now - timedelta(hours=23),
+                        "raw_content": "Direct rail siding and RFID e-lock verification cut dwell times for industrial raw materials from days to under four hours.",
+                        "relationship_type": "primary"
+                    }
+                ]
+            },
+
+            # SCENARIO 50: Pakistan (Karachi) - K-IV Hawkesbay Solar Desalination Plant & Municipal Water Grid
+            {
+                "event": {
+                    "id": "evt-karachi-kiv-water-desalination-2026",
+                    "canonical_title": "Karachi Metropolitan Corporation Commissions K-IV Hawkesbay Solar Desalination Plant to Supply 50 MGD to Ward Districts",
+                    "summary": "Sindh Water Board launches automated pipeline telemetry across Lyari and Saddar municipal wards, reducing municipal water tanker rationing.",
+                    "category": "infrastructure",
+                    "subcategory": "urban_infrastructure",
+                    "country": "Pakistan",
+                    "admin_region": "Sindh",
+                    "city": "Karachi",
+                    "latitude": 24.86,
+                    "longitude": 67.00,
+                    "location_confidence": 0.98,
+                    "importance_score": 8.6,
+                    "confidence_score": 0.95,
+                    "source_coverage_score": 8.7,
+                    "development_velocity_score": 7.9,
+                    "novelty_score": 8.4,
+                    "economic_impact_score": 8.9,
+                    "political_impact_score": 8.0,
+                    "human_impact_score": 9.3,
+                    "global_impact_score": 8.0,
+                    "first_seen_at": now - timedelta(hours=21),
+                    "last_updated_at": now - timedelta(hours=4, minutes=50),
+                    "status": "active"
+                },
+                "entities": [
+                    {"name": "Karachi Water and Sewerage Corporation", "type": "organization"},
+                    {"name": "Sindh Provincial Government", "type": "organization"},
+                    {"name": "Hawkesbay Coastal District", "type": "location"}
+                ],
+                "articles": [
+                    {
+                        "id": "art-dwn-karachi-01",
+                        "source_id": "src-dawn-pk",
+                        "title": "Karachi inaugurates Hawkesbay solar seawater desalination facility to supply 50 million gallons daily",
+                        "url": "https://www.dawn.com/news/karachi-hawkesbay-desalination-launch",
+                        "author": "Imran Ayub",
+                        "published_at": now - timedelta(hours=21),
+                        "raw_content": "The solar-powered plant channels clean potable water directly into municipal reservoirs servicing Lyari, Kemari and downtown Karachi.",
+                        "relationship_type": "primary"
+                    },
+                    {
+                        "id": "art-et-karachi-02",
+                        "source_id": "src-expresstribune-pk",
+                        "title": "Smart digital telemetry installed along K-IV bulk water feeder pipes to halt illegal hydrant siphoning",
+                        "url": "https://tribune.com.pk/story/karachi-kiv-water-telemetry-monitoring",
+                        "author": "Raza Hassan",
+                        "published_at": now - timedelta(hours=12),
+                        "raw_content": "Acoustic flow-rate meters relay live pipeline pressure to the central civic control room, eliminating distribution losses.",
+                        "relationship_type": "supporting"
+                    }
+                ]
+            },
+
+            # SCENARIO 51: Pakistan (Lahore) - AI Smog Absorption Towers & Municipal Green Fleet
+            {
+                "event": {
+                    "id": "evt-lahore-smog-ai-corridor-2026",
+                    "canonical_title": "Punjab Environmental Authority Launches AI-Guided Smog Absorption Towers and Electric Sweepers Across Lahore Wards",
+                    "summary": "Municipal teams deploy real-time PM2.5 tracking across Mall Road, Gulberg, and Cantonment wards to enforce targeted traffic restrictions and urban air scrubbing.",
+                    "category": "environment",
+                    "subcategory": "air_quality",
+                    "country": "Pakistan",
+                    "admin_region": "Punjab",
+                    "city": "Lahore",
+                    "latitude": 31.52,
+                    "longitude": 74.35,
+                    "location_confidence": 0.98,
+                    "importance_score": 8.4,
+                    "confidence_score": 0.93,
+                    "source_coverage_score": 8.5,
+                    "development_velocity_score": 7.7,
+                    "novelty_score": 8.5,
+                    "economic_impact_score": 8.2,
+                    "political_impact_score": 7.8,
+                    "human_impact_score": 9.1,
+                    "global_impact_score": 7.9,
+                    "first_seen_at": now - timedelta(hours=16),
+                    "last_updated_at": now - timedelta(hours=3, minutes=30),
+                    "status": "active"
+                },
+                "entities": [
+                    {"name": "Punjab Environment Protection Department", "type": "organization"},
+                    {"name": "Lahore Waste Management Company", "type": "organization"},
+                    {"name": "Gulberg & Mall Road Ward Corridors", "type": "location"}
+                ],
+                "articles": [
+                    {
+                        "id": "art-geo-lahore-01",
+                        "source_id": "src-geonews-pk",
+                        "title": "Lahore deploys automated mist towers and electric sweepers to combat hazardous winter smog index",
+                        "url": "https://www.geo.tv/latest/lahore-smog-ai-towers-electric-sweepers",
+                        "author": "Fahad Chaudhry",
+                        "published_at": now - timedelta(hours=16),
+                        "raw_content": "The automated towers filter up to 1.5 million cubic meters of ambient air per hour in heavy traffic junctions during peak morning commute.",
+                        "relationship_type": "primary"
+                    }
+                ]
+            },
+
+            # SCENARIO 52: Maldives (Malé) - Hulhumalé Coastal Surge Revetment & Electric Atoll Ferry
+            {
+                "event": {
+                    "id": "evt-male-hulhumale-sea-wall-2026",
+                    "canonical_title": "Malé City Council Commissions Dissipative Wave-Barrier Revetments and Electric Atoll Shuttles to Hulhumalé Phase-2",
+                    "summary": "Ministry of National Planning deploys autonomous electric catamarans and tidal surge barriers to defend capital island wards against rising sea levels.",
+                    "category": "infrastructure",
+                    "subcategory": "urban_infrastructure",
+                    "country": "Maldives",
+                    "admin_region": "Kaafu Atoll",
+                    "city": "Malé",
+                    "latitude": 4.17,
+                    "longitude": 73.50,
+                    "location_confidence": 0.97,
+                    "importance_score": 8.3,
+                    "confidence_score": 0.93,
+                    "source_coverage_score": 8.3,
+                    "development_velocity_score": 7.5,
+                    "novelty_score": 8.4,
+                    "economic_impact_score": 8.4,
+                    "political_impact_score": 7.7,
+                    "human_impact_score": 8.8,
+                    "global_impact_score": 8.2,
+                    "first_seen_at": now - timedelta(hours=18),
+                    "last_updated_at": now - timedelta(hours=5, minutes=0),
+                    "status": "active"
+                },
+                "entities": [
+                    {"name": "Ministry of National Planning Maldives", "type": "organization"},
+                    {"name": "Malé City Council", "type": "organization"},
+                    {"name": "Hulhumalé Phase-2 Marine Artery", "type": "location"}
+                ],
+                "articles": [
+                    {
+                        "id": "art-ed-male-01",
+                        "source_id": "src-edition-mv",
+                        "title": "Maldives completes reinforced wave-absorbing breakwaters and rapid electric ferry piers connecting Malé to Hulhumalé",
+                        "url": "https://edition.mv/news/male-hulhumale-coastal-breakwater-ferry",
+                        "author": "Mohamed Sharuhaan",
+                        "published_at": now - timedelta(hours=18),
+                        "raw_content": "The eco-concrete breakwater absorbs up to 70 percent of ocean swell energy while recharging all-electric commuter catamarans via wave power.",
+                        "relationship_type": "primary"
+                    }
+                ]
+            },
+
+            # SCENARIO 53: Bhutan (Thimphu) - Mountain Valley Hydro EV Grid & Gelephu Rapid Transit
+            {
+                "event": {
+                    "id": "evt-thimphu-gelepuh-mindfulness-city-2026",
+                    "canonical_title": "Royal Government of Bhutan Launches Thimphu Valley Electric Transit Grid Connecting Gelephu Special Corridor",
+                    "summary": "Bhutan Power Corporation commissions 100% run-of-the-river hydroelectric EV charging infrastructure across Thimphu to power zero-emission mountain transit.",
+                    "category": "energy",
+                    "subcategory": "clean_energy",
+                    "country": "Bhutan",
+                    "admin_region": "Thimphu District",
+                    "city": "Thimphu",
+                    "latitude": 27.47,
+                    "longitude": 89.63,
+                    "location_confidence": 0.96,
+                    "importance_score": 8.0,
+                    "confidence_score": 0.92,
+                    "source_coverage_score": 8.1,
+                    "development_velocity_score": 7.3,
+                    "novelty_score": 8.2,
+                    "economic_impact_score": 8.1,
+                    "political_impact_score": 7.6,
+                    "human_impact_score": 7.8,
+                    "global_impact_score": 7.7,
+                    "first_seen_at": now - timedelta(hours=22),
+                    "last_updated_at": now - timedelta(hours=6, minutes=30),
+                    "status": "active"
+                },
+                "entities": [
+                    {"name": "Bhutan Power Corporation", "type": "organization"},
+                    {"name": "Royal Government of Bhutan", "type": "organization"},
+                    {"name": "Thimphu Valley Green Artery", "type": "location"}
+                ],
+                "articles": [
+                    {
+                        "id": "art-kn-thimphu-01",
+                        "source_id": "src-kuensel-bt",
+                        "title": "Bhutan rolls out all-electric mountain buses and hydro charging stations linking Thimphu to southern hubs",
+                        "url": "https://kuenselonline.com/thimphu-electric-bus-charging-grid",
+                        "author": "Tshering Palden",
+                        "published_at": now - timedelta(hours=22),
+                        "raw_content": "Powered completely by clean Himalayan run-of-the-river hydropower, the transit system ensures carbon-negative urban mobility.",
+                        "relationship_type": "primary"
+                    }
+                ]
             }
         ]
 

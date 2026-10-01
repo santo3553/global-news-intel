@@ -198,6 +198,28 @@ CURATED_SOURCES: List[Dict[str, Any]] = [
         "active": True
     },
     {
+        "id": "src-expresstribune-pk",
+        "name": "The Express Tribune (Pakistan)",
+        "domain": "tribune.com.pk",
+        "feed_url": "https://tribune.com.pk/feed/home",
+        "source_type": "rss",
+        "country": "PK",
+        "language": "en",
+        "reliability_score": 0.84,
+        "active": True
+    },
+    {
+        "id": "src-geonews-pk",
+        "name": "Geo News (Pakistan)",
+        "domain": "geo.tv",
+        "feed_url": "https://www.geo.tv/rss/1/1",
+        "source_type": "rss",
+        "country": "PK",
+        "language": "en",
+        "reliability_score": 0.83,
+        "active": True
+    },
+    {
         "id": "src-dailystar-bd",
         "name": "The Daily Star (Bangladesh)",
         "domain": "thedailystar.net",
@@ -209,10 +231,76 @@ CURATED_SOURCES: List[Dict[str, Any]] = [
         "active": True
     },
     {
+        "id": "src-dhakatribune-bd",
+        "name": "Dhaka Tribune (Bangladesh)",
+        "domain": "dhakatribune.com",
+        "feed_url": "https://www.dhakatribune.com/feed",
+        "source_type": "rss",
+        "country": "BD",
+        "language": "en",
+        "reliability_score": 0.84,
+        "active": True
+    },
+    {
+        "id": "src-prothomalo-bd",
+        "name": "Prothom Alo English (Bangladesh)",
+        "domain": "en.prothomalo.com",
+        "feed_url": "https://en.prothomalo.com/feed",
+        "source_type": "rss",
+        "country": "BD",
+        "language": "en",
+        "reliability_score": 0.86,
+        "active": True
+    },
+    {
+        "id": "src-bdnews24-bd",
+        "name": "bdnews24.com (Bangladesh)",
+        "domain": "bdnews24.com",
+        "feed_url": "https://bdnews24.com/feed",
+        "source_type": "rss",
+        "country": "BD",
+        "language": "en",
+        "reliability_score": 0.83,
+        "active": True
+    },
+    {
         "id": "src-dailymirror-lk",
         "name": "Daily Mirror (Sri Lanka)",
         "domain": "dailymirror.lk",
         "feed_url": "https://www.dailymirror.lk/RSS_Feeds/breaking_news",
+        "source_type": "rss",
+        "country": "LK",
+        "language": "en",
+        "reliability_score": 0.82,
+        "active": True
+    },
+    {
+        "id": "src-adaderana-lk",
+        "name": "Ada Derana (Sri Lanka)",
+        "domain": "adaderana.lk",
+        "feed_url": "http://www.adaderana.lk/rss.php",
+        "source_type": "rss",
+        "country": "LK",
+        "language": "en",
+        "reliability_score": 0.84,
+        "active": True
+    },
+    {
+        "id": "src-island-lk",
+        "name": "The Island (Sri Lanka)",
+        "domain": "island.lk",
+        "feed_url": "https://island.lk/feed/",
+        "source_type": "rss",
+        "country": "LK",
+        "language": "en",
+        "reliability_score": 0.81,
+        "active": True
+    },
+    {
+        "id": "src-newsfirst-lk",
+        "name": "News First (Sri Lanka)",
+        "domain": "newsfirst.lk",
+        "feed_url": "https://www.newsfirst.lk/feed/",
         "source_type": "rss",
         "country": "LK",
         "language": "en",
@@ -228,6 +316,61 @@ CURATED_SOURCES: List[Dict[str, Any]] = [
         "country": "NP",
         "language": "en",
         "reliability_score": 0.82,
+        "active": True
+    },
+    {
+        "id": "src-thehimalayantimes-np",
+        "name": "The Himalayan Times (Nepal)",
+        "domain": "thehimalayantimes.com",
+        "feed_url": "https://thehimalayantimes.com/feed",
+        "source_type": "rss",
+        "country": "NP",
+        "language": "en",
+        "reliability_score": 0.83,
+        "active": True
+    },
+    {
+        "id": "src-myrepublica-np",
+        "name": "MyRepublica (Nepal)",
+        "domain": "myrepublica.nagariknetwork.com",
+        "feed_url": "https://myrepublica.nagariknetwork.com/feed",
+        "source_type": "rss",
+        "country": "NP",
+        "language": "en",
+        "reliability_score": 0.82,
+        "active": True
+    },
+    {
+        "id": "src-onlinekhabar-np",
+        "name": "OnlineKhabar English (Nepal)",
+        "domain": "english.onlinekhabar.com",
+        "feed_url": "https://english.onlinekhabar.com/feed",
+        "source_type": "rss",
+        "country": "NP",
+        "language": "en",
+        "reliability_score": 0.81,
+        "active": True
+    },
+    {
+        "id": "src-edition-mv",
+        "name": "The Edition (Maldives)",
+        "domain": "edition.mv",
+        "feed_url": "https://edition.mv/rss",
+        "source_type": "rss",
+        "country": "MV",
+        "language": "en",
+        "reliability_score": 0.82,
+        "active": True
+    },
+    {
+        "id": "src-kuensel-bt",
+        "name": "Kuensel (Bhutan)",
+        "domain": "kuenselonline.com",
+        "feed_url": "https://kuenselonline.com/feed/",
+        "source_type": "rss",
+        "country": "BT",
+        "language": "en",
+        "reliability_score": 0.84,
         "active": True
     },
 

@@ -105,7 +105,7 @@ export default function HomePage() {
   const getSourceRegion = useCallback((country?: string): string => {
     if (!country) return "Global";
     const c = country.toUpperCase();
-    if (["IN", "PK", "BD", "LK", "NP"].includes(c)) return "India & South Asia";
+    if (["IN", "PK", "BD", "LK", "NP", "MV", "BT"].includes(c)) return "India & South Asia";
     if (["KZ", "UZ", "KG", "TJ", "TM", "AZ", "GE", "AM", "AF", "TR"].includes(c)) return "Central Asia & Caucasus";
     if (["SG", "ID", "TH", "PH", "VN", "MY", "JP", "KR", "TW", "HK", "AU", "NZ", "FJ", "PG"].includes(c)) return "Asia & Pacific";
     if (["SA", "AE", "QA", "IL", "EG", "JO", "LB", "MA", "KE", "NG", "ZA", "GH", "SD", "ET", "LY", "CD"].includes(c)) return "Middle East & Africa";
@@ -147,6 +147,12 @@ export default function HomePage() {
 
   const COUNTRY_CENTERS: Record<string, { center: [number, number]; zoom: number }> = useMemo(() => ({
     "India": { center: [78.5, 22.0], zoom: 4.2 },
+    "Bangladesh": { center: [90.35, 23.68], zoom: 6.8 },
+    "Sri Lanka": { center: [80.77, 7.87], zoom: 7.2 },
+    "Nepal": { center: [84.12, 28.39], zoom: 7.0 },
+    "Pakistan": { center: [69.34, 30.37], zoom: 5.2 },
+    "Maldives": { center: [73.50, 4.17], zoom: 8.0 },
+    "Bhutan": { center: [89.63, 27.47], zoom: 7.5 },
     "United States": { center: [-98.0, 39.0], zoom: 3.5 },
     "Kazakhstan": { center: [67.0, 48.0], zoom: 3.8 },
     "Uzbekistan": { center: [64.0, 41.5], zoom: 4.5 },
@@ -1112,6 +1118,10 @@ export default function HomePage() {
               {[
                 { id: "all", label: "Worldwide (All)", count: events.length },
                 { id: "India", label: "🇮🇳 India", count: events.filter(e => (e.country || "").toLowerCase() === "india").length },
+                { id: "Bangladesh", label: "🇧🇩 Bangladesh", count: events.filter(e => (e.country || "").toLowerCase() === "bangladesh").length },
+                { id: "Sri Lanka", label: "🇱🇰 Sri Lanka", count: events.filter(e => (e.country || "").toLowerCase() === "sri lanka").length },
+                { id: "Nepal", label: "🇳🇵 Nepal", count: events.filter(e => (e.country || "").toLowerCase() === "nepal").length },
+                { id: "Pakistan", label: "🇵🇰 Pakistan", count: events.filter(e => (e.country || "").toLowerCase() === "pakistan").length },
                 { id: "Kazakhstan", label: "🇰🇿 Central Asia", count: events.filter(e => ["Kazakhstan", "Uzbekistan", "Kyrgyzstan", "Tajikistan", "Turkmenistan"].includes(e.country || "")).length },
                 { id: "United States", label: "🇺🇸 United States", count: events.filter(e => (e.country || "").toLowerCase() === "united states").length },
                 { id: "Japan", label: "🇯🇵 Japan", count: events.filter(e => (e.country || "").toLowerCase() === "japan").length },
