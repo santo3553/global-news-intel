@@ -139,6 +139,21 @@ export default function IntelligenceMap({
   const [showImpactZones, setShowImpactZones] = useState<boolean>(true);
   const [cursorCoords, setCursorCoords] = useState<{ lng: number; lat: number } | null>(null);
 
+  // Stable references to callbacks and last emitted bounds to eliminate render loops
+  const onBoundsChangeRef = useRef(onBoundsChange);
+  useEffect(() => {
+    onBoundsChangeRef.current = onBoundsChange;
+  });
+
+  const onSelectEventRef = useRef(onSelectEvent);
+  useEffect(() => {
+    onSelectEventRef.current = onSelectEvent;
+  });
+
+  const lastBboxRef = useRef<string>("");
+  const lastZoomRef = useRef<number>(1.8);
+  const lastFocusedKeyRef = useRef<string>("");
+
   // Convert events to GeoJSON Points
   const toGeoJSON = useCallback((eventsList: EventItem[]) => {
     const filtered = activeCategory === "all" 
@@ -698,19 +713,27 @@ export default function IntelligenceMap({
           setCursorCoords(null);
         });
 
-        // Viewport bounding box listener
+        // Viewport bounding box listener with change guards
         const emitBounds = () => {
+          if (!map) return;
           const currentZoom = Math.round(map.getZoom() * 10) / 10;
-          setZoomLevel(currentZoom);
-          if (onBoundsChange) {
+          setZoomLevel(prev => (prev === currentZoom ? prev : currentZoom));
+
+          if (onBoundsChangeRef.current) {
             const bounds = map.getBounds();
             const bbox = `${bounds.getWest().toFixed(3)},${bounds.getSouth().toFixed(3)},${bounds.getEast().toFixed(3)},${bounds.getNorth().toFixed(3)}`;
-            onBoundsChange(bbox, currentZoom);
+            if (lastBboxRef.current !== bbox || Math.abs(lastZoomRef.current - currentZoom) >= 0.1) {
+              lastBboxRef.current = bbox;
+              lastZoomRef.current = currentZoom;
+              onBoundsChangeRef.current(bbox, currentZoom);
+            }
           }
         };
 
         map.on("moveend", emitBounds);
-        emitBounds();
+        map.once("load", () => {
+          emitBounds();
+        });
       });
     }
 
@@ -767,6 +790,7 @@ export default function IntelligenceMap({
   // Handle external reset to global view
   useEffect(() => {
     if (resetViewTrigger && mapRef.current) {
+      lastFocusedKeyRef.current = "";
       if (focusedMarkerRef.current) {
         focusedMarkerRef.current.remove();
         focusedMarkerRef.current = null;
@@ -786,88 +810,110 @@ export default function IntelligenceMap({
 
   // Handle focusing map to a specific event's exact location
   useEffect(() => {
-    if (focusedEventCoords && mapRef.current && maplibreglRef.current) {
-      const { lng, lat, title, city, country, category, location_confidence } = focusedEventCoords;
-
-      // Draw Tactical Concentric Range Rings (50km, 100km, 250km)
-      const rangeSource = mapRef.current.getSource("range-rings-source");
-      if (rangeSource) {
-        rangeSource.setData(createRangeRingsGeoJSON([lng, lat]));
-      }
-
-      // Center map smoothly on the actual location
-      mapRef.current.flyTo({
-        center: [lng, lat],
-        zoom: Math.max(mapRef.current.getZoom(), 5.8),
-        essential: true,
-        duration: 1600
-      });
-
-      // Clear any prior focused marker
+    if (!focusedEventCoords) {
+      lastFocusedKeyRef.current = "";
       if (focusedMarkerRef.current) {
         focusedMarkerRef.current.remove();
         focusedMarkerRef.current = null;
       }
-
-      // Create an animated HTML pinpoint beacon element
-      const el = document.createElement("div");
-      el.className = "cursor-pointer group select-none";
-      el.innerHTML = `
-        <div class="relative flex flex-col items-center -translate-x-1/2 -translate-y-full">
-          <div class="absolute -bottom-1 h-5 w-5 rounded-full bg-rose-500/70 animate-ping"></div>
-          <div class="relative flex items-center gap-1.5 rounded-full bg-rose-600 px-3 py-1 text-white shadow-2xl border-2 border-white ring-4 ring-rose-500/40">
-            <svg class="h-3.5 w-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"></path><circle cx="12" cy="10" r="3"></circle></svg>
-            <span class="text-[11px] font-bold tracking-wide">${city || country || "Event Location"}</span>
-          </div>
-          <div class="w-0 h-0 border-x-4 border-x-transparent border-t-4 border-t-rose-600"></div>
-        </div>
-      `;
-
-      el.addEventListener("click", () => {
-        if (focusedEventCoords.id) {
-          onSelectEvent(focusedEventCoords.id);
+      if (mapRef.current) {
+        const rangeSource = mapRef.current.getSource("range-rings-source");
+        if (rangeSource) {
+          rangeSource.setData({ type: "FeatureCollection", features: [] });
         }
-      });
-
-      // Open interactive popup at the exact location
-      const popup = new maplibreglRef.current.Popup({
-        offset: 35,
-        closeButton: true,
-        closeOnClick: false
-      }).setHTML(`
-        <div style="font-family: inherit; max-width: 270px;">
-          <div style="display: flex; align-items: center; justify-content: space-between; gap: 8px; margin-bottom: 6px;">
-            <span style="background: rgba(244,63,94,0.2); color: #fb7185; font-size: 10px; font-weight: 700; padding: 2px 6px; border-radius: 4px; text-transform: uppercase; border: 1px solid rgba(244,63,94,0.3);">
-              ${category?.replace("_", " ") || "EVENT LOCATION"}
-            </span>
-            <span style="color: #34d399; font-size: 10px; font-weight: 600;">
-              ${Math.round((location_confidence || 0.96) * 100)}% GPS Grounded
-            </span>
-          </div>
-          <h4 style="font-weight: 700; color: #ffffff; font-size: 13px; line-height: 1.35; margin-bottom: 6px;">
-            ${title || "Active News Event"}
-          </h4>
-          <div style="font-size: 11px; color: #cbd5e1; display: flex; align-items: center; justify-content: space-between; border-top: 1px solid #1e293b; padding-top: 6px;">
-            <span>📍 <strong>${city ? `${city}, ` : ""}${country || "Global"}</strong></span>
-            <span style="color: #64748b; font-size: 10px; font-family: monospace;">
-              ${lat.toFixed(3)}°, ${lng.toFixed(3)}°
-            </span>
-          </div>
-          <div style="margin-top: 4px; font-size: 10px; color: #38bdf8;">
-            Concentric 50km, 100km & 250km tactical range rings active
-          </div>
-        </div>
-      `);
-
-      const marker = new maplibreglRef.current.Marker({ element: el })
-        .setLngLat([lng, lat])
-        .setPopup(popup)
-        .addTo(mapRef.current);
-
-      popup.addTo(mapRef.current);
-      focusedMarkerRef.current = marker;
+      }
+      return;
     }
-  }, [focusedEventCoords, onSelectEvent, createRangeRingsGeoJSON]);
+
+    if (!mapRef.current || !maplibreglRef.current) return;
+
+    const { lng, lat, title, city, country, category, location_confidence } = focusedEventCoords;
+    const focusKey = `${lng.toFixed(3)}_${lat.toFixed(3)}_${title || ""}`;
+
+    // Prevent redundant map flyTo and marker churn if already focused on this coordinate
+    if (lastFocusedKeyRef.current === focusKey) {
+      return;
+    }
+    lastFocusedKeyRef.current = focusKey;
+
+    // Draw Tactical Concentric Range Rings (50km, 100km, 250km)
+    const rangeSource = mapRef.current.getSource("range-rings-source");
+    if (rangeSource) {
+      rangeSource.setData(createRangeRingsGeoJSON([lng, lat]));
+    }
+
+    // Center map smoothly on the actual location
+    mapRef.current.flyTo({
+      center: [lng, lat],
+      zoom: Math.max(mapRef.current.getZoom(), 5.8),
+      essential: true,
+      duration: 1600
+    });
+
+    // Clear any prior focused marker
+    if (focusedMarkerRef.current) {
+      focusedMarkerRef.current.remove();
+      focusedMarkerRef.current = null;
+    }
+
+    // Create an animated HTML pinpoint beacon element
+    const el = document.createElement("div");
+    el.className = "cursor-pointer group select-none";
+    el.innerHTML = `
+      <div class="relative flex flex-col items-center -translate-x-1/2 -translate-y-full">
+        <div class="absolute -bottom-1 h-5 w-5 rounded-full bg-rose-500/70 animate-ping"></div>
+        <div class="relative flex items-center gap-1.5 rounded-full bg-rose-600 px-3 py-1 text-white shadow-2xl border-2 border-white ring-4 ring-rose-500/40">
+          <svg class="h-3.5 w-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"></path><circle cx="12" cy="10" r="3"></circle></svg>
+          <span class="text-[11px] font-bold tracking-wide">${city || country || "Event Location"}</span>
+        </div>
+        <div class="w-0 h-0 border-x-4 border-x-transparent border-t-4 border-t-rose-600"></div>
+      </div>
+    `;
+
+    el.addEventListener("click", () => {
+      if (focusedEventCoords.id && onSelectEventRef.current) {
+        onSelectEventRef.current(focusedEventCoords.id);
+      }
+    });
+
+    // Open interactive popup at the exact location
+    const popup = new maplibreglRef.current.Popup({
+      offset: 35,
+      closeButton: true,
+      closeOnClick: false
+    }).setHTML(`
+      <div style="font-family: inherit; max-width: 270px;">
+        <div style="display: flex; align-items: center; justify-content: space-between; gap: 8px; margin-bottom: 6px;">
+          <span style="background: rgba(244,63,94,0.2); color: #fb7185; font-size: 10px; font-weight: 700; padding: 2px 6px; border-radius: 4px; text-transform: uppercase; border: 1px solid rgba(244,63,94,0.3);">
+            ${category?.replace("_", " ") || "EVENT LOCATION"}
+          </span>
+          <span style="color: #34d399; font-size: 10px; font-weight: 600;">
+            ${Math.round((location_confidence || 0.96) * 100)}% GPS Grounded
+          </span>
+        </div>
+        <h4 style="font-weight: 700; color: #ffffff; font-size: 13px; line-height: 1.35; margin-bottom: 6px;">
+          ${title || "Active News Event"}
+        </h4>
+        <div style="font-size: 11px; color: #cbd5e1; display: flex; align-items: center; justify-content: space-between; border-top: 1px solid #1e293b; padding-top: 6px;">
+          <span>📍 <strong>${city ? `${city}, ` : ""}${country || "Global"}</strong></span>
+          <span style="color: #64748b; font-size: 10px; font-family: monospace;">
+            ${lat.toFixed(3)}°, ${lng.toFixed(3)}°
+          </span>
+        </div>
+        <div style="margin-top: 4px; font-size: 10px; color: #38bdf8;">
+          Concentric 50km, 100km & 250km tactical range rings active
+        </div>
+      </div>
+    `);
+
+    const marker = new maplibreglRef.current.Marker({ element: el })
+      .setLngLat([lng, lat])
+      .setPopup(popup)
+      .addTo(mapRef.current);
+
+    popup.addTo(mapRef.current);
+    focusedMarkerRef.current = marker;
+  }, [focusedEventCoords, createRangeRingsGeoJSON]);
 
   // Sync category if controlled from parent
   useEffect(() => {

@@ -171,6 +171,7 @@ export default function HomePage() {
   const handleSelectCountry = (country: string) => {
     setSelectedCountry(country);
     if (country === "all") {
+      setFocusedEventCoords(null);
       setResetViewTrigger(prev => prev + 1);
       return;
     }
@@ -331,9 +332,23 @@ export default function HomePage() {
     return list;
   }, [events, selectedCountry, selectedScope, getEventScope, mapBbox, isZoomedIn, isViewportSyncActive, selectedMapCategory, sortBy]);
 
-  const handleResetToGlobal = () => {
+  const handleResetToGlobal = useCallback(() => {
+    setFocusedEventCoords(null);
     setResetViewTrigger(prev => prev + 1);
-  };
+  }, []);
+
+  const handleSelectEvent = useCallback((id: string) => {
+    setSelectedEventId(id);
+  }, []);
+
+  const handleBoundsChange = useCallback((bbox: string, zoom: number) => {
+    setMapBbox(prev => (prev === bbox ? prev : bbox));
+    setMapZoom(prev => (Math.abs(prev - zoom) < 0.05 ? prev : zoom));
+  }, []);
+
+  const handleCategoryChange = useCallback((cat: string) => {
+    setSelectedMapCategory(cat);
+  }, []);
 
   const handleFocusEventOnMap = (evt: EventItem) => {
     setFocusedEventCoords({
@@ -947,13 +962,10 @@ export default function HomePage() {
 
           <IntelligenceMap
             events={events}
-            onSelectEvent={(id) => setSelectedEventId(id)}
-            onBoundsChange={(bbox, zoom) => {
-              setMapBbox(bbox);
-              setMapZoom(zoom);
-            }}
+            onSelectEvent={handleSelectEvent}
+            onBoundsChange={handleBoundsChange}
             selectedCategory={selectedMapCategory}
-            onCategoryChange={(cat) => setSelectedMapCategory(cat)}
+            onCategoryChange={handleCategoryChange}
             resetViewTrigger={resetViewTrigger}
             focusedEventCoords={focusedEventCoords}
           />
