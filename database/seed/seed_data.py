@@ -1694,6 +1694,444 @@ async def seed_database():
                         "relationship_type": "primary"
                     }
                 ]
+            },
+
+            # SCENARIO 32: Delhi-NCR (Hyper-Local / Ward & Municipal) - Real-time Air Quality Action Plan & EV Corridor
+            {
+                "event": {
+                    "id": "evt-delhi-ncr-air-quality-2026",
+                    "canonical_title": "Delhi-NCR Municipal Commission Deploys Ward-Level Automated Dust Suppression & Strict Zone-4 Traffic Curbs",
+                    "summary": "The Commission for Air Quality Management (CAQM) and Delhi Municipal Corporation activated ward-level IoT smog towers and mandated non-electric commercial vehicle diversions across Anand Vihar, Connaught Place, and Noida arterial corridors to suppress seasonal PM2.5 concentrations.",
+                    "category": "environment",
+                    "subcategory": "air_quality",
+                    "latitude": 28.61,
+                    "longitude": 77.21,
+                    "country": "India",
+                    "admin_region": "Delhi",
+                    "city": "New Delhi",
+                    "location_confidence": 0.99,
+                    "importance_score": 8.4,
+                    "confidence_score": 0.95,
+                    "human_impact_score": 8.9,
+                    "global_impact_score": 7.3,
+                    "economic_impact_score": 7.8,
+                    "political_impact_score": 8.1,
+                    "novelty_score": 8.0,
+                    "development_velocity_score": 8.2,
+                    "source_coverage_score": 9.2,
+                    "first_seen_at": now - timedelta(hours=4),
+                    "last_updated_at": now - timedelta(minutes=45),
+                    "status": "developing"
+                },
+                "entities": [
+                    {"name": "Commission for Air Quality Management", "type": "organization"},
+                    {"name": "Municipal Corporation of Delhi", "type": "organization"},
+                    {"name": "Central Pollution Control Board", "type": "organization"}
+                ],
+                "articles": [
+                    {
+                        "id": "art-ht-delhi-01",
+                        "source_id": "src-hindustantimes-in",
+                        "title": "Delhi launches hyper-local sensor network across 250 municipal wards to combat winter particulate spikes",
+                        "url": "https://www.hindustantimes.com/cities/delhi-news/delhi-ward-air-quality-grid",
+                        "author": "Soumya Pillai",
+                        "published_at": now - timedelta(hours=4),
+                        "raw_content": "The Municipal Corporation of Delhi deployed misting cannon trucks and dynamic electronic variable message signs across all major roundabouts.",
+                        "relationship_type": "primary"
+                    },
+                    {
+                        "id": "art-ndtv-delhi-02",
+                        "source_id": "src-ndtv-in",
+                        "title": "Delhi-NCR air index curbs: Commercial truck checkpoints operational on 12 border entry corridors",
+                        "url": "https://www.ndtv.com/delhi-news/delhi-traffic-diversion-smog-guidelines",
+                        "author": "NDTV News Desk",
+                        "published_at": now - timedelta(hours=2, minutes=30),
+                        "raw_content": "Traffic police teams in Gurugram, Faridabad, and Noida set up electronic RFID diversion bays for non-essential commercial vehicles.",
+                        "relationship_type": "corroborating"
+                    }
+                ]
+            },
+
+            # SCENARIO 33: Mumbai (Hyper-Local / Coastal Municipal) - Mumbai Coastal Road Tunnel & High-Speed Connector
+            {
+                "event": {
+                    "id": "evt-mumbai-coastal-road-2026",
+                    "canonical_title": "Mumbai Municipal Corporation Opens Phase-2 Undersea Tunnel Linking Nariman Point to Bandra-Worli Sea Link",
+                    "summary": "Brihanmumbai Municipal Corporation (BMC) inaugurated the twin undersea road tunnels between Marine Drive and Worli, slashing peak South Mumbai commute times by 70% with real-time acoustic fire safety monitoring.",
+                    "category": "economy",
+                    "subcategory": "urban_infrastructure",
+                    "latitude": 18.92,
+                    "longitude": 72.83,
+                    "country": "India",
+                    "admin_region": "Maharashtra",
+                    "city": "Mumbai",
+                    "location_confidence": 0.99,
+                    "importance_score": 8.2,
+                    "confidence_score": 0.94,
+                    "human_impact_score": 8.6,
+                    "global_impact_score": 7.5,
+                    "economic_impact_score": 8.8,
+                    "political_impact_score": 7.8,
+                    "novelty_score": 8.1,
+                    "development_velocity_score": 7.5,
+                    "source_coverage_score": 8.9,
+                    "first_seen_at": now - timedelta(hours=6),
+                    "last_updated_at": now - timedelta(hours=1, minutes=15),
+                    "status": "active"
+                },
+                "entities": [
+                    {"name": "Brihanmumbai Municipal Corporation", "type": "organization"},
+                    {"name": "Maharashtra State Road Development Corporation", "type": "organization"}
+                ],
+                "articles": [
+                    {
+                        "id": "art-ie-mumbai-01",
+                        "source_id": "src-indianexpress-in",
+                        "title": "Mumbai coastal road fully operational: Marine Drive to Worli commute cut to 10 minutes",
+                        "url": "https://indianexpress.com/article/cities/mumbai/mumbai-coastal-road-phase-2-undersea-tunnel",
+                        "author": "Clara Lewis",
+                        "published_at": now - timedelta(hours=6),
+                        "raw_content": "The subterranean expressway incorporates seismic dampers and automated ventilation shafts bored 20 meters beneath the Arabian Sea seabed.",
+                        "relationship_type": "primary"
+                    },
+                    {
+                        "id": "art-livemint-mumbai-02",
+                        "source_id": "src-livemint-in",
+                        "title": "Maharashtra infrastructure boom: Mumbai coastal highway opens, boosting western suburbs commercial logistics",
+                        "url": "https://www.livemint.com/news/india/mumbai-coastal-road-traffic-telemetry",
+                        "author": "Anirudh Laskar",
+                        "published_at": now - timedelta(hours=3),
+                        "raw_content": "Commercial real estate developers in Lower Parel and Worli reported surging corporate leasing following direct arterial highway connectivity.",
+                        "relationship_type": "corroborating"
+                    }
+                ]
+            },
+
+            # SCENARIO 34: Bengaluru (Hyper-Local / Tech Corridor) - Outer Ring Road Autonomous Feeder Shuttles & Metro Interchange
+            {
+                "event": {
+                    "id": "evt-bengaluru-orr-transit-2026",
+                    "canonical_title": "Bengaluru Outer Ring Road Companies Alliance Launches Autonomous Electric Bus Feeders & Silk Board Interchange",
+                    "summary": "The Bangalore Metropolitan Transport Corporation (BMTC) partnered with Whitefield and Bellandur IT corridors to deploy 120 dedicated electric feeder shuttles directly synchronized with the newly commissioned Yellow Line metro interchange.",
+                    "category": "science_technology",
+                    "subcategory": "smart_transit",
+                    "latitude": 12.97,
+                    "longitude": 77.59,
+                    "country": "India",
+                    "admin_region": "Karnataka",
+                    "city": "Bengaluru",
+                    "location_confidence": 0.98,
+                    "importance_score": 8.0,
+                    "confidence_score": 0.92,
+                    "human_impact_score": 8.5,
+                    "global_impact_score": 7.7,
+                    "economic_impact_score": 8.5,
+                    "political_impact_score": 7.4,
+                    "novelty_score": 8.3,
+                    "development_velocity_score": 7.1,
+                    "source_coverage_score": 8.7,
+                    "first_seen_at": now - timedelta(hours=8),
+                    "last_updated_at": now - timedelta(hours=2),
+                    "status": "active"
+                },
+                "entities": [
+                    {"name": "Bangalore Metropolitan Transport Corporation", "type": "organization"},
+                    {"name": "Outer Ring Road Companies Association", "type": "organization"},
+                    {"name": "Namma Metro", "type": "organization"}
+                ],
+                "articles": [
+                    {
+                        "id": "art-dh-bengaluru-01",
+                        "source_id": "src-deccanherald-in",
+                        "title": "Bengaluru tech corridor traffic respite: 120 EV feeder buses operational along Bellandur and Outer Ring Road",
+                        "url": "https://www.deccanherald.com/india/karnataka/bengaluru/outer-ring-road-smart-shuttles",
+                        "author": "Rasheed Kappan",
+                        "published_at": now - timedelta(hours=8),
+                        "raw_content": "The low-floor accessible electric buses operate at 4-minute intervals connecting major tech parks directly to the Silk Board elevated metro hub.",
+                        "relationship_type": "primary"
+                    },
+                    {
+                        "id": "art-thehindu-bengaluru-02",
+                        "source_id": "src-thehindu-in",
+                        "title": "Bengaluru Smart City initiative integrates contactless ticketing across Namma Metro and corporate tech parks",
+                        "url": "https://www.thehindu.com/news/cities/bangalore/bengaluru-silk-board-interchange-ev",
+                        "author": "K.V. Aditya Bharadwaj",
+                        "published_at": now - timedelta(hours=4),
+                        "raw_content": "Tech employees can tap standard corporate smartcards to access both intra-park shuttles and rapid transit trains.",
+                        "relationship_type": "corroborating"
+                    }
+                ]
+            },
+
+            # SCENARIO 35: Chennai (State & Maritime Port) - Ennore Deep-Water Green Ammonia & Hydrogen Bunkering Artery
+            {
+                "event": {
+                    "id": "evt-chennai-ennore-port-2026",
+                    "canonical_title": "Tamil Nadu Maritime Board Commissions Green Hydrogen Bunkering Terminal at Chennai Kamarajar Port",
+                    "summary": "Tamil Nadu maritime infrastructure authorities and international shipping consortiums opened India's first zero-carbon marine bunkering jetty at Ennore, capable of refueling 40 deep-sea container vessels monthly.",
+                    "category": "economy",
+                    "subcategory": "maritime_trade",
+                    "latitude": 13.08,
+                    "longitude": 80.27,
+                    "country": "India",
+                    "admin_region": "Tamil Nadu",
+                    "city": "Chennai",
+                    "location_confidence": 0.98,
+                    "importance_score": 7.9,
+                    "confidence_score": 0.91,
+                    "human_impact_score": 7.4,
+                    "global_impact_score": 8.1,
+                    "economic_impact_score": 8.7,
+                    "political_impact_score": 7.6,
+                    "novelty_score": 8.2,
+                    "development_velocity_score": 6.4,
+                    "source_coverage_score": 8.4,
+                    "first_seen_at": now - timedelta(hours=10),
+                    "last_updated_at": now - timedelta(hours=3),
+                    "status": "active"
+                },
+                "entities": [
+                    {"name": "Tamil Nadu Maritime Board", "type": "organization"},
+                    {"name": "Kamarajar Port Limited", "type": "organization"}
+                ],
+                "articles": [
+                    {
+                        "id": "art-thehindu-chennai-01",
+                        "source_id": "src-thehindu-in",
+                        "title": "Chennai's Kamarajar Port becomes first in South Asia to initiate commercial green ammonia ship bunkering",
+                        "url": "https://www.thehindu.com/news/national/tamil-nadu/chennai-ennore-green-bunkering",
+                        "author": "Sunitha Sekar",
+                        "published_at": now - timedelta(hours=10),
+                        "raw_content": "The cryogenic fuel storage farm is directly linked to offshore solar-powered electrolyzers along the Coromandel coastline.",
+                        "relationship_type": "primary"
+                    }
+                ]
+            },
+
+            # SCENARIO 36: Kolkata (Municipal & Riverine) - East-West Under-River Metro Expansion & Hooghly Flood Barrier Network
+            {
+                "event": {
+                    "id": "evt-kolkata-metro-hooghly-2026",
+                    "canonical_title": "Kolkata Metro Extends Underwater Hooghly River Service to Howrah Station with Automated Sluice Flood Gates",
+                    "summary": "Kolkata Metro Rail Corporation (KMRC) and civil flood engineers activated 14 pneumatic floodgate chambers along the Hooghly river tunnel, safeguarding high-frequency passenger transit beneath the river during monsoon surges.",
+                    "category": "science_technology",
+                    "subcategory": "civil_engineering",
+                    "latitude": 22.57,
+                    "longitude": 88.36,
+                    "country": "India",
+                    "admin_region": "West Bengal",
+                    "city": "Kolkata",
+                    "location_confidence": 0.99,
+                    "importance_score": 8.1,
+                    "confidence_score": 0.93,
+                    "human_impact_score": 8.7,
+                    "global_impact_score": 7.6,
+                    "economic_impact_score": 8.4,
+                    "political_impact_score": 7.7,
+                    "novelty_score": 8.1,
+                    "development_velocity_score": 6.8,
+                    "source_coverage_score": 8.6,
+                    "first_seen_at": now - timedelta(hours=11),
+                    "last_updated_at": now - timedelta(hours=3, minutes=30),
+                    "status": "active"
+                },
+                "entities": [
+                    {"name": "Kolkata Metro Rail Corporation", "type": "organization"},
+                    {"name": "Howrah Municipal Corporation", "type": "organization"}
+                ],
+                "articles": [
+                    {
+                        "id": "art-telegraph-kolkata-01",
+                        "source_id": "src-telegraph-in",
+                        "title": "Kolkata underwater metro increases peak frequency across Howrah corridor; automated Hooghly flood monitors active",
+                        "url": "https://www.telegraphindia.com/west-bengal/calcutta/kolkata-underwater-metro-howrah-frequency",
+                        "author": "Subhajoy Roy",
+                        "published_at": now - timedelta(hours=11),
+                        "raw_content": "The state-of-the-art tunnel sensors transmit telemetry to central command at 500-millisecond intervals to detect any moisture variations.",
+                        "relationship_type": "primary"
+                    }
+                ]
+            },
+
+            # SCENARIO 37: Hyderabad (Regional & Biotech) - Genome Valley AI-Powered Biopharmaceutical Cluster Expansion
+            {
+                "event": {
+                    "id": "evt-hyderabad-genome-valley-2026",
+                    "canonical_title": "Telangana Expands Hyderabad Genome Valley with $1.4B Automated Biologics & AI Drug Discovery Campus",
+                    "summary": "Telangana state government and global pharmaceutical research alliances opened Phase-4 of Genome Valley in Hyderabad, introducing robotic formulation labs and a centralized cold-chain logistics park.",
+                    "category": "science_technology",
+                    "subcategory": "biotechnology",
+                    "latitude": 17.38,
+                    "longitude": 78.48,
+                    "country": "India",
+                    "admin_region": "Telangana",
+                    "city": "Hyderabad",
+                    "location_confidence": 0.98,
+                    "importance_score": 7.8,
+                    "confidence_score": 0.91,
+                    "human_impact_score": 7.9,
+                    "global_impact_score": 8.2,
+                    "economic_impact_score": 8.6,
+                    "political_impact_score": 7.5,
+                    "novelty_score": 8.0,
+                    "development_velocity_score": 6.5,
+                    "source_coverage_score": 8.3,
+                    "first_seen_at": now - timedelta(hours=13),
+                    "last_updated_at": now - timedelta(hours=4),
+                    "status": "active"
+                },
+                "entities": [
+                    {"name": "Telangana Life Sciences Advisory Committee", "type": "organization"},
+                    {"name": "Genome Valley Bio-Cluster", "type": "organization"}
+                ],
+                "articles": [
+                    {
+                        "id": "art-ie-hyderabad-01",
+                        "source_id": "src-indianexpress-in",
+                        "title": "Hyderabad Genome Valley Phase-4 inaugurated: Telangana solidifies global life sciences manufacturing leadership",
+                        "url": "https://indianexpress.com/article/cities/hyderabad/hyderabad-genome-valley-expansion",
+                        "author": "Sreenivas Janyala",
+                        "published_at": now - timedelta(hours=13),
+                        "raw_content": "The campus integrates cleanrooms with high-performance computing clusters designed for accelerated vaccine candidate synthesis.",
+                        "relationship_type": "primary"
+                    }
+                ]
+            },
+
+            # SCENARIO 38: Ahmedabad (Regional Transport) - Mumbai-Ahmedabad High Speed Rail Sabarmati Multimodal Transit Terminal
+            {
+                "event": {
+                    "id": "evt-ahmedabad-bullet-train-2026",
+                    "canonical_title": "National High Speed Rail Corporation Completes Sabarmati Multimodal Bullet Train Terminal in Ahmedabad",
+                    "summary": "High-speed rail engineers in Ahmedabad completed the central terminal building for the Mumbai-Ahmedabad bullet train corridor, connecting high-speed rail with Western Railway broad-gauge platforms and Ahmedabad BRTS buses.",
+                    "category": "economy",
+                    "subcategory": "rail_transport",
+                    "latitude": 23.02,
+                    "longitude": 72.57,
+                    "country": "India",
+                    "admin_region": "Gujarat",
+                    "city": "Ahmedabad",
+                    "location_confidence": 0.98,
+                    "importance_score": 8.3,
+                    "confidence_score": 0.93,
+                    "human_impact_score": 8.4,
+                    "global_impact_score": 8.0,
+                    "economic_impact_score": 8.9,
+                    "political_impact_score": 8.0,
+                    "novelty_score": 8.2,
+                    "development_velocity_score": 7.0,
+                    "source_coverage_score": 8.8,
+                    "first_seen_at": now - timedelta(hours=14),
+                    "last_updated_at": now - timedelta(hours=4, minutes=15),
+                    "status": "active"
+                },
+                "entities": [
+                    {"name": "National High Speed Rail Corporation", "type": "organization"},
+                    {"name": "Gujarat Metro Rail Corporation", "type": "organization"}
+                ],
+                "articles": [
+                    {
+                        "id": "art-livemint-ahmedabad-01",
+                        "source_id": "src-livemint-in",
+                        "title": "Sabarmati bullet train terminal ready: Integrated ticketing to link Ahmedabad metro, railway, and high-speed rail",
+                        "url": "https://www.livemint.com/news/india/ahmedabad-sabarmati-bullet-train-hub",
+                        "author": "Shayan Ghosh",
+                        "published_at": now - timedelta(hours=14),
+                        "raw_content": "The terminal features roof-top photovoltaic arrays and automated luggage transfer belts directly connecting airport shuttle bays.",
+                        "relationship_type": "primary"
+                    }
+                ]
+            },
+
+            # SCENARIO 39: Kochi (Hyper-Local Island Transit) - Kochi Water Metro 10-Island Clean Ferry Grid Expansion
+            {
+                "event": {
+                    "id": "evt-kochi-water-metro-2026",
+                    "canonical_title": "Kochi Water Metro Extends All-Electric Ferry Services to 10 Additional Island Terminals",
+                    "summary": "Kochi Metro Rail Limited (KMRL) expanded its battery-electric catamaran ferry fleet to cover Vypin, Bolgatty, and Mattancherry, providing affordable solar-powered water transport to over 80,000 daily island commuters.",
+                    "category": "environment",
+                    "subcategory": "green_mobility",
+                    "latitude": 9.93,
+                    "longitude": 76.27,
+                    "country": "India",
+                    "admin_region": "Kerala",
+                    "city": "Kochi",
+                    "location_confidence": 0.98,
+                    "importance_score": 7.7,
+                    "confidence_score": 0.92,
+                    "human_impact_score": 8.3,
+                    "global_impact_score": 7.4,
+                    "economic_impact_score": 8.1,
+                    "political_impact_score": 7.5,
+                    "novelty_score": 8.0,
+                    "development_velocity_score": 6.3,
+                    "source_coverage_score": 8.2,
+                    "first_seen_at": now - timedelta(hours=15),
+                    "last_updated_at": now - timedelta(hours=5),
+                    "status": "active"
+                },
+                "entities": [
+                    {"name": "Kochi Metro Rail Limited", "type": "organization"},
+                    {"name": "Kerala State Inland Navigation Corporation", "type": "organization"}
+                ],
+                "articles": [
+                    {
+                        "id": "art-mathrubhumi-kochi-01",
+                        "source_id": "src-mathrubhumi-in",
+                        "title": "Kochi Water Metro expands fleet to 10 more terminals; eco-friendly water transport brings islanders closer to city mainland",
+                        "url": "https://english.mathrubhumi.com/news/kerala/kochi-water-metro-ten-new-terminals",
+                        "author": "Anil Radhakrishnan",
+                        "published_at": now - timedelta(hours=15),
+                        "raw_content": "The silent battery-powered vessels feature air-conditioned cabins and dedicated floating pontoons that rise and fall with sea tides.",
+                        "relationship_type": "primary"
+                    }
+                ]
+            },
+
+            # SCENARIO 40: Guwahati / Northeast (Disaster Resilience & Regional Riverine) - Brahmaputra Basin Real-Time Sensor Telemetry Net
+            {
+                "event": {
+                    "id": "evt-guwahati-brahmaputra-flood-2026",
+                    "canonical_title": "Assam Disaster Management Authority Installs 85 Acoustic River Sensors Across Brahmaputra Basin in Guwahati",
+                    "summary": "Hydrologists and state emergency response teams along the Brahmaputra river installed high-precision acoustic doppler riverbed profilers and solar telemetry stations in Guwahati to provide 48-hour advance flash flood warnings to over 3 million riverbank residents.",
+                    "category": "natural_disaster",
+                    "subcategory": "flood_early_warning",
+                    "latitude": 26.14,
+                    "longitude": 91.73,
+                    "country": "India",
+                    "admin_region": "Assam",
+                    "city": "Guwahati",
+                    "location_confidence": 0.98,
+                    "importance_score": 8.5,
+                    "confidence_score": 0.94,
+                    "human_impact_score": 9.1,
+                    "global_impact_score": 7.8,
+                    "economic_impact_score": 8.4,
+                    "political_impact_score": 7.9,
+                    "novelty_score": 8.3,
+                    "development_velocity_score": 7.6,
+                    "source_coverage_score": 8.7,
+                    "first_seen_at": now - timedelta(hours=17),
+                    "last_updated_at": now - timedelta(hours=5, minutes=30),
+                    "status": "active"
+                },
+                "entities": [
+                    {"name": "Assam State Disaster Management Authority", "type": "organization"},
+                    {"name": "Brahmaputra Board", "type": "organization"},
+                    {"name": "Central Water Commission", "type": "organization"}
+                ],
+                "articles": [
+                    {
+                        "id": "art-ht-guwahati-01",
+                        "source_id": "src-hindustantimes-in",
+                        "title": "Assam deploys automated Doppler river-depth sensors in Brahmaputra to eliminate flash-flood blind spots",
+                        "url": "https://www.hindustantimes.com/india-news/assam-brahmaputra-flood-telemetry-grid",
+                        "author": "Utpal Parashar",
+                        "published_at": now - timedelta(hours=17),
+                        "raw_content": "The ultrasonic transducers detect sudden embankment erosion and silt accumulation, alerting village panchayats via SMS siren relays.",
+                        "relationship_type": "primary"
+                    }
+                ]
             }
         ]
 

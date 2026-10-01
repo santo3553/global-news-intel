@@ -88,14 +88,91 @@ CURATED_SOURCES: List[Dict[str, Any]] = [
         "active": True
     },
     {
+        "id": "src-hindustantimes-in",
+        "name": "Hindustan Times (Delhi & National)",
+        "domain": "hindustantimes.com",
+        "feed_url": "https://www.hindustantimes.com/feeds/rss/india-news/rssfeed.xml",
+        "source_type": "rss",
+        "country": "IN",
+        "language": "en",
+        "reliability_score": 0.85,
+        "active": True
+    },
+    {
+        "id": "src-ndtv-in",
+        "name": "NDTV India News",
+        "domain": "ndtv.com",
+        "feed_url": "https://feeds.feedburner.com/ndtvnews-india-news",
+        "source_type": "rss",
+        "country": "IN",
+        "language": "en",
+        "reliability_score": 0.85,
+        "active": True
+    },
+    {
+        "id": "src-livemint-in",
+        "name": "Livemint (Economy & Urban Policy)",
+        "domain": "livemint.com",
+        "feed_url": "https://www.livemint.com/rss/news",
+        "source_type": "rss",
+        "country": "IN",
+        "language": "en",
+        "reliability_score": 0.87,
+        "active": True
+    },
+    {
         "id": "src-deccanherald-in",
-        "name": "Deccan Herald (Bangalore)",
+        "name": "Deccan Herald (Bengaluru & South)",
         "domain": "deccanherald.com",
         "feed_url": "https://www.deccanherald.com/rss/national.rss",
         "source_type": "rss",
         "country": "IN",
         "language": "en",
         "reliability_score": 0.84,
+        "active": True
+    },
+    {
+        "id": "src-telegraph-in",
+        "name": "The Telegraph (Kolkata & East India)",
+        "domain": "telegraphindia.com",
+        "feed_url": "https://www.telegraphindia.com/rss/india",
+        "source_type": "rss",
+        "country": "IN",
+        "language": "en",
+        "reliability_score": 0.84,
+        "active": True
+    },
+    {
+        "id": "src-tribune-in",
+        "name": "The Tribune (North India & Chandigarh)",
+        "domain": "tribuneindia.com",
+        "feed_url": "https://www.tribuneindia.com/rss/feed",
+        "source_type": "rss",
+        "country": "IN",
+        "language": "en",
+        "reliability_score": 0.83,
+        "active": True
+    },
+    {
+        "id": "src-mathrubhumi-in",
+        "name": "Mathrubhumi English (Kerala & Coastal South)",
+        "domain": "mathrubhumi.com",
+        "feed_url": "https://english.mathrubhumi.com/rss/news/kerala",
+        "source_type": "rss",
+        "country": "IN",
+        "language": "en",
+        "reliability_score": 0.84,
+        "active": True
+    },
+    {
+        "id": "src-dailyexcelsior-in",
+        "name": "Daily Excelsior (Jammu & Kashmir)",
+        "domain": "dailyexcelsior.com",
+        "feed_url": "https://www.dailyexcelsior.com/feed/",
+        "source_type": "rss",
+        "country": "IN",
+        "language": "en",
+        "reliability_score": 0.82,
         "active": True
     },
     {

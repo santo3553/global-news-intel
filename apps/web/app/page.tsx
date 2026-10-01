@@ -31,7 +31,8 @@ import {
   ChevronRight,
   Play,
   CheckCircle,
-  RotateCcw
+  RotateCcw,
+  SlidersHorizontal
 } from "lucide-react";
 import { 
   fetchHealth, 
@@ -98,17 +99,109 @@ export default function HomePage() {
   const [pipelineTelemetry, setPipelineTelemetry] = useState<PipelineTelemetry | null>(null);
   const [pipelineStatus, setPipelineStatus] = useState<PipelineStatusResponse | null>(null);
   const [selectedSourceRegion, setSelectedSourceRegion] = useState<string>("all");
+  const [selectedCountry, setSelectedCountry] = useState<string>("all");
+  const [selectedScope, setSelectedScope] = useState<"all" | "galli" | "regional" | "national" | "international">("all");
 
   const getSourceRegion = useCallback((country?: string): string => {
     if (!country) return "Global";
     const c = country.toUpperCase();
+    if (["IN", "PK", "BD", "LK", "NP"].includes(c)) return "India & South Asia";
     if (["KZ", "UZ", "KG", "TJ", "TM", "AZ", "GE", "AM", "AF", "TR"].includes(c)) return "Central Asia & Caucasus";
-    if (["IN", "PK", "BD", "LK", "NP", "SG", "ID", "TH", "PH", "VN", "MY", "JP", "KR", "TW", "HK", "AU", "NZ", "FJ", "PG"].includes(c)) return "Asia & Pacific";
+    if (["SG", "ID", "TH", "PH", "VN", "MY", "JP", "KR", "TW", "HK", "AU", "NZ", "FJ", "PG"].includes(c)) return "Asia & Pacific";
     if (["SA", "AE", "QA", "IL", "EG", "JO", "LB", "MA", "KE", "NG", "ZA", "GH", "SD", "ET", "LY", "CD"].includes(c)) return "Middle East & Africa";
     if (["GB", "DE", "FR", "UA", "PL", "LV", "EE", "LT", "GR", "IS", "NO", "CH", "NL", "BE", "IT", "ES", "AT", "SE", "DK", "FI", "CZ", "RO", "RU"].includes(c)) return "Europe";
     if (["US", "CA", "MX", "BR", "AR", "CO", "CL", "JM", "UY", "PE", "VE", "PA", "CU", "TT"].includes(c)) return "Americas";
     return "Global / UN";
   }, []);
+
+  const getEventScope = useCallback((evt: EventItem): "galli" | "regional" | "national" | "international" => {
+    if ((evt.global_impact_score ?? 0) >= 8.5 && (!evt.city || ["politics", "security"].includes(evt.category))) {
+      return "international";
+    }
+    const subcat = (evt.subcategory || "").toLowerCase();
+    const title = (evt.canonical_title || "").toLowerCase();
+    const isMunicipalLocal = subcat.includes("air_quality") || 
+      subcat.includes("urban_infrastructure") || 
+      subcat.includes("smart_transit") || 
+      subcat.includes("green_mobility") || 
+      subcat.includes("civil_engineering") ||
+      subcat.includes("flood_early_warning") ||
+      title.includes("ward") || 
+      title.includes("municipal") || 
+      title.includes("metro") || 
+      title.includes("tunnel") || 
+      title.includes("road") || 
+      title.includes("corridor") || 
+      title.includes("feeder") || 
+      title.includes("shuttle") ||
+      title.includes("ferry");
+
+    if (evt.city && (evt.location_confidence ?? 0) >= 0.95 && isMunicipalLocal) {
+      return "galli";
+    }
+    if (evt.admin_region || evt.city) {
+      return "regional";
+    }
+    return "national";
+  }, []);
+
+  const COUNTRY_CENTERS: Record<string, { center: [number, number]; zoom: number }> = useMemo(() => ({
+    "India": { center: [78.5, 22.0], zoom: 4.2 },
+    "United States": { center: [-98.0, 39.0], zoom: 3.5 },
+    "Kazakhstan": { center: [67.0, 48.0], zoom: 3.8 },
+    "Uzbekistan": { center: [64.0, 41.5], zoom: 4.5 },
+    "Azerbaijan": { center: [47.5, 40.5], zoom: 5.5 },
+    "Georgia": { center: [44.0, 42.0], zoom: 5.5 },
+    "Japan": { center: [138.0, 36.5], zoom: 4.2 },
+    "Germany": { center: [10.5, 51.2], zoom: 4.8 },
+    "United Kingdom": { center: [-2.5, 54.0], zoom: 4.8 },
+    "Switzerland": { center: [8.2, 46.8], zoom: 5.8 },
+    "Iceland": { center: [-18.5, 64.8], zoom: 5.0 },
+    "China": { center: [104.0, 35.0], zoom: 3.5 },
+    "Brazil": { center: [-51.9, -14.2], zoom: 3.5 },
+    "Kenya": { center: [37.9, 0.0], zoom: 4.8 },
+    "Egypt": { center: [30.8, 26.8], zoom: 4.5 },
+    "Turkey": { center: [35.0, 39.0], zoom: 4.5 },
+    "Afghanistan": { center: [67.7, 33.9], zoom: 4.8 },
+    "South Korea": { center: [127.8, 36.5], zoom: 5.5 },
+    "Philippines": { center: [121.8, 12.8], zoom: 4.8 },
+    "Australia": { center: [133.8, -25.3], zoom: 3.5 },
+  }), []);
+
+  const handleSelectCountry = (country: string) => {
+    setSelectedCountry(country);
+    if (country === "all") {
+      setResetViewTrigger(prev => prev + 1);
+      return;
+    }
+    const coords = COUNTRY_CENTERS[country];
+    if (coords) {
+      setFocusedEventCoords({
+        lng: coords.center[0],
+        lat: coords.center[1],
+        title: `${country} National & Local News Intelligence`,
+        city: "",
+        country: country,
+        category: "all"
+      });
+      const mapElement = document.getElementById("geospatial-map-section");
+      if (mapElement) {
+        mapElement.scrollIntoView({ behavior: "smooth", block: "center" });
+      }
+    }
+  };
+
+  const availableCountries = useMemo(() => {
+    const counts: Record<string, number> = {};
+    events.forEach(e => {
+      if (e.country) {
+        counts[e.country] = (counts[e.country] || 0) + 1;
+      }
+    });
+    return Object.entries(counts)
+      .sort((a, b) => b[1] - a[1])
+      .map(([name, count]) => ({ name, count }));
+  }, [events]);
 
   const filteredSources = useMemo(() => {
     if (selectedSourceRegion === "all") return sources;
@@ -179,13 +272,23 @@ export default function HomePage() {
   const visibleRankedEvents = useMemo(() => {
     let list = [...events];
 
+    // Filter by Country if selected
+    if (selectedCountry && selectedCountry !== "all") {
+      list = list.filter(e => (e.country || "").toLowerCase() === selectedCountry.toLowerCase());
+    }
+
+    // Filter by Scope if selected (hyper-local "galli", regional, national, international)
+    if (selectedScope && selectedScope !== "all") {
+      list = list.filter(e => getEventScope(e) === selectedScope);
+    }
+
     // Filter by map category if selected and not "all"
     if (selectedMapCategory && selectedMapCategory !== "all") {
       list = list.filter(e => e.category === selectedMapCategory);
     }
 
-    // Filter by visible map bounding box when viewport sync is active and zoomed in
-    if (isViewportSyncActive && isZoomedIn && mapBbox) {
+    // Filter by visible map bounding box when viewport sync is active, zoomed in, and country filter is "all"
+    if (isViewportSyncActive && isZoomedIn && mapBbox && selectedCountry === "all") {
       const parts = mapBbox.split(",").map(Number);
       if (parts.length === 4 && !parts.some(isNaN)) {
         const [w, s, e, n] = parts;
@@ -226,7 +329,7 @@ export default function HomePage() {
     });
 
     return list;
-  }, [events, mapBbox, isZoomedIn, isViewportSyncActive, selectedMapCategory, sortBy]);
+  }, [events, selectedCountry, selectedScope, getEventScope, mapBbox, isZoomedIn, isViewportSyncActive, selectedMapCategory, sortBy]);
 
   const handleResetToGlobal = () => {
     setResetViewTrigger(prev => prev + 1);
@@ -954,19 +1057,120 @@ export default function HomePage() {
             </div>
           </div>
 
+          {/* All-Country Intelligence & Galli News Filter Panel */}
+          <div className="rounded-xl border border-slate-800 bg-slate-950/70 p-4 mb-4 space-y-3">
+            {/* Country Selector & Quick Chips */}
+            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2.5 pb-2.5 border-b border-slate-800/80">
+              <div className="flex items-center gap-2">
+                <Globe2 className="h-4 w-4 text-sky-400" />
+                <span className="text-xs font-bold text-white tracking-wide uppercase">
+                  Country Intelligence:
+                </span>
+                <span className="text-[11px] text-slate-400">
+                  Select any nation to fly map & view local domestic news
+                </span>
+              </div>
+              <div className="flex items-center gap-2">
+                <select
+                  value={selectedCountry}
+                  onChange={(e) => handleSelectCountry(e.target.value)}
+                  className="rounded-lg border border-slate-700 bg-slate-900 px-2.5 py-1 text-xs text-white focus:border-sky-500 focus:outline-none"
+                >
+                  <option value="all">🌍 All Countries ({events.length} Events)</option>
+                  {availableCountries.map((c) => (
+                    <option key={c.name} value={c.name}>
+                      {c.name} ({c.count})
+                    </option>
+                  ))}
+                </select>
+                {selectedCountry !== "all" && (
+                  <button
+                    type="button"
+                    onClick={() => handleSelectCountry("all")}
+                    className="text-[11px] text-sky-400 hover:underline px-1"
+                  >
+                    Clear Country
+                  </button>
+                )}
+              </div>
+            </div>
+
+            {/* Quick Country Pills */}
+            <div className="flex items-center gap-1.5 flex-wrap">
+              {[
+                { id: "all", label: "Worldwide (All)", count: events.length },
+                { id: "India", label: "🇮🇳 India", count: events.filter(e => (e.country || "").toLowerCase() === "india").length },
+                { id: "Kazakhstan", label: "🇰🇿 Central Asia", count: events.filter(e => ["Kazakhstan", "Uzbekistan", "Kyrgyzstan", "Tajikistan", "Turkmenistan"].includes(e.country || "")).length },
+                { id: "United States", label: "🇺🇸 United States", count: events.filter(e => (e.country || "").toLowerCase() === "united states").length },
+                { id: "Japan", label: "🇯🇵 Japan", count: events.filter(e => (e.country || "").toLowerCase() === "japan").length },
+                { id: "Germany", label: "🇩🇪 Germany & EU", count: events.filter(e => ["Germany", "France", "Switzerland", "Poland"].includes(e.country || "")).length },
+                { id: "United Kingdom", label: "🇬🇧 United Kingdom", count: events.filter(e => (e.country || "").toLowerCase() === "united kingdom").length },
+                { id: "China", label: "🇨🇳 China & Taiwan", count: events.filter(e => ["China", "Taiwan"].includes(e.country || "")).length }
+              ].map((pill) => (
+                <button
+                  key={pill.id}
+                  type="button"
+                  onClick={() => handleSelectCountry(pill.id)}
+                  className={`px-2.5 py-1 text-[11px] rounded-lg font-medium transition-all ${
+                    selectedCountry === pill.id
+                      ? "bg-sky-500 text-white font-bold shadow-sm"
+                      : "bg-slate-900 text-slate-300 hover:bg-slate-800 hover:text-white border border-slate-800"
+                  }`}
+                >
+                  {pill.label} ({pill.count})
+                </button>
+              ))}
+            </div>
+
+            {/* Scope / Tier Filter Tabs: From Hyper-Local "Galli" to International */}
+            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 pt-2.5 border-t border-slate-800/80">
+              <div className="flex items-center gap-1.5">
+                <SlidersHorizontal className="h-3.5 w-3.5 text-amber-400" />
+                <span className="text-[11px] font-bold text-slate-300 uppercase tracking-wide">
+                  Scope (Galli to Global):
+                </span>
+              </div>
+              <div className="flex items-center gap-1.5 flex-wrap">
+                {[
+                  { id: "all", label: "All Scopes" },
+                  { id: "galli", label: "🏙️ Hyper-Local / Galli" },
+                  { id: "regional", label: "🗺️ State & District" },
+                  { id: "national", label: "🏛️ National" },
+                  { id: "international", label: "🌐 Global Wires" }
+                ].map((sTab) => (
+                  <button
+                    key={sTab.id}
+                    type="button"
+                    onClick={() => setSelectedScope(sTab.id as any)}
+                    className={`px-2 py-0.5 text-[11px] rounded-md transition-all font-medium ${
+                      selectedScope === sTab.id
+                        ? "bg-amber-500 text-slate-950 font-bold shadow-sm"
+                        : "bg-slate-900/80 text-slate-400 hover:bg-slate-800 hover:text-slate-200 border border-slate-800"
+                    }`}
+                  >
+                    {sTab.label}
+                  </button>
+                ))}
+              </div>
+            </div>
+          </div>
+
           {/* Viewport Info Sub-bar */}
           <div className="flex items-center justify-between py-2 px-3 rounded-lg bg-slate-950/60 border border-slate-800/80 text-xs mb-4">
-            <div className="flex items-center gap-2">
+            <div className="flex items-center gap-2 flex-wrap">
               <span className="text-slate-400">
-                {isViewportSyncActive && isZoomedIn ? (
-                  <>
-                    Showing <strong className="text-sky-300">{visibleRankedEvents.length}</strong> visible events in current map area, ranked by <strong className="text-white capitalize">{sortBy === "importance" ? "Highest Impact" : sortBy}</strong>
-                  </>
+                Showing <strong className="text-sky-300">{visibleRankedEvents.length}</strong> events{" "}
+                {selectedCountry !== "all" ? (
+                  <>in <strong className="text-white">{selectedCountry}</strong></>
+                ) : isViewportSyncActive && isZoomedIn ? (
+                  <>in visible map area</>
                 ) : (
-                  <>
-                    Showing <strong className="text-sky-300">{visibleRankedEvents.length}</strong> events worldwide, ranked by <strong className="text-white capitalize">{sortBy === "importance" ? "Highest Impact" : sortBy}</strong>
-                  </>
+                  <>worldwide</>
                 )}
+                {selectedScope !== "all" && (
+                  <>, filtered by <strong className="text-amber-400 uppercase">{selectedScope === "galli" ? "Hyper-Local / Galli" : selectedScope}</strong></>
+                )}
+                , ranked by <strong className="text-white capitalize">{sortBy === "importance" ? "Highest Impact" : sortBy}</strong>
               </span>
               {selectedMapCategory && selectedMapCategory !== "all" && (
                 <span className="rounded bg-sky-500/10 px-2 py-0.5 text-[10px] font-semibold text-sky-400 border border-sky-500/20 uppercase">
@@ -974,7 +1178,7 @@ export default function HomePage() {
                 </span>
               )}
             </div>
-            {isViewportSyncActive && isZoomedIn && (
+            {isViewportSyncActive && isZoomedIn && selectedCountry === "all" && (
               <span className="text-[11px] text-slate-500 hidden sm:inline">
                 Pan or zoom map above to update ranking
               </span>
@@ -984,18 +1188,22 @@ export default function HomePage() {
           {visibleRankedEvents.length === 0 ? (
             <div className="py-12 px-4 text-center rounded-xl border border-dashed border-slate-800 bg-slate-950/40">
               <Globe2 className="h-10 w-10 text-slate-600 mx-auto mb-3" />
-              <h4 className="text-sm font-semibold text-slate-300">No Events in Current Map Viewport</h4>
+              <h4 className="text-sm font-semibold text-slate-300">No Events Matching Current Filters</h4>
               <p className="text-xs text-slate-500 max-w-md mx-auto mt-1 mb-4">
-                No active clustered news events were detected within this geographic area. Pan or zoom out the map above to view events in other regions.
+                No active clustered news events matched your chosen country, scope, or map viewport. Reset filters to explore other regions.
               </p>
               <div className="flex items-center justify-center gap-3">
                 <button
                   type="button"
-                  onClick={handleResetToGlobal}
+                  onClick={() => {
+                    setSelectedCountry("all");
+                    setSelectedScope("all");
+                    handleResetToGlobal();
+                  }}
                   className="inline-flex items-center gap-2 px-3 py-1.5 rounded-lg bg-sky-600 text-xs font-medium text-white hover:bg-sky-500 transition-all shadow-sm"
                 >
                   <RotateCcw className="h-3.5 w-3.5" />
-                  Reset to Worldwide View
+                  Reset to All Countries & Worldwide
                 </button>
                 <button
                   type="button"
@@ -1008,7 +1216,9 @@ export default function HomePage() {
             </div>
           ) : (
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-              {visibleRankedEvents.map((evt, idx) => (
+              {visibleRankedEvents.map((evt, idx) => {
+                const scope = getEventScope(evt);
+                return (
                 <div 
                   key={evt.id}
                   onClick={() => setSelectedEventId(evt.id)}
@@ -1016,13 +1226,30 @@ export default function HomePage() {
                 >
                   <div>
                     <div className="flex items-center justify-between gap-2 mb-2">
-                      <div className="flex items-center gap-2">
+                      <div className="flex items-center gap-1.5 flex-wrap">
                         <span className="flex items-center justify-center h-5 w-5 rounded bg-sky-500/20 text-sky-400 font-mono font-bold text-[10px] border border-sky-500/30">
                           #{idx + 1}
                         </span>
                         <span className="rounded bg-sky-500/10 px-2 py-0.5 text-[10px] font-semibold text-sky-400 border border-sky-500/20 uppercase">
                           {evt.category.replace("_", " ")}
                         </span>
+                        {scope === "galli" ? (
+                          <span className="rounded bg-amber-500/20 px-1.5 py-0.5 text-[10px] font-bold text-amber-300 border border-amber-500/30">
+                            🏙️ Galli / Local
+                          </span>
+                        ) : scope === "regional" ? (
+                          <span className="rounded bg-sky-500/20 px-1.5 py-0.5 text-[10px] font-bold text-sky-300 border border-sky-500/30">
+                            🗺️ State / District
+                          </span>
+                        ) : scope === "national" ? (
+                          <span className="rounded bg-purple-500/20 px-1.5 py-0.5 text-[10px] font-bold text-purple-300 border border-purple-500/30">
+                            🏛️ National
+                          </span>
+                        ) : (
+                          <span className="rounded bg-emerald-500/20 px-1.5 py-0.5 text-[10px] font-bold text-emerald-300 border border-emerald-500/30">
+                            🌐 Global
+                          </span>
+                        )}
                       </div>
                       <div className="flex items-center gap-1.5">
                         <span className="flex items-center gap-1 rounded bg-amber-500/10 px-1.5 py-0.5 text-[10px] font-semibold text-amber-400 border border-amber-500/20">
@@ -1090,7 +1317,8 @@ export default function HomePage() {
                     </div>
                   </div>
                 </div>
-              ))}
+              );
+            })}
             </div>
           )}
         </div>
@@ -1117,6 +1345,7 @@ export default function HomePage() {
               <div className="flex items-center gap-1.5 flex-wrap mb-3">
                 {[
                   { id: "all", label: "All Regions" },
+                  { id: "India & South Asia", label: "India & South Asia" },
                   { id: "Central Asia & Caucasus", label: "Central Asia & Caucasus" },
                   { id: "Asia & Pacific", label: "Asia & Pacific" },
                   { id: "Middle East & Africa", label: "Mid East & Africa" },
