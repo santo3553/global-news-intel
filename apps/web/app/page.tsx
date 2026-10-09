@@ -68,6 +68,41 @@ const IntelligenceMap = dynamic(
   }
 );
 
+function getSmartNewsSearchUrl(title: string): string {
+  if (!title) return "https://news.google.com";
+  const cleanTerms = title
+    .replace(/[^\w\s]/gi, " ")
+    .split(/\s+/)
+    .filter(
+      (w) =>
+        w.length > 2 &&
+        ![
+          "concluded",
+          "concludes",
+          "launches",
+          "unveils",
+          "tripartite",
+          "ministerial",
+          "protocol",
+          "operational",
+          "installed",
+          "commissioned",
+          "activates",
+          "agree",
+          "agrees",
+          "historic",
+          "across",
+          "underway",
+          "deploys",
+          "reveals",
+          "confirms",
+        ].includes(w.toLowerCase())
+    )
+    .slice(0, 5)
+    .join(" ");
+  return `https://news.google.com/search?q=${encodeURIComponent(cleanTerms || title)}`;
+}
+
 export default function HomePage() {
   const [health, setHealth] = useState<HealthResponse | null>(null);
   const [sources, setSources] = useState<SourceItem[]>([]);
@@ -1500,7 +1535,7 @@ export default function HomePage() {
                             <span>Verify Story</span>
                           </a>
                           <a
-                            href={`https://news.google.com/search?q=${encodeURIComponent(a.title)}`}
+                            href={getSmartNewsSearchUrl(a.title)}
                             target="_blank"
                             rel="noopener noreferrer"
                             className="inline-flex items-center gap-1 rounded bg-indigo-500/10 hover:bg-indigo-500/20 border border-indigo-500/30 px-2 py-0.5 font-semibold text-indigo-400 hover:text-white transition-all"

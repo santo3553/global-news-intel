@@ -33,6 +33,45 @@ interface EventDetailModalProps {
   onSelectEvent: (eventId: string) => void;
 }
 
+function getSmartNewsSearchUrl(title: string, country?: string): string {
+  if (!title) return "https://news.google.com";
+  const cleanTerms = title
+    .replace(/[^\w\s]/gi, " ")
+    .split(/\s+/)
+    .filter(
+      (w) =>
+        w.length > 2 &&
+        ![
+          "concluded",
+          "concludes",
+          "launches",
+          "unveils",
+          "tripartite",
+          "ministerial",
+          "protocol",
+          "operational",
+          "installed",
+          "commissioned",
+          "activates",
+          "agree",
+          "agrees",
+          "historic",
+          "across",
+          "underway",
+          "deploys",
+          "reveals",
+          "confirms",
+        ].includes(w.toLowerCase())
+    )
+    .slice(0, 5)
+    .join(" ");
+  const query =
+    country && !cleanTerms.toLowerCase().includes(country.toLowerCase())
+      ? `${cleanTerms} ${country}`
+      : cleanTerms;
+  return `https://news.google.com/search?q=${encodeURIComponent(query || title)}`;
+}
+
 export default function EventDetailModal({
   eventId,
   onClose,
@@ -316,7 +355,7 @@ export default function EventDetailModal({
                                     </a>
                                   )}
                                   <a
-                                    href={`https://news.google.com/search?q=${encodeURIComponent(entry.title)}`}
+                                    href={getSmartNewsSearchUrl(entry.title, detail?.country)}
                                     target="_blank"
                                     rel="noopener noreferrer"
                                     className="inline-flex items-center gap-1 rounded bg-indigo-500/15 hover:bg-indigo-500/30 border border-indigo-500/40 px-2 py-0.5 text-[10px] font-semibold text-indigo-300 hover:text-white transition-all"
@@ -387,7 +426,7 @@ export default function EventDetailModal({
                                 <span>Verify Source Article</span>
                               </a>
                               <a
-                                href={`https://news.google.com/search?q=${encodeURIComponent(art.title)}`}
+                                href={getSmartNewsSearchUrl(art.title, detail?.country)}
                                 target="_blank"
                                 rel="noopener noreferrer"
                                 className="inline-flex items-center gap-1 rounded-md bg-indigo-500/15 hover:bg-indigo-500/30 border border-indigo-500/40 px-2 py-1 text-[11px] font-semibold text-indigo-300 hover:text-white transition-all shadow-sm"
