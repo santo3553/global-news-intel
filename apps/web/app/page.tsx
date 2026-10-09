@@ -32,7 +32,8 @@ import {
   Play,
   CheckCircle,
   RotateCcw,
-  SlidersHorizontal
+  SlidersHorizontal,
+  Clock
 } from "lucide-react";
 import { 
   fetchHealth, 
@@ -53,6 +54,7 @@ import {
   PipelineTelemetry,
   PipelineStatusResponse
 } from "@/lib/api";
+import { formatTimeAgo, isLiveBreaking, formatExactTime } from "@/lib/time";
 import EventDetailModal from "@/components/events/EventDetailModal";
 
 const IntelligenceMap = dynamic(
@@ -124,7 +126,7 @@ export default function HomePage() {
     country?: string;
     category?: string;
   } | null>(null);
-  const [sortBy, setSortBy] = useState<string>("importance");
+  const [sortBy, setSortBy] = useState<string>("recent");
   const [searchQuery, setSearchQuery] = useState<string>("");
   const [isSearching, setIsSearching] = useState<boolean>(false);
   const [briefingTab, setBriefingTab] = useState<"breaking" | "geopolitical" | "hazards" | "economic">("breaking");
@@ -438,6 +440,12 @@ export default function HomePage() {
           </div>
 
           <div className="flex items-center gap-3">
+            <div className="hidden sm:flex items-center gap-2 rounded-full border border-rose-500/30 bg-rose-500/10 px-3 py-1 text-xs">
+              <span className="h-2 w-2 rounded-full bg-rose-400 animate-ping" />
+              <span className="font-semibold text-rose-300">LIVE WORLD TRACKER</span>
+              <span className="text-slate-400 font-mono text-[10px]">• 20s auto-sync</span>
+            </div>
+
             <div className="flex items-center gap-2 rounded-full border border-slate-800 bg-slate-900/80 px-3 py-1 text-xs">
               <span className={`h-2 w-2 rounded-full ${isConnected ? "bg-emerald-400 animate-pulse" : "bg-rose-400"}`} />
               <span className="text-slate-300">
@@ -874,6 +882,10 @@ export default function HomePage() {
                           {item.location}
                         </span>
                         <div className="flex items-center gap-1.5 font-mono">
+                          <span className="inline-flex items-center gap-1 rounded bg-rose-500/20 px-1.5 py-0.2 text-[9px] font-bold text-rose-300 border border-rose-500/30 mr-1">
+                            <span className="h-1.5 w-1.5 rounded-full bg-rose-400 animate-pulse" />
+                            LIVE
+                          </span>
                           <span className="text-[10px] text-slate-500">Imp:</span>
                           <span className="font-bold text-sky-400">{item.importance.toFixed(1)}</span>
                           <span className="text-[10px] text-slate-500 ml-1">Vel:</span>
@@ -1066,7 +1078,18 @@ export default function HomePage() {
 
               <div className="h-4 w-px bg-slate-800 mx-1 hidden sm:block" />
 
-              <span className="text-slate-400 mr-1 text-[11px]">Rank by:</span>
+              <span className="text-slate-400 mr-1 text-[11px]">Wire Mode:</span>
+              <button
+                onClick={() => setSortBy("recent")}
+                className={`flex items-center gap-1.5 rounded-lg px-3 py-1 text-xs font-semibold transition-all ${
+                  sortBy === "recent"
+                    ? "bg-rose-600 text-white shadow-md shadow-rose-950/50 border border-rose-400/40"
+                    : "bg-slate-800/80 text-slate-300 hover:bg-slate-800 hover:text-white"
+                }`}
+              >
+                <span className={`h-2 w-2 rounded-full ${sortBy === "recent" ? "bg-white animate-ping" : "bg-rose-400"}`} />
+                <span>🔴 LIVE BREAKING (Wire)</span>
+              </button>
               <button
                 onClick={() => setSortBy("importance")}
                 className={`rounded-lg px-2.5 py-1 text-xs font-medium transition-all ${
@@ -1096,16 +1119,6 @@ export default function HomePage() {
                 }`}
               >
                 Fast Velocity
-              </button>
-              <button
-                onClick={() => setSortBy("recent")}
-                className={`rounded-lg px-2.5 py-1 text-xs font-medium transition-all ${
-                  sortBy === "recent"
-                    ? "bg-purple-500 text-white shadow-sm"
-                    : "bg-slate-800/80 text-slate-300 hover:bg-slate-800 hover:text-white"
-                }`}
-              >
-                Recent
               </button>
             </div>
           </div>
@@ -1320,6 +1333,25 @@ export default function HomePage() {
                       </div>
                     </div>
 
+                    {/* Live Recency & Relative Time */}
+                    <div className="flex items-center justify-between gap-2 mb-2 text-[11px] font-mono">
+                      <div className="flex items-center gap-1.5 text-slate-300" title={formatExactTime(evt.last_updated_at)}>
+                        <Clock className="h-3 w-3 text-emerald-400" />
+                        <span className="font-semibold text-emerald-300">{formatTimeAgo(evt.last_updated_at)}</span>
+                        {isLiveBreaking(evt.last_updated_at) && (
+                          <span className="inline-flex items-center gap-1 rounded bg-rose-500/20 px-1.5 py-0.2 text-[9px] font-bold text-rose-300 border border-rose-500/40">
+                            <span className="h-1.5 w-1.5 rounded-full bg-rose-400 animate-pulse" />
+                            LIVE
+                          </span>
+                        )}
+                      </div>
+                      {evt.first_seen_at && (
+                        <span className="text-[10px] text-slate-500" title={formatExactTime(evt.first_seen_at)}>
+                          First: {formatTimeAgo(evt.first_seen_at)}
+                        </span>
+                      )}
+                    </div>
+
                     <h3 className="font-semibold text-white text-sm line-clamp-2 mb-2 group-hover:text-sky-300 transition-colors">
                       {evt.canonical_title}
                     </h3>
@@ -1498,10 +1530,24 @@ export default function HomePage() {
                 ] as ArticleItem[]).map((a) => (
                   <div key={a.id} className="rounded-lg border border-slate-800/80 bg-slate-900/60 p-3 hover:border-slate-700 transition-all">
                     <div className="flex items-center justify-between text-[11px] mb-1.5">
-                      <span className="font-medium text-sky-400 truncate max-w-[200px]">{a.source_id}</span>
-                      <span className="rounded bg-slate-800 px-1.5 py-0.5 text-[10px] text-slate-300 font-mono">
-                        {a.processing_status}
-                      </span>
+                      <div className="flex items-center gap-1.5 truncate max-w-[200px]">
+                        <span className="font-medium text-sky-400 truncate">{a.source_id}</span>
+                        {isLiveBreaking(a.published_at) && (
+                          <span className="inline-flex items-center gap-1 rounded bg-rose-500/20 px-1 py-0.2 text-[9px] font-bold text-rose-300 border border-rose-500/30">
+                            <span className="h-1 w-1 rounded-full bg-rose-400 animate-pulse" />
+                            LIVE
+                          </span>
+                        )}
+                      </div>
+                      <div className="flex items-center gap-2">
+                        <span className="text-[10px] font-mono text-slate-400 flex items-center gap-1" title={formatExactTime(a.published_at)}>
+                          <Clock className="h-2.5 w-2.5 text-emerald-400" />
+                          <span>{formatTimeAgo(a.published_at)}</span>
+                        </span>
+                        <span className="rounded bg-slate-800 px-1.5 py-0.5 text-[10px] text-slate-300 font-mono">
+                          {a.processing_status}
+                        </span>
+                      </div>
                     </div>
                     {a.url ? (
                       <a

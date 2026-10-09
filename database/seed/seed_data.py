@@ -2788,6 +2788,10 @@ async def seed_database():
                 total_events_created += 1
             else:
                 event = existing_event
+                event.first_seen_at = evt_data.get("first_seen_at", now - timedelta(hours=2))
+                event.last_updated_at = evt_data.get("last_updated_at", now - timedelta(minutes=10))
+                event.canonical_title = evt_data["canonical_title"]
+                event.summary = evt_data["summary"]
 
             # Seed Event Entities
             for ent_data in item.get("entities", []):
@@ -2861,6 +2865,9 @@ async def seed_database():
                     article = existing_article
                     article.url = art_data["url"]
                     article.canonical_url = canonical_url
+                    if art_data.get("published_at"):
+                        article.published_at = art_data["published_at"]
+                    article.fetched_at = now
 
                 # Link Event to Article
                 existing_link = (await session.execute(

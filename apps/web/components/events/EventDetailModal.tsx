@@ -26,6 +26,7 @@ import {
   fetchNearbyEvents,
   fetchEventTimeline 
 } from "@/lib/api";
+import { formatTimeAgo, isLiveBreaking, formatExactTime } from "@/lib/time";
 
 interface EventDetailModalProps {
   eventId: string | null;
@@ -189,6 +190,27 @@ export default function EventDetailModal({
               </div>
             </div>
 
+            {/* Real-Time Live Status Bar */}
+            <div className="flex flex-wrap items-center justify-between gap-2 rounded-lg bg-slate-950/80 border border-slate-800 px-3.5 py-2 text-xs">
+              <div className="flex items-center gap-2 font-mono">
+                <span className="flex items-center gap-1.5 text-slate-300" title={formatExactTime(detail.last_updated_at)}>
+                  <Clock className="h-3.5 w-3.5 text-emerald-400" />
+                  <span>Last Updated: <strong className="text-emerald-400">{formatTimeAgo(detail.last_updated_at)}</strong></span>
+                </span>
+                {isLiveBreaking(detail.last_updated_at) && (
+                  <span className="inline-flex items-center gap-1 rounded-full bg-rose-500/20 px-2 py-0.5 text-[10px] font-bold text-rose-300 border border-rose-500/30">
+                    <span className="h-1.5 w-1.5 rounded-full bg-rose-400 animate-pulse" />
+                    LIVE WIRE
+                  </span>
+                )}
+              </div>
+              <div className="flex items-center gap-3 text-[11px] text-slate-400 font-mono">
+                <span title={formatExactTime(detail.first_seen_at)}>
+                  First Detected: <strong className="text-slate-300">{formatTimeAgo(detail.first_seen_at)}</strong>
+                </span>
+              </div>
+            </div>
+
             {/* Canonical Title & Summary */}
             <div>
               <h2 className="text-xl font-bold text-white leading-snug">
@@ -310,9 +332,15 @@ export default function EventDetailModal({
                                   </span>
                                 </div>
                                 {entry.published_at && (
-                                  <span className="flex items-center gap-1 font-mono text-[10px] text-slate-400">
-                                    <Clock className="h-3 w-3" />
-                                    {new Date(entry.published_at).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', month: 'short', day: 'numeric' })}
+                                  <span className="flex items-center gap-1 font-mono text-[10px] text-slate-300" title={formatExactTime(entry.published_at)}>
+                                    <Clock className="h-3 w-3 text-sky-400" />
+                                    <span className="text-emerald-300 font-medium">{formatTimeAgo(entry.published_at)}</span>
+                                    {isLiveBreaking(entry.published_at) && (
+                                      <span className="inline-flex items-center gap-1 rounded bg-rose-500/20 px-1 py-0.2 text-[9px] font-bold text-rose-300 border border-rose-500/30 ml-1">
+                                        <span className="h-1.5 w-1.5 rounded-full bg-rose-400 animate-pulse" />
+                                        LIVE
+                                      </span>
+                                    )}
                                   </span>
                                 )}
                               </div>
@@ -386,9 +414,15 @@ export default function EventDetailModal({
                         <div className="flex items-center justify-between text-[11px] text-slate-400 mb-1.5">
                           <span className="font-semibold text-sky-400">{art.source_id}</span>
                           {art.published_at && (
-                            <span className="flex items-center gap-1 font-mono text-[10px]">
-                              <Clock className="h-3 w-3" />
-                              {new Date(art.published_at).toLocaleString()}
+                            <span className="flex items-center gap-1 font-mono text-[10px] text-slate-300" title={formatExactTime(art.published_at)}>
+                              <Clock className="h-3 w-3 text-sky-400" />
+                              <span className="text-emerald-300 font-medium">{formatTimeAgo(art.published_at)}</span>
+                              {isLiveBreaking(art.published_at) && (
+                                <span className="inline-flex items-center gap-1 rounded bg-rose-500/20 px-1 py-0.2 text-[9px] font-bold text-rose-300 border border-rose-500/30 ml-1">
+                                  <span className="h-1.5 w-1.5 rounded-full bg-rose-400 animate-pulse" />
+                                  LIVE
+                                </span>
+                              )}
                             </span>
                           )}
                         </div>
