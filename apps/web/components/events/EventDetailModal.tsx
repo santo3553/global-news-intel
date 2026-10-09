@@ -301,7 +301,7 @@ export default function EventDetailModal({
                               )}
                               <div className="mt-2.5 flex flex-wrap items-center justify-between gap-2 text-[10px] text-slate-500 pt-2 border-t border-slate-800/60">
                                 <span>Domain: <strong className="text-slate-400">{entry.source_domain}</strong></span>
-                                <div className="flex items-center gap-3">
+                                <div className="flex items-center gap-2">
                                   <span className="font-mono text-sky-400">Similarity: {(entry.similarity_score * 100).toFixed(0)}%</span>
                                   {entry.url && (
                                     <a
@@ -309,11 +309,22 @@ export default function EventDetailModal({
                                       target="_blank"
                                       rel="noopener noreferrer"
                                       className="inline-flex items-center gap-1 rounded bg-sky-500/15 hover:bg-sky-500/30 border border-sky-500/40 px-2 py-0.5 text-[10px] font-semibold text-sky-300 hover:text-white transition-all"
+                                      title="Open original publisher wire or portal"
                                     >
                                       <ExternalLink className="h-2.5 w-2.5" />
                                       <span>Verify Original Dispatch</span>
                                     </a>
                                   )}
+                                  <a
+                                    href={`https://news.google.com/search?q=${encodeURIComponent(entry.title)}`}
+                                    target="_blank"
+                                    rel="noopener noreferrer"
+                                    className="inline-flex items-center gap-1 rounded bg-indigo-500/15 hover:bg-indigo-500/30 border border-indigo-500/40 px-2 py-0.5 text-[10px] font-semibold text-indigo-300 hover:text-white transition-all"
+                                    title="Search live coverage across all news sources on Google News"
+                                  >
+                                    <Globe2 className="h-2.5 w-2.5" />
+                                    <span>Google News Wire</span>
+                                  </a>
                                 </div>
                               </div>
                             </div>
@@ -361,18 +372,31 @@ export default function EventDetailModal({
                         )}
                         {art.url && (
                           <div className="mt-2.5 flex items-center justify-between pt-2 border-t border-slate-800/60">
-                            <span className="text-[10px] text-slate-400 font-mono truncate max-w-[180px]">
+                            <span className="text-[10px] text-slate-400 font-mono truncate max-w-[140px]">
                               {art.url.replace(/^https?:\/\//i, '').split('/')[0]}
                             </span>
-                            <a
-                              href={art.url}
-                              target="_blank"
-                              rel="noopener noreferrer"
-                              className="inline-flex items-center gap-1.5 rounded-md bg-emerald-500/15 hover:bg-emerald-500/30 border border-emerald-500/40 px-2.5 py-1 text-[11px] font-semibold text-emerald-300 hover:text-white transition-all shadow-sm"
-                            >
-                              <ExternalLink className="h-3 w-3" />
-                              <span>Verify Source Article</span>
-                            </a>
+                            <div className="flex items-center gap-2">
+                              <a
+                                href={art.url}
+                                target="_blank"
+                                rel="noopener noreferrer"
+                                className="inline-flex items-center gap-1.5 rounded-md bg-emerald-500/15 hover:bg-emerald-500/30 border border-emerald-500/40 px-2 py-1 text-[11px] font-semibold text-emerald-300 hover:text-white transition-all shadow-sm"
+                                title="Open original publisher source article"
+                              >
+                                <ExternalLink className="h-3 w-3" />
+                                <span>Verify Source Article</span>
+                              </a>
+                              <a
+                                href={`https://news.google.com/search?q=${encodeURIComponent(art.title)}`}
+                                target="_blank"
+                                rel="noopener noreferrer"
+                                className="inline-flex items-center gap-1 rounded-md bg-indigo-500/15 hover:bg-indigo-500/30 border border-indigo-500/40 px-2 py-1 text-[11px] font-semibold text-indigo-300 hover:text-white transition-all shadow-sm"
+                                title="Search live coverage across all news sources on Google News"
+                              >
+                                <Globe2 className="h-3 w-3" />
+                                <span>Google News Wire</span>
+                              </a>
+                            </div>
                           </div>
                         )}
                       </div>

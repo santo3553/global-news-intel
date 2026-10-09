@@ -1455,11 +1455,11 @@ export default function HomePage() {
 
               <div className="space-y-2.5 max-h-[360px] overflow-y-auto pr-1">
                 {(articles.length > 0 ? articles.slice(0, 5) : [
-                  { id: "1", title: "Strong 7.1 magnitude quake strikes off southern Japan; tsunami advisory issued", source_id: "Reuters", processing_status: "clustered", published_at: "2 hours ago", url: "https://reuters.com/world/japan-quake", fetched_at: "" },
-                  { id: "2", title: "M7.1 earthquake hits off Miyazaki Coast; JMA urges vigilance for aftershocks", source_id: "NHK World", processing_status: "clustered", published_at: "3 hours ago", url: "https://nhk.or.jp/news/m71", fetched_at: "" },
-                  { id: "3", title: "Geneva Climate Summit: Nations clinch surprise consensus on 2035 clean power pact", source_id: "Deutsche Welle", processing_status: "clustered", published_at: "7 hours ago", url: "https://dw.com/climate", fetched_at: "" },
-                  { id: "4", title: "NASA's Webb telescope confirms water vapor on Earth-sized rocky exoplanet", source_id: "AP News", processing_status: "clustered", published_at: "14 hours ago", url: "https://apnews.com/webb", fetched_at: "" },
-                  { id: "5", title: "Baltic grid operators investigate electrical fluctuations; sabotage unconfirmed", source_id: "Euronews", processing_status: "clustered", published_at: "18 hours ago", url: "https://euronews.com/baltic", fetched_at: "" }
+                  { id: "1", title: "Strong 7.1 magnitude quake strikes off southern Japan; tsunami advisory issued", source_id: "Reuters", processing_status: "clustered", published_at: "2 hours ago", url: "https://www.reuters.com/world/asia-pacific/", fetched_at: "" },
+                  { id: "2", title: "M7.1 earthquake hits off Miyazaki Coast; JMA urges vigilance for aftershocks", source_id: "NHK World", processing_status: "clustered", published_at: "3 hours ago", url: "https://www3.nhk.or.jp/nhkworld/en/news/", fetched_at: "" },
+                  { id: "3", title: "Geneva Climate Summit: Nations clinch surprise consensus on 2035 clean power pact", source_id: "Deutsche Welle", processing_status: "clustered", published_at: "7 hours ago", url: "https://www.dw.com/en/climate-change/s-30842", fetched_at: "" },
+                  { id: "4", title: "NASA's Webb telescope confirms water vapor on Earth-sized rocky exoplanet", source_id: "AP News", processing_status: "clustered", published_at: "14 hours ago", url: "https://science.nasa.gov/missions/webb/", fetched_at: "" },
+                  { id: "5", title: "Baltic grid operators investigate electrical fluctuations; sabotage unconfirmed", source_id: "Euronews", processing_status: "clustered", published_at: "18 hours ago", url: "https://www.euronews.com/business/energy", fetched_at: "" }
                 ] as ArticleItem[]).map((a) => (
                   <div key={a.id} className="rounded-lg border border-slate-800/80 bg-slate-900/60 p-3 hover:border-slate-700 transition-all">
                     <div className="flex items-center justify-between text-[11px] mb-1.5">
@@ -1485,18 +1485,31 @@ export default function HomePage() {
                     )}
                     {a.url && (
                       <div className="mt-2.5 flex items-center justify-between pt-2 border-t border-slate-800/60 text-[10px]">
-                        <span className="text-slate-500 font-mono truncate max-w-[200px]">
+                        <span className="text-slate-500 font-mono truncate max-w-[140px]">
                           {a.url.replace(/^https?:\/\//i, '').split('/')[0]}
                         </span>
-                        <a
-                          href={a.url}
-                          target="_blank"
-                          rel="noopener noreferrer"
-                          className="inline-flex items-center gap-1 rounded bg-sky-500/10 hover:bg-sky-500/20 border border-sky-500/30 px-2 py-0.5 font-semibold text-sky-400 hover:text-white transition-all"
-                        >
-                          <ExternalLink className="h-2.5 w-2.5" />
-                          <span>Verify Story</span>
-                        </a>
+                        <div className="flex items-center gap-2">
+                          <a
+                            href={a.url}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            className="inline-flex items-center gap-1 rounded bg-sky-500/10 hover:bg-sky-500/20 border border-sky-500/30 px-2 py-0.5 font-semibold text-sky-400 hover:text-white transition-all"
+                            title="Open original publisher wire or portal"
+                          >
+                            <ExternalLink className="h-2.5 w-2.5" />
+                            <span>Verify Story</span>
+                          </a>
+                          <a
+                            href={`https://news.google.com/search?q=${encodeURIComponent(a.title)}`}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            className="inline-flex items-center gap-1 rounded bg-indigo-500/10 hover:bg-indigo-500/20 border border-indigo-500/30 px-2 py-0.5 font-semibold text-indigo-400 hover:text-white transition-all"
+                            title="Search live coverage across all news sources on Google News"
+                          >
+                            <Globe2 className="h-2.5 w-2.5" />
+                            <span>Google News</span>
+                          </a>
+                        </div>
                       </div>
                     )}
                   </div>
