@@ -22,7 +22,7 @@ async def list_events(
     min_importance: Optional[float] = Query(None, ge=0.0, le=10.0, description="Minimum importance score"),
     status: Optional[str] = Query(None, description="Event lifecycle status (active, developing, resolved)"),
     sort_by: str = Query("importance", description="Sort order (importance, confidence, velocity, recent)"),
-    limit: int = Query(50, ge=1, le=200, description="Max events to return"),
+    limit: int = Query(50, ge=1, le=1000, description="Max events to return"),
     offset: int = Query(0, ge=0, description="Offset for pagination"),
     db: AsyncSession = Depends(get_db)
 ):
@@ -41,6 +41,16 @@ async def list_events(
         limit=limit,
         offset=offset
     )
+
+
+@router.get("/countries", summary="List all countries with active events and counts")
+async def get_event_countries(
+    db: AsyncSession = Depends(get_db)
+) -> List[Dict[str, Any]]:
+    """
+    Returns all countries with verified events across the globe with their counts.
+    """
+    return await EventService.get_event_countries(session=db)
 
 
 @router.get("/top", response_model=List[EventResponse], summary="Get highest-ranked global events")

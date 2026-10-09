@@ -454,7 +454,96 @@ GAZETTEER_COUNTRIES: Dict[str, Dict[str, Any]] = {
     "georgia": {"lat": 42.32, "lng": 43.36, "country": "Georgia", "name": "Georgia"},
     "armenia": {"lat": 40.07, "lng": 45.04, "country": "Armenia", "name": "Armenia"},
     "afghanistan": {"lat": 33.94, "lng": 67.71, "country": "Afghanistan", "name": "Afghanistan"},
-    "turkey": {"lat": 38.96, "lng": 35.24, "country": "Turkey", "name": "Turkey"}
+    "turkey": {"lat": 38.96, "lng": 35.24, "country": "Turkey", "name": "Turkey"},
+    "hong kong": {"lat": 22.32, "lng": 114.17, "country": "Hong Kong", "name": "Hong Kong"},
+    "israel": {"lat": 31.05, "lng": 34.85, "country": "Israel", "name": "Israel"},
+    "iceland": {"lat": 64.96, "lng": -19.02, "country": "Iceland", "name": "Iceland"},
+    "mexico": {"lat": 23.63, "lng": -102.55, "country": "Mexico", "name": "Mexico"},
+    "norway": {"lat": 60.47, "lng": 8.47, "country": "Norway", "name": "Norway"},
+    "qatar": {"lat": 25.35, "lng": 51.18, "country": "Qatar", "name": "Qatar"},
+    "singapore": {"lat": 1.35, "lng": 103.82, "country": "Singapore", "name": "Singapore"},
+    "uruguay": {"lat": -32.52, "lng": -55.77, "country": "Uruguay", "name": "Uruguay"}
+}
+
+# ISO Alpha-2 to Full Country Name Mapping
+ISO_TO_COUNTRY: Dict[str, str] = {
+    "IN": "India",
+    "BD": "Bangladesh",
+    "PK": "Pakistan",
+    "LK": "Sri Lanka",
+    "NP": "Nepal",
+    "BT": "Bhutan",
+    "MV": "Maldives",
+    "AF": "Afghanistan",
+    "US": "United States",
+    "GB": "United Kingdom",
+    "FR": "France",
+    "DE": "Germany",
+    "JP": "Japan",
+    "CN": "China",
+    "KR": "South Korea",
+    "SG": "Singapore",
+    "MY": "Malaysia",
+    "ID": "Indonesia",
+    "PH": "Philippines",
+    "TH": "Thailand",
+    "VN": "Vietnam",
+    "AU": "Australia",
+    "NZ": "New Zealand",
+    "CA": "Canada",
+    "MX": "Mexico",
+    "BR": "Brazil",
+    "AR": "Argentina",
+    "CL": "Chile",
+    "CO": "Colombia",
+    "PE": "Peru",
+    "UY": "Uruguay",
+    "VE": "Venezuela",
+    "EG": "Egypt",
+    "SA": "Saudi Arabia",
+    "AE": "United Arab Emirates",
+    "QA": "Qatar",
+    "IL": "Israel",
+    "TR": "Turkey",
+    "ZA": "South Africa",
+    "NG": "Nigeria",
+    "KE": "Kenya",
+    "GH": "Ghana",
+    "ET": "Ethiopia",
+    "SD": "Sudan",
+    "RU": "Russia",
+    "UA": "Ukraine",
+    "PL": "Poland",
+    "LV": "Latvia",
+    "EE": "Estonia",
+    "LT": "Lithuania",
+    "IT": "Italy",
+    "ES": "Spain",
+    "NL": "Netherlands",
+    "BE": "Belgium",
+    "CH": "Switzerland",
+    "AT": "Austria",
+    "GR": "Greece",
+    "SE": "Sweden",
+    "NO": "Norway",
+    "DK": "Denmark",
+    "FI": "Finland",
+    "KZ": "Kazakhstan",
+    "UZ": "Uzbekistan",
+    "KG": "Kyrgyzstan",
+    "TJ": "Tajikistan",
+    "TM": "Turkmenistan",
+    "AZ": "Azerbaijan",
+    "GE": "Georgia",
+    "AM": "Armenia",
+    "FJ": "Fiji",
+    "JM": "Jamaica",
+    "TT": "Trinidad and Tobago",
+    "HK": "Hong Kong",
+    "IS": "Iceland",
+    "JO": "Jordan",
+    "LB": "Lebanon",
+    "MA": "Morocco"
 }
 
 
@@ -473,7 +562,12 @@ class Geocoder:
         llm_lat: Optional[float] = None,
         llm_lng: Optional[float] = None
     ) -> ResolvedLocation:
-        search_str = f"{raw_name} {country_hint or ''} {text_context or ''}".lower()
+        # Expand ISO 2-letter codes to full country names
+        expanded_country = country_hint
+        if country_hint and len(country_hint.strip()) == 2:
+            expanded_country = ISO_TO_COUNTRY.get(country_hint.strip().upper(), country_hint)
+
+        search_str = f"{raw_name} {expanded_country or ''} {country_hint or ''} {text_context or ''}".lower()
 
         # 1. Look for specific City match (Highest Precision: 'city', confidence: 0.95+)
         for city_key, city_data in GAZETTEER_CITIES.items():

@@ -161,14 +161,32 @@ class PipelineOrchestrator:
                         text=content_for_ai
                     )
 
+                    # Determine source country hint if available
+                    source_country_hint = None
+                    if article.source_id:
+                        src_res = await session.execute(select(Source).where(Source.id == article.source_id))
+                        src_obj = src_res.scalar_one_or_none()
+                        if src_obj and src_obj.country and src_obj.country != "UN":
+                            source_country_hint = src_obj.country
+
                     # Coordinate Grounding & Spatial Disambiguation
                     resolved_loc = self.geocoder.resolve(
                         raw_name=extracted_data.location.name,
-                        country_hint=extracted_data.location.country,
+                        country_hint=extracted_data.location.country or source_country_hint,
                         text_context=content_for_ai[:1000],
                         llm_lat=extracted_data.location.latitude,
                         llm_lng=extracted_data.location.longitude
                     )
+
+                    # Propagate verified location back to extracted_data so clusterer receives grounded coordinates & country
+                    extracted_data.location.name = resolved_loc.name
+                    extracted_data.location.country = resolved_loc.country
+                    extracted_data.location.admin_region = resolved_loc.admin_region
+                    extracted_data.location.city = resolved_loc.city
+                    extracted_data.location.latitude = resolved_loc.latitude
+                    extracted_data.location.longitude = resolved_loc.longitude
+                    extracted_data.location.precision = resolved_loc.precision
+                    extracted_data.location.location_confidence = resolved_loc.location_confidence
 
                     # Dense Semantic Vector Embeddings
                     embedding_text = f"{article.title} {extracted_data.category} {resolved_loc.name} {content_for_ai[:400]}"

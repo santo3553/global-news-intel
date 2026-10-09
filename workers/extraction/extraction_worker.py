@@ -51,6 +51,16 @@ class ExtractionWorker:
             llm_lng=extracted_data.location.longitude
         )
 
+        # Propagate verified location back to extracted_data
+        extracted_data.location.name = resolved_loc.name
+        extracted_data.location.country = resolved_loc.country
+        extracted_data.location.admin_region = resolved_loc.admin_region
+        extracted_data.location.city = resolved_loc.city
+        extracted_data.location.latitude = resolved_loc.latitude
+        extracted_data.location.longitude = resolved_loc.longitude
+        extracted_data.location.precision = resolved_loc.precision
+        extracted_data.location.location_confidence = resolved_loc.location_confidence
+
         # 3. Dense Semantic Vector Embedding
         embedding_text = f"{article.title} {extracted_data.category} {resolved_loc.name} {content_for_ai[:500]}"
         embedding = await self.embedding_engine.embed_text(embedding_text)

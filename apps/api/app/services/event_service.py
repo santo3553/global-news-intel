@@ -69,7 +69,7 @@ class EventService:
         if category:
             conditions.append(Event.category == category.lower().strip())
         if country:
-            conditions.append(Event.country == country.strip())
+            conditions.append(func.lower(Event.country) == country.strip().lower())
 
         # 3. Importance Threshold
         if min_importance is not None:
@@ -294,4 +294,19 @@ class EventService:
             }
             output.append(evt_dict)
         return output
+
+    @classmethod
+    async def get_event_countries(cls, session: AsyncSession) -> List[Dict[str, Any]]:
+        """
+        Returns all unique countries with event counts across the database.
+        """
+        from sqlalchemy import func
+        stmt = (
+            select(Event.country, func.count(Event.id).label("count"))
+            .where(Event.country.isnot(None), Event.country != "", Event.country != "None")
+            .group_by(Event.country)
+            .order_by(func.count(Event.id).desc())
+        )
+        res = await session.execute(stmt)
+        return [{"name": row[0], "count": row[1]} for row in res.all()]
 

@@ -64,82 +64,32 @@ class MockAIProvider(AIProvider):
             global_impact = 7.2
             novelty = 0.65
 
-        # 2. Location Detection
-        loc_name = "Global"
-        country = None
-        city = None
-        region = None
-        lat = None
-        lng = None
-        precision = "global"
-        loc_conf = 0.50
-
-        if "japan" in combined or "kyushu" in combined or "miyazaki" in combined:
-            country = "Japan"
-            if "miyazaki" in combined:
-                loc_name = "Miyazaki, Kyushu, Japan"
-                city = "Miyazaki"
-                region = "Kyushu"
-                lat, lng = 31.8, 131.4
-                precision = "city"
-                loc_conf = 0.98
-            elif "kyushu" in combined:
-                loc_name = "Kyushu, Japan"
-                region = "Kyushu"
-                lat, lng = 32.8, 130.8
-                precision = "region"
-                loc_conf = 0.90
-            else:
-                loc_name = "Japan"
-                lat, lng = 36.2, 138.2
-                precision = "country"
-                loc_conf = 0.85
-        elif "geneva" in combined or "switzerland" in combined:
-            country = "Switzerland"
-            city = "Geneva"
-            loc_name = "Geneva, Switzerland"
-            lat, lng = 46.2, 6.14
-            precision = "city"
-            loc_conf = 0.99
-        elif "latvia" in combined or "riga" in combined or "baltic" in combined:
-            country = "Latvia"
-            city = "Riga" if "riga" in combined else None
-            loc_name = "Riga, Latvia" if city else "Baltic Region"
-            lat, lng = 56.95, 24.10
-            precision = "city" if city else "region"
-            loc_conf = 0.70
-        elif "buenos aires" in combined or "argentina" in combined or "mercosur" in combined:
-            country = "Argentina"
-            city = "Buenos Aires"
-            loc_name = "Buenos Aires, Argentina"
-            lat, lng = -34.60, -58.38
-            precision = "city"
-            loc_conf = 0.95
-        elif "washington" in combined or "nasa" in combined:
-            country = "United States"
-            city = "Washington"
-            loc_name = "Washington D.C., United States"
-            lat, lng = 38.89, -77.03
-            precision = "city"
-            loc_conf = 0.90
+        # 2. Location Detection using comprehensive offline gazetteer
+        from workers.extraction.geocoder import Geocoder
+        geocoder = Geocoder()
+        resolved = geocoder.resolve(
+            raw_name="",
+            country_hint=None,
+            text_context=combined
+        )
 
         location = ExtractedLocation(
-            name=loc_name,
-            country=country,
-            admin_region=region,
-            city=city,
-            latitude=lat,
-            longitude=lng,
-            precision=precision,
-            location_confidence=loc_conf
+            name=resolved.name,
+            country=resolved.country,
+            admin_region=resolved.admin_region,
+            city=resolved.city,
+            latitude=resolved.latitude,
+            longitude=resolved.longitude,
+            precision=resolved.precision,
+            location_confidence=resolved.location_confidence
         )
 
         # 3. Entities
         entities: List[ExtractedEntity] = []
-        if country:
-            entities.append(ExtractedEntity(name=country, type="country"))
-        if city:
-            entities.append(ExtractedEntity(name=city, type="location"))
+        if resolved.country:
+            entities.append(ExtractedEntity(name=resolved.country, type="country"))
+        if resolved.city:
+            entities.append(ExtractedEntity(name=resolved.city, type="location"))
 
         for org in ["Reuters", "Associated Press", "BBC", "NHK", "NASA", "UN", "Mercosur", "ASEAN", "European Union", "JMA"]:
             if org.lower() in combined:

@@ -45,6 +45,7 @@ import {
   searchEvents,
   triggerPipelineRun,
   fetchPipelineStatus,
+  fetchEventCountries,
   HealthResponse, 
   SourceItem, 
   ArticleItem, 
@@ -52,7 +53,8 @@ import {
   IntelligenceBriefingResponse,
   BriefingItem,
   PipelineTelemetry,
-  PipelineStatusResponse
+  PipelineStatusResponse,
+  CountryCountItem
 } from "@/lib/api";
 import { formatTimeAgo, isLiveBreaking, formatExactTime } from "@/lib/time";
 import EventDetailModal from "@/components/events/EventDetailModal";
@@ -138,6 +140,7 @@ export default function HomePage() {
   const [selectedSourceRegion, setSelectedSourceRegion] = useState<string>("all");
   const [selectedCountry, setSelectedCountry] = useState<string>("all");
   const [selectedScope, setSelectedScope] = useState<"all" | "galli" | "regional" | "national" | "international">("all");
+  const [countryList, setCountryList] = useState<CountryCountItem[]>([]);
 
   const getSourceRegion = useCallback((country?: string): string => {
     if (!country) return "Global";
@@ -209,6 +212,47 @@ export default function HomePage() {
     "South Korea": { center: [127.8, 36.5], zoom: 5.5 },
     "Philippines": { center: [121.8, 12.8], zoom: 4.8 },
     "Australia": { center: [133.8, -25.3], zoom: 3.5 },
+    "France": { center: [2.21, 46.22], zoom: 5.0 },
+    "Saudi Arabia": { center: [45.07, 23.88], zoom: 4.8 },
+    "Nigeria": { center: [8.67, 9.08], zoom: 5.0 },
+    "Qatar": { center: [51.18, 25.35], zoom: 7.5 },
+    "Singapore": { center: [103.81, 1.35], zoom: 9.5 },
+    "Latvia": { center: [24.60, 56.87], zoom: 6.5 },
+    "Palestine": { center: [35.23, 31.95], zoom: 8.0 },
+    "South Africa": { center: [22.93, -30.55], zoom: 4.5 },
+    "Argentina": { center: [-63.61, -38.41], zoom: 4.0 },
+    "Colombia": { center: [-74.29, 4.57], zoom: 4.8 },
+    "Ukraine": { center: [31.16, 48.37], zoom: 5.0 },
+    "Mexico": { center: [-102.55, 23.63], zoom: 4.2 },
+    "Uruguay": { center: [-55.76, -32.52], zoom: 5.8 },
+    "Spain": { center: [-3.74, 40.46], zoom: 5.0 },
+    "Italy": { center: [12.56, 41.87], zoom: 5.0 },
+    "Poland": { center: [19.14, 51.91], zoom: 5.2 },
+    "Canada": { center: [-106.34, 56.13], zoom: 3.5 },
+    "Indonesia": { center: [113.92, -0.78], zoom: 4.0 },
+    "Thailand": { center: [100.99, 15.87], zoom: 5.0 },
+    "Vietnam": { center: [108.27, 14.05], zoom: 5.0 },
+    "Malaysia": { center: [101.97, 4.21], zoom: 5.5 },
+    "Taiwan": { center: [120.96, 23.69], zoom: 7.0 },
+    "Hong Kong": { center: [114.16, 22.31], zoom: 9.5 },
+    "Israel": { center: [34.85, 31.04], zoom: 7.5 },
+    "Norway": { center: [8.46, 60.47], zoom: 4.5 },
+    "Sweden": { center: [18.64, 60.12], zoom: 4.5 },
+    "Denmark": { center: [9.50, 56.26], zoom: 6.0 },
+    "Finland": { center: [25.74, 61.92], zoom: 4.5 },
+    "Netherlands": { center: [5.29, 52.13], zoom: 6.5 },
+    "Belgium": { center: [4.46, 50.50], zoom: 7.0 },
+    "Greece": { center: [21.82, 39.07], zoom: 5.5 },
+    "Ghana": { center: [-1.02, 7.94], zoom: 5.5 },
+    "Ethiopia": { center: [40.48, 9.14], zoom: 5.0 },
+    "Jordan": { center: [36.23, 30.58], zoom: 6.5 },
+    "Lebanon": { center: [35.86, 33.85], zoom: 8.0 },
+    "Morocco": { center: [-7.09, 31.79], zoom: 5.0 },
+    "Sudan": { center: [30.21, 12.86], zoom: 4.5 },
+    "Chile": { center: [-71.54, -35.67], zoom: 4.0 },
+    "Peru": { center: [-75.01, -9.18], zoom: 4.8 },
+    "Czech Republic": { center: [15.47, 49.81], zoom: 6.5 },
+    "Austria": { center: [14.55, 47.51], zoom: 6.5 }
   }), []);
 
   const handleSelectCountry = (country: string) => {
@@ -218,7 +262,13 @@ export default function HomePage() {
       setResetViewTrigger(prev => prev + 1);
       return;
     }
-    const coords = COUNTRY_CENTERS[country];
+    const coords = COUNTRY_CENTERS[country] || (() => {
+      const match = events.find(e => (e.country || "").toLowerCase() === country.toLowerCase() && (e.latitude !== 0 || e.longitude !== 0));
+      if (match) {
+        return { center: [match.longitude, match.latitude] as [number, number], zoom: 5.5 };
+      }
+      return null;
+    })();
     if (coords) {
       setFocusedEventCoords({
         lng: coords.center[0],
@@ -236,6 +286,9 @@ export default function HomePage() {
   };
 
   const availableCountries = useMemo(() => {
+    if (countryList.length > 0) {
+      return countryList;
+    }
     const counts: Record<string, number> = {};
     events.forEach(e => {
       if (e.country) {
@@ -245,7 +298,7 @@ export default function HomePage() {
     return Object.entries(counts)
       .sort((a, b) => b[1] - a[1])
       .map(([name, count]) => ({ name, count }));
-  }, [events]);
+  }, [countryList, events]);
 
   const filteredSources = useMemo(() => {
     if (selectedSourceRegion === "all") return sources;
@@ -254,13 +307,14 @@ export default function HomePage() {
 
   const loadData = useCallback(async () => {
     setLoading(true);
-    const [healthData, sourcesData, articlesData, eventsData, briefingData, pipeStatus] = await Promise.all([
+    const [healthData, sourcesData, articlesData, eventsData, briefingData, pipeStatus, countriesData] = await Promise.all([
       fetchHealth(),
       fetchSources(),
       fetchArticles(15),
-      searchQuery.trim() ? searchEvents(searchQuery.trim(), 100) : fetchEvents(100, sortBy),
+      searchQuery.trim() ? searchEvents(searchQuery.trim(), 200) : fetchEvents(600, sortBy),
       fetchBriefing(),
-      fetchPipelineStatus()
+      fetchPipelineStatus(),
+      fetchEventCountries()
     ]);
     setHealth(healthData);
     setSources(sourcesData);
@@ -268,6 +322,7 @@ export default function HomePage() {
     setEvents(eventsData);
     setBriefing(briefingData);
     setPipelineStatus(pipeStatus);
+    setCountryList(countriesData);
     setLastChecked(new Date().toLocaleTimeString());
     setLoading(false);
   }, [sortBy, searchQuery]);
@@ -283,12 +338,12 @@ export default function HomePage() {
   const handleSearchSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!searchQuery.trim()) {
-      const data = await fetchEvents(100, sortBy);
+      const data = await fetchEvents(600, sortBy);
       setEvents(data);
       return;
     }
     setIsSearching(true);
-    const results = await searchEvents(searchQuery.trim(), 100);
+    const results = await searchEvents(searchQuery.trim(), 200);
     setEvents(results);
     setIsSearching(false);
   };
@@ -296,7 +351,7 @@ export default function HomePage() {
   const handleClearSearch = async () => {
     setSearchQuery("");
     setIsSearching(true);
-    const data = await fetchEvents(100, sortBy);
+    const data = await fetchEvents(600, sortBy);
     setEvents(data);
     setIsSearching(false);
   };
@@ -1142,10 +1197,10 @@ export default function HomePage() {
                   onChange={(e) => handleSelectCountry(e.target.value)}
                   className="rounded-lg border border-slate-700 bg-slate-900 px-2.5 py-1 text-xs text-white focus:border-sky-500 focus:outline-none"
                 >
-                  <option value="all">🌍 All Countries ({events.length} Events)</option>
+                  <option value="all">🌍 All Countries ({events.length} Events across {availableCountries.length} Nations)</option>
                   {availableCountries.map((c) => (
                     <option key={c.name} value={c.name}>
-                      {c.name} ({c.count})
+                      {c.name} ({c.count} {c.count === 1 ? "event" : "events"})
                     </option>
                   ))}
                 </select>
@@ -1165,17 +1220,20 @@ export default function HomePage() {
             <div className="flex items-center gap-1.5 flex-wrap">
               {[
                 { id: "all", label: "Worldwide (All)", count: events.length },
-                { id: "India", label: "🇮🇳 India", count: events.filter(e => (e.country || "").toLowerCase() === "india").length },
-                { id: "Bangladesh", label: "🇧🇩 Bangladesh", count: events.filter(e => (e.country || "").toLowerCase() === "bangladesh").length },
-                { id: "Sri Lanka", label: "🇱🇰 Sri Lanka", count: events.filter(e => (e.country || "").toLowerCase() === "sri lanka").length },
-                { id: "Nepal", label: "🇳🇵 Nepal", count: events.filter(e => (e.country || "").toLowerCase() === "nepal").length },
-                { id: "Pakistan", label: "🇵🇰 Pakistan", count: events.filter(e => (e.country || "").toLowerCase() === "pakistan").length },
-                { id: "Kazakhstan", label: "🇰🇿 Central Asia", count: events.filter(e => ["Kazakhstan", "Uzbekistan", "Kyrgyzstan", "Tajikistan", "Turkmenistan"].includes(e.country || "")).length },
-                { id: "United States", label: "🇺🇸 United States", count: events.filter(e => (e.country || "").toLowerCase() === "united states").length },
-                { id: "Japan", label: "🇯🇵 Japan", count: events.filter(e => (e.country || "").toLowerCase() === "japan").length },
-                { id: "Germany", label: "🇩🇪 Germany & EU", count: events.filter(e => ["Germany", "France", "Switzerland", "Poland"].includes(e.country || "")).length },
-                { id: "United Kingdom", label: "🇬🇧 United Kingdom", count: events.filter(e => (e.country || "").toLowerCase() === "united kingdom").length },
-                { id: "China", label: "🇨🇳 China & Taiwan", count: events.filter(e => ["China", "Taiwan"].includes(e.country || "")).length }
+                { id: "India", label: "🇮🇳 India", count: availableCountries.find(c => c.name.toLowerCase() === "india")?.count ?? 0 },
+                { id: "Bangladesh", label: "🇧🇩 Bangladesh", count: availableCountries.find(c => c.name.toLowerCase() === "bangladesh")?.count ?? 0 },
+                { id: "Sri Lanka", label: "🇱🇰 Sri Lanka", count: availableCountries.find(c => c.name.toLowerCase() === "sri lanka")?.count ?? 0 },
+                { id: "Nepal", label: "🇳🇵 Nepal", count: availableCountries.find(c => c.name.toLowerCase() === "nepal")?.count ?? 0 },
+                { id: "Pakistan", label: "🇵🇰 Pakistan", count: availableCountries.find(c => c.name.toLowerCase() === "pakistan")?.count ?? 0 },
+                { id: "United Kingdom", label: "🇬🇧 United Kingdom", count: availableCountries.find(c => c.name.toLowerCase() === "united kingdom")?.count ?? 0 },
+                { id: "France", label: "🇫🇷 France", count: availableCountries.find(c => c.name.toLowerCase() === "france")?.count ?? 0 },
+                { id: "United States", label: "🇺🇸 United States", count: availableCountries.find(c => c.name.toLowerCase() === "united states")?.count ?? 0 },
+                { id: "Saudi Arabia", label: "🇸🇦 Saudi Arabia", count: availableCountries.find(c => c.name.toLowerCase() === "saudi arabia")?.count ?? 0 },
+                { id: "Japan", label: "🇯🇵 Japan", count: availableCountries.find(c => c.name.toLowerCase() === "japan")?.count ?? 0 },
+                { id: "Nigeria", label: "🇳🇬 Nigeria", count: availableCountries.find(c => c.name.toLowerCase() === "nigeria")?.count ?? 0 },
+                { id: "Singapore", label: "🇸🇬 Singapore", count: availableCountries.find(c => c.name.toLowerCase() === "singapore")?.count ?? 0 },
+                { id: "Kazakhstan", label: "🇰🇿 Central Asia", count: availableCountries.find(c => c.name.toLowerCase() === "kazakhstan")?.count ?? 0 },
+                { id: "Germany", label: "🇩🇪 Germany & EU", count: availableCountries.find(c => c.name.toLowerCase() === "germany")?.count ?? 0 }
               ].map((pill) => (
                 <button
                   key={pill.id}

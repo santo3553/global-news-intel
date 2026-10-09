@@ -132,9 +132,34 @@ export interface NearbyEventItem extends EventItem {
   distance_km: number;
 }
 
-export async function fetchEvents(limit: number = 20, sortBy: string = "importance"): Promise<EventItem[]> {
+export interface CountryCountItem {
+  name: string;
+  count: number;
+}
+
+export async function fetchEventCountries(): Promise<CountryCountItem[]> {
   try {
-    const res = await fetch(`${API_BASE_URL}/api/events?limit=${limit}&sort_by=${sortBy}`, {
+    const res = await fetch(`${API_BASE_URL}/api/events/countries`, {
+      cache: "no-store",
+    });
+    if (!res.ok) return [];
+    return await res.json();
+  } catch {
+    return [];
+  }
+}
+
+export async function fetchEvents(
+  limit: number = 20, 
+  sortBy: string = "importance",
+  country?: string
+): Promise<EventItem[]> {
+  try {
+    let url = `${API_BASE_URL}/api/events?limit=${limit}&sort_by=${sortBy}`;
+    if (country && country !== "all") {
+      url += `&country=${encodeURIComponent(country)}`;
+    }
+    const res = await fetch(url, {
       cache: "no-store",
     });
     if (!res.ok) return [];
