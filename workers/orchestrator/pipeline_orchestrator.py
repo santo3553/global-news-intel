@@ -65,19 +65,20 @@ class PipelineOrchestrator:
         self.ranking_worker = EventRankingWorker()
 
     async def ensure_sources_seeded(self, session: AsyncSession) -> List[Source]:
-        """Ensures at least curated sources are in the database."""
+        """Ensures curated sources catalog is synchronized and active in the database."""
+        for src_data in CURATED_SOURCES:
+            existing = (await session.execute(select(Source).where(Source.id == src_data["id"]))).scalar_one_or_none()
+            if not existing:
+                session.add(Source(**src_data))
+            else:
+                # Keep feed_url, name, and active status synchronized with latest catalog
+                if existing.feed_url != src_data["feed_url"]:
+                    existing.feed_url = src_data["feed_url"]
+                if existing.active != src_data.get("active", True):
+                    existing.active = src_data.get("active", True)
+        await session.commit()
         res = await session.execute(select(Source).where(Source.active.is_(True)))
-        sources = list(res.scalars().all())
-        if not sources:
-            logger.info("No active sources found. Auto-seeding curated sources catalog...")
-            for src_data in CURATED_SOURCES:
-                existing = (await session.execute(select(Source).where(Source.id == src_data["id"]))).scalar_one_or_none()
-                if not existing:
-                    session.add(Source(**src_data))
-            await session.commit()
-            res = await session.execute(select(Source).where(Source.active.is_(True)))
-            sources = list(res.scalars().all())
-        return sources
+        return list(res.scalars().all())
 
     async def run_cycle(
         self,
@@ -109,11 +110,24 @@ class PipelineOrchestrator:
         # -------------------------------------------------------------
         try:
             sources = await self.ensure_sources_seeded(session)
-            if max_feeds:
-                sources = sources[:max_feeds]
+            if max_feeds and max_feeds < len(sources):
+                # Ensure fair multi-country and regional representation across polls
+                from collections import defaultdict
+                by_country = defaultdict(list)
+                for s in sources:
+                    by_country[s.country or "GLOBAL"].append(s)
+                
+                selected_sources = []
+                while len(selected_sources) < max_feeds and any(by_country.values()):
+                    for c_key in list(by_country.keys()):
+                        if by_country[c_key]:
+                            selected_sources.append(by_country[c_key].pop(0))
+                            if len(selected_sources) >= max_feeds:
+                                break
+                sources = selected_sources
 
             sources_checked = len(sources)
-            logger.info("Polling %d active feeds for new dispatches...", sources_checked)
+            logger.info("Polling %d active feeds across countries for new dispatches...", sources_checked)
 
             for source in sources:
                 try:

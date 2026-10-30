@@ -41,14 +41,14 @@ class RawFeedItem:
 def parse_feed_xml(xml_content: str) -> List[RawFeedItem]:
     """
     Parses RSS 2.0 or Atom XML content into a standardized list of RawFeedItems.
-    Handles varying XML namespaces, tag casing, and alternative date formats.
+    Handles varying XML namespaces, tag casing, unescaped HTML/entities, and fallback regex parsing.
     """
     items: List[RawFeedItem] = []
-    try:
-        root = ET.fromstring(xml_content)
-    except Exception as e:
-        logger.warning("XML parsing failed: %s", e)
+    if not xml_content or not xml_content.strip():
         return items
+
+    import re
+    root = None
 
     # Helper to strip namespace from tag name
     def clean_tag(tag: str) -> str:
@@ -56,101 +56,151 @@ def parse_feed_xml(xml_content: str) -> List[RawFeedItem]:
             return tag.split("}", 1)[1].lower()
         return tag.lower()
 
-    root_tag = clean_tag(root.tag)
+    # 1. Standard XML parse attempt
+    try:
+        root = ET.fromstring(xml_content)
+    except Exception:
+        # 2. Resilient XML cleanup (unescaped ampersands, control characters)
+        try:
+            sanitized = re.sub(r'&(?!(?:amp|lt|gt|quot|apos|#\d+|#x[0-9a-fA-F]+);)', '&amp;', xml_content)
+            sanitized = re.sub(r'[\x00-\x08\x0B\x0C\x0E-\x1F\x7F]', '', sanitized)
+            root = ET.fromstring(sanitized)
+        except Exception:
+            # 3. CDATA wrapping for description/summary/title tags with unescaped HTML
+            try:
+                def wrap_cdata(m):
+                    tag, body = m.group(1), m.group(2)
+                    if '<' in body and not body.strip().startswith('<![CDATA['):
+                        return f"<{tag}><![CDATA[{body}]]></{tag}>"
+                    return m.group(0)
+                sanitized2 = re.sub(r'<(description|title|summary|content:encoded)>(.*?)</\1>', wrap_cdata, sanitized, flags=re.DOTALL)
+                root = ET.fromstring(sanitized2)
+            except Exception:
+                root = None
 
-    # 1. Standard RSS 2.0 (<rss><channel><item>...)
-    if root_tag in ("rss", "rdf"):
-        channel = None
-        for child in root:
-            if clean_tag(child.tag) == "channel":
-                channel = child
-                break
-        
-        target_nodes = channel if channel is not None else root
-        for item_node in target_nodes:
-            if clean_tag(item_node.tag) != "item":
-                continue
+    if root is not None:
+        root_tag = clean_tag(root.tag)
 
-            title = ""
-            link = ""
-            desc = ""
-            pub_date = None
-            author = None
-            content_encoded = None
+        # 1. Standard RSS 2.0 (<rss><channel><item>...)
+        if root_tag in ("rss", "rdf"):
+            channel = None
+            for child in root:
+                if clean_tag(child.tag) == "channel":
+                    channel = child
+                    break
+            
+            target_nodes = channel if channel is not None else root
+            for item_node in target_nodes:
+                if clean_tag(item_node.tag) != "item":
+                    continue
 
-            for elem in item_node:
-                tag = clean_tag(elem.tag)
-                text = (elem.text or "").strip()
-                if tag == "title":
-                    title = text
-                elif tag == "link":
-                    link = text or elem.attrib.get("href", "")
-                elif tag in ("description", "summary"):
-                    desc = text
-                elif tag in ("pubdate", "date"):
-                    pub_date = text
-                elif tag in ("creator", "author"):
-                    author = text
-                elif tag in ("encoded", "content"):
-                    content_encoded = text
+                title = ""
+                link = ""
+                desc = ""
+                pub_date = None
+                author = None
+                content_encoded = None
 
-            if title and (link or desc):
-                items.append(
-                    RawFeedItem(
-                        title=title,
-                        link=link,
-                        summary=desc,
-                        published_at=pub_date,
-                        author=author,
-                        raw_content=content_encoded or desc
+                for elem in item_node:
+                    tag = clean_tag(elem.tag)
+                    text = (elem.text or "").strip()
+                    if tag == "title":
+                        title = text
+                    elif tag == "link":
+                        link = text or elem.attrib.get("href", "")
+                    elif tag in ("description", "summary"):
+                        desc = text
+                    elif tag in ("pubdate", "date"):
+                        pub_date = text
+                    elif tag in ("creator", "author"):
+                        author = text
+                    elif tag in ("encoded", "content"):
+                        content_encoded = text
+
+                if title and (link or desc):
+                    items.append(
+                        RawFeedItem(
+                            title=title,
+                            link=link,
+                            summary=desc,
+                            published_at=pub_date,
+                            author=author,
+                            raw_content=content_encoded or desc
+                        )
                     )
-                )
+            if items:
+                return items
 
-    # 2. Atom format (<feed><entry>...)
-    elif root_tag == "feed":
-        for entry in root:
-            if clean_tag(entry.tag) != "entry":
-                continue
+        # 2. Atom format (<feed><entry>...)
+        elif root_tag == "feed":
+            for entry in root:
+                if clean_tag(entry.tag) != "entry":
+                    continue
 
-            title = ""
-            link = ""
-            summary = ""
-            content = ""
-            pub_date = None
-            author = None
+                title = ""
+                link = ""
+                summary = ""
+                content = ""
+                pub_date = None
+                author = None
 
-            for elem in entry:
-                tag = clean_tag(elem.tag)
-                text = (elem.text or "").strip()
-                if tag == "title":
-                    title = text
-                elif tag == "link":
-                    # In Atom, link is often in href attribute
-                    link = elem.attrib.get("href", "") or text
-                elif tag == "summary":
-                    summary = text
-                elif tag == "content":
-                    content = text
-                elif tag in ("published", "updated"):
-                    pub_date = text
-                elif tag == "author":
-                    for sub in elem:
-                        if clean_tag(sub.tag) == "name":
-                            author = (sub.text or "").strip()
+                for elem in entry:
+                    tag = clean_tag(elem.tag)
+                    text = (elem.text or "").strip()
+                    if tag == "title":
+                        title = text
+                    elif tag == "link":
+                        link = elem.attrib.get("href", "") or text
+                    elif tag == "summary":
+                        summary = text
+                    elif tag == "content":
+                        content = text
+                    elif tag in ("published", "updated"):
+                        pub_date = text
+                    elif tag == "author":
+                        for sub in elem:
+                            if clean_tag(sub.tag) == "name":
+                                author = (sub.text or "").strip()
 
-            if title and (link or summary or content):
-                items.append(
-                    RawFeedItem(
-                        title=title,
-                        link=link,
-                        summary=summary or content,
-                        published_at=pub_date,
-                        author=author,
-                        raw_content=content or summary
+                if title and (link or summary or content):
+                    items.append(
+                        RawFeedItem(
+                            title=title,
+                            link=link,
+                            summary=summary or content,
+                            published_at=pub_date,
+                            author=author,
+                            raw_content=content or summary
+                        )
                     )
+            if items:
+                return items
+
+    # 3. Regex Fallback: If XML tree parsing failed, extract raw <item> / <entry> blocks directly
+    item_blocks = re.findall(r'<item(?:\s+[^>]*)?>(.*?)</item>', xml_content, flags=re.DOTALL | re.IGNORECASE)
+    for block in item_blocks:
+        title_m = re.search(r'<title(?:\s+[^>]*)?>(?:<!\[CDATA\[)?(.*?)(?:\]\]>)?</title>', block, flags=re.DOTALL | re.IGNORECASE)
+        link_m = re.search(r'<link(?:\s+[^>]*)?>(?:<!\[CDATA\[)?(.*?)(?:\]\]>)?</link>', block, flags=re.DOTALL | re.IGNORECASE)
+        desc_m = re.search(r'<(?:description|summary)(?:\s+[^>]*)?>(?:<!\[CDATA\[)?(.*?)(?:\]\]>)?</(?:description|summary)>', block, flags=re.DOTALL | re.IGNORECASE)
+        pub_m = re.search(r'<(?:pubDate|date|dc:date)(?:\s+[^>]*)?>(?:<!\[CDATA\[)?(.*?)(?:\]\]>)?</(?:pubDate|date|dc:date)>', block, flags=re.DOTALL | re.IGNORECASE)
+
+        t = re.sub(r'<[^>]+>', '', title_m.group(1)).strip() if title_m else ""
+        l = link_m.group(1).strip() if link_m else ""
+        d = re.sub(r'<[^>]+>', '', desc_m.group(1)).strip() if desc_m else ""
+        p = pub_m.group(1).strip() if pub_m else None
+        if t and (l or d):
+            items.append(
+                RawFeedItem(
+                    title=t,
+                    link=l,
+                    summary=d,
+                    published_at=p,
+                    raw_content=d
                 )
+            )
 
     return items
+
 
 
 class RSSCollector:

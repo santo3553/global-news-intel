@@ -234,11 +234,33 @@ CURATED_SOURCES: List[Dict[str, Any]] = [
         "id": "src-dhakatribune-bd",
         "name": "Dhaka Tribune (Bangladesh)",
         "domain": "dhakatribune.com",
-        "feed_url": "https://www.dhakatribune.com/feed",
+        "feed_url": "https://www.dhakatribune.com/feed/",
         "source_type": "rss",
         "country": "BD",
         "language": "en",
-        "reliability_score": 0.84,
+        "reliability_score": 0.88,
+        "active": True
+    },
+    {
+        "id": "src-google-bd",
+        "name": "Google News Bangladesh",
+        "domain": "news.google.com",
+        "feed_url": "https://news.google.com/rss?hl=en-BD&gl=BD&ceid=BD:en",
+        "source_type": "rss",
+        "country": "BD",
+        "language": "en",
+        "reliability_score": 0.90,
+        "active": True
+    },
+    {
+        "id": "src-tbsnews-bd",
+        "name": "The Business Standard (Bangladesh)",
+        "domain": "tbsnews.net",
+        "feed_url": "https://www.tbsnews.net/rss.xml",
+        "source_type": "rss",
+        "country": "BD",
+        "language": "en",
+        "reliability_score": 0.88,
         "active": True
     },
     {
@@ -249,7 +271,51 @@ CURATED_SOURCES: List[Dict[str, Any]] = [
         "source_type": "rss",
         "country": "BD",
         "language": "en",
-        "reliability_score": 0.86,
+        "reliability_score": 0.88,
+        "active": True
+    },
+    {
+        "id": "src-google-in",
+        "name": "Google News India",
+        "domain": "news.google.com",
+        "feed_url": "https://news.google.com/rss?hl=en-IN&gl=IN&ceid=IN:en",
+        "source_type": "rss",
+        "country": "IN",
+        "language": "en",
+        "reliability_score": 0.90,
+        "active": True
+    },
+    {
+        "id": "src-google-pk",
+        "name": "Google News Pakistan",
+        "domain": "news.google.com",
+        "feed_url": "https://news.google.com/rss?hl=en-PK&gl=PK&ceid=PK:en",
+        "source_type": "rss",
+        "country": "PK",
+        "language": "en",
+        "reliability_score": 0.90,
+        "active": True
+    },
+    {
+        "id": "src-google-lk",
+        "name": "Google News Sri Lanka",
+        "domain": "news.google.com",
+        "feed_url": "https://news.google.com/rss?hl=en-LK&gl=LK&ceid=LK:en",
+        "source_type": "rss",
+        "country": "LK",
+        "language": "en",
+        "reliability_score": 0.90,
+        "active": True
+    },
+    {
+        "id": "src-google-np",
+        "name": "Google News Nepal",
+        "domain": "news.google.com",
+        "feed_url": "https://news.google.com/rss?hl=en-NP&gl=NP&ceid=NP:en",
+        "source_type": "rss",
+        "country": "NP",
+        "language": "en",
+        "reliability_score": 0.90,
         "active": True
     },
     {
