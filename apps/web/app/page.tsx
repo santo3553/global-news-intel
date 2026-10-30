@@ -329,7 +329,7 @@ export default function HomePage() {
 
   const handleTriggerPipeline = async () => {
     setIsRunningPipeline(true);
-    const telemetry = await triggerPipelineRun(5);
+    const telemetry = await triggerPipelineRun(25);
     setPipelineTelemetry(telemetry);
     await loadData();
     setIsRunningPipeline(false);
@@ -937,10 +937,18 @@ export default function HomePage() {
                           {item.location}
                         </span>
                         <div className="flex items-center gap-1.5 font-mono">
-                          <span className="inline-flex items-center gap-1 rounded bg-rose-500/20 px-1.5 py-0.2 text-[9px] font-bold text-rose-300 border border-rose-500/30 mr-1">
-                            <span className="h-1.5 w-1.5 rounded-full bg-rose-400 animate-pulse" />
-                            LIVE
-                          </span>
+                          {item.last_updated_at && (
+                            <span className="text-slate-400 flex items-center gap-1 text-[10px] mr-1" title={formatExactTime(item.last_updated_at)}>
+                              <Clock className="h-3 w-3 text-emerald-400" />
+                              <strong className="text-emerald-300 font-normal">{formatTimeAgo(item.last_updated_at)}</strong>
+                            </span>
+                          )}
+                          {isLiveBreaking(item.last_updated_at) && (
+                            <span className="inline-flex items-center gap-1 rounded bg-rose-500/20 px-1.5 py-0.2 text-[9px] font-bold text-rose-300 border border-rose-500/30 mr-1">
+                              <span className="h-1.5 w-1.5 rounded-full bg-rose-400 animate-pulse" />
+                              LIVE
+                            </span>
+                          )}
                           <span className="text-[10px] text-slate-500">Imp:</span>
                           <span className="font-bold text-sky-400">{item.importance.toFixed(1)}</span>
                           <span className="text-[10px] text-slate-500 ml-1">Vel:</span>

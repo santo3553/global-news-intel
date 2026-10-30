@@ -121,7 +121,7 @@ class Event(Base):
 
     # Lifecycle
     first_seen_at = Column(DateTime(timezone=True), default=utc_now, nullable=False, index=True)
-    last_updated_at = Column(DateTime(timezone=True), default=utc_now, onupdate=utc_now, nullable=False, index=True)
+    last_updated_at = Column(DateTime(timezone=True), default=utc_now, nullable=False, index=True)
     status = Column(String(50), nullable=False, default="active", index=True)  # active, developing, resolved, archived
     
     created_at = Column(DateTime(timezone=True), default=utc_now, nullable=False)

@@ -31,16 +31,23 @@ class BriefingService:
         """
         Answers 'What should I read right now?' by synthesizing the highest-impact,
         high-velocity, and strategic global events into an executive intelligence memo.
+        Prioritizes active real-time events from the current monitoring window.
         """
+        from datetime import timedelta
         now = datetime.now(timezone.utc)
+        recent_cutoff = now - timedelta(days=2)
 
-        # Query top active events ordered by importance
+        # 1. Query top active/developing events, prioritizing recent dispatches
         stmt = (
             select(Event)
             .options(selectinload(Event.article_associations))
             .where(Event.status.in_(["active", "developing"]))
-            .order_by(Event.importance_score.desc(), Event.development_velocity_score.desc())
-            .limit(25)
+            .order_by(
+                Event.last_updated_at.desc(),
+                Event.development_velocity_score.desc(),
+                Event.importance_score.desc()
+            )
+            .limit(50)
         )
         res = await session.execute(stmt)
         events = res.scalars().all()
@@ -69,36 +76,47 @@ class BriefingService:
                 confidence=evt.confidence_score,
                 velocity=evt.development_velocity_score,
                 summary=evt.summary[:240] + ("..." if len(evt.summary) > 240 else ""),
-                key_takeaway=key_takeaway
+                key_takeaway=key_takeaway,
+                first_seen_at=evt.first_seen_at,
+                last_updated_at=evt.last_updated_at
             )
 
         for evt in events:
             item = to_briefing_item(evt)
+            evt_time = evt.last_updated_at or evt.first_seen_at
+            if evt_time and evt_time.tzinfo is None:
+                evt_time = evt_time.replace(tzinfo=timezone.utc)
+            is_recent = evt_time is not None and evt_time >= recent_cutoff
 
-            # Breaking alerts: rapid incoming reports
-            if evt.development_velocity_score >= 6.0 and len(breaking_alerts) < limit_per_section:
+            # Breaking alerts: rapid incoming reports from current window
+            if is_recent and evt.development_velocity_score >= 3.0 and len(breaking_alerts) < limit_per_section:
                 breaking_alerts.append(item)
 
             # Geopolitical: high global or political impact
-            if (evt.category == "politics" or evt.global_impact_score >= 6.0) and len(geopolitical) < limit_per_section:
+            if (evt.category == "politics" or evt.global_impact_score >= 5.5) and len(geopolitical) < limit_per_section:
                 geopolitical.append(item)
 
-            # Hazards / Natural Disasters / Conflict
-            if (evt.category in ("natural_disaster", "security", "conflict") or evt.human_impact_score >= 6.0) and len(hazards) < limit_per_section:
+            # Hazards / Natural Disasters / Conflict / Security
+            if (evt.category in ("natural_disaster", "security", "conflict") or evt.human_impact_score >= 5.5) and len(hazards) < limit_per_section:
                 hazards.append(item)
 
-            # Economic disruptions
-            if (evt.category == "economy" or evt.economic_impact_score >= 5.5) and len(economic) < limit_per_section:
+            # Economic disruptions / Global Trade & Crypto
+            if (evt.category == "economy" or evt.economic_impact_score >= 5.0 or "hack" in evt.canonical_title.lower() or "crypto" in evt.canonical_title.lower()) and len(economic) < limit_per_section:
                 economic.append(item)
+
+        # Fallback if breaking_alerts is empty (e.g. initial setup)
+        if len(breaking_alerts) == 0 and events:
+            for evt in events[:limit_per_section]:
+                breaking_alerts.append(to_briefing_item(evt))
 
         total_analyzed = len(events)
         if total_analyzed == 0:
             exec_summary = "Global monitoring active. No high-severity anomalies detected in current surveillance window."
         else:
-            top_evt = events[0]
+            top_evt = breaking_alerts[0] if breaking_alerts else events[0]
             exec_summary = (
-                f"Global intelligence sweep analyzed {total_analyzed} active events. "
-                f"Primary focus centers on '{top_evt.canonical_title}' (Impact {top_evt.importance_score:.1f}/10) "
+                f"Global intelligence sweep analyzed {total_analyzed} active events in the current monitoring window. "
+                f"Primary focus centers on '{top_evt.title}' (Impact {top_evt.importance:.1f}/10) "
                 f"with {len(breaking_alerts)} high-velocity developing situations tracked across continents."
             )
 

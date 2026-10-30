@@ -29,6 +29,7 @@ async def lifespan(app: FastAPI):
         logger.info("Database tables verified.")
     except Exception as e:
         logger.error("Failed to auto-create database tables on startup: %s", e)
+
     yield
     logger.info("Shutting down Global News Intelligence API...")
     await async_engine.dispose()

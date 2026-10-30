@@ -13,6 +13,8 @@ class BriefingItem(BaseModel):
     velocity: float
     summary: str
     key_takeaway: str
+    first_seen_at: Optional[datetime] = None
+    last_updated_at: Optional[datetime] = None
 
 
 class IntelligenceBriefingResponse(BaseModel):

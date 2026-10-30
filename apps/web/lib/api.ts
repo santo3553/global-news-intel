@@ -241,6 +241,8 @@ export interface BriefingItem {
   velocity: number;
   summary: string;
   key_takeaway: string;
+  first_seen_at?: string;
+  last_updated_at?: string;
 }
 
 export interface IntelligenceBriefingResponse {
