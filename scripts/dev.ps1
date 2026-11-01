@@ -23,11 +23,15 @@ Push-Location (Join-Path $PSScriptRoot "..")
 & $VenvAlembic upgrade head
 Pop-Location
 
-# 3. Start Backend API
+# 3. Start Persistent Redis Server
+Write-Host "`n--> Launching Persistent Redis Server on 127.0.0.1:6379..." -ForegroundColor Green
+$RedisProcess = Start-Process -FilePath $VenvPython -ArgumentList "scripts\persistent_redis_server.py" -WorkingDirectory (Join-Path $PSScriptRoot "..") -PassThru
+
+# 4. Start Backend API
 Write-Host "`n--> Launching FastAPI Backend on http://localhost:8000..." -ForegroundColor Green
 $BackendProcess = Start-Process -FilePath $VenvUvicorn -ArgumentList "apps.api.app.main:app", "--reload", "--host", "0.0.0.0", "--port", "8000" -WorkingDirectory (Join-Path $PSScriptRoot "..") -PassThru
 
-# 4. Start Next.js Frontend
+# 5. Start Next.js Frontend
 Write-Host "`n--> Launching Next.js Frontend on http://localhost:3000..." -ForegroundColor Green
 $FrontendProcess = Start-Process -FilePath "npm.cmd" -ArgumentList "run", "dev" -WorkingDirectory (Join-Path $PSScriptRoot "..\apps\web") -PassThru
 
@@ -38,8 +42,9 @@ Write-Host "Web Console: http://localhost:3000" -ForegroundColor White
 Write-Host "`nPress Ctrl+C or stop processes to exit." -ForegroundColor Yellow
 
 try {
-    Wait-Process -Id $BackendProcess.Id, $FrontendProcess.Id
+    Wait-Process -Id $RedisProcess.Id, $BackendProcess.Id, $FrontendProcess.Id
 } finally {
+    Stop-Process -Id $RedisProcess.Id -ErrorAction SilentlyContinue
     Stop-Process -Id $BackendProcess.Id -ErrorAction SilentlyContinue
     Stop-Process -Id $FrontendProcess.Id -ErrorAction SilentlyContinue
 }

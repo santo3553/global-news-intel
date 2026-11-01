@@ -9,6 +9,9 @@ class EventBase(BaseModel):
     summary: str
     category: str = Field(..., max_length=100)
     subcategory: Optional[str] = Field(None, max_length=100)
+    original_language: Optional[str] = Field(default="en", max_length=10)
+    original_title: Optional[str] = Field(default=None, max_length=512)
+    original_summary: Optional[str] = None
     latitude: float = Field(..., ge=-90.0, le=90.0)
     longitude: float = Field(..., ge=-180.0, le=180.0)
     country: Optional[str] = None

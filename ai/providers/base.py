@@ -31,3 +31,11 @@ class AIProvider(ABC):
         Generates text summaries and briefings for events.
         """
         pass
+
+    @abstractmethod
+    async def translate_to_english(self, text: str, source_lang: str) -> str:
+        """
+        Translates native text (Bengali, Hindi, Urdu, Arabic, Spanish, etc.)
+        to canonical English while preserving local municipal names, numbers, and key entities.
+        """
+        pass

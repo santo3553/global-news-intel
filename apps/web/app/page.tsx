@@ -949,6 +949,12 @@ export default function HomePage() {
                               LIVE
                             </span>
                           )}
+                          {item.original_language && item.original_language !== "en" && (
+                            <span className="inline-flex items-center gap-1 rounded bg-emerald-500/15 px-1.5 py-0.2 text-[9px] font-bold text-emerald-300 border border-emerald-500/30 mr-1" title={`Source: ${item.original_language.toUpperCase()} with AI translation`}>
+                              <span>🌐</span>
+                              <span>{item.original_language.toUpperCase()}</span>
+                            </span>
+                          )}
                           <span className="text-[10px] text-slate-500">Imp:</span>
                           <span className="font-bold text-sky-400">{item.importance.toFixed(1)}</span>
                           <span className="text-[10px] text-slate-500 ml-1">Vel:</span>
@@ -1408,6 +1414,12 @@ export default function HomePage() {
                           <span className="inline-flex items-center gap-1 rounded bg-rose-500/20 px-1.5 py-0.2 text-[9px] font-bold text-rose-300 border border-rose-500/40">
                             <span className="h-1.5 w-1.5 rounded-full bg-rose-400 animate-pulse" />
                             LIVE
+                          </span>
+                        )}
+                        {evt.original_language && evt.original_language !== "en" && (
+                          <span className="inline-flex items-center gap-1 rounded bg-emerald-500/15 px-1.5 py-0.2 text-[9px] font-bold text-emerald-300 border border-emerald-500/30 ml-1" title={`Native source: ${evt.original_language.toUpperCase()} with AI translation`}>
+                            <span>🌐</span>
+                            <span>{evt.original_language.toUpperCase()}</span>
                           </span>
                         )}
                       </div>

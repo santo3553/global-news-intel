@@ -18,7 +18,7 @@ class Settings(BaseSettings):
 
     DATABASE_URL: str = "sqlite+aiosqlite:///./global_news.db"
     DATABASE_SYNC_URL: str = "sqlite:///./global_news.db"
-    REDIS_URL: str = "redis://localhost:6379/0"
+    REDIS_URL: str = "redis://127.0.0.1:6379/0"
 
     LLM_PROVIDER: str = "mock"
     LLM_MODEL: str = "mistral-7b-instruct-v0.2.Q4_K_M.gguf"

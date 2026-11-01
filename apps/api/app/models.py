@@ -76,6 +76,9 @@ class Article(Base):
     published_at = Column(DateTime(timezone=True), nullable=True, index=True)
     fetched_at = Column(DateTime(timezone=True), default=utc_now, nullable=False)
     language = Column(String(10), nullable=False, default="en")
+    original_language = Column(String(10), nullable=True, default="en")
+    original_title = Column(String(512), nullable=True)
+    original_content = Column(Text, nullable=True)
     raw_content = Column(Text, nullable=True)
     cleaned_content = Column(Text, nullable=True)
     content_hash = Column(String(64), nullable=True, index=True)  # SHA-256
@@ -98,6 +101,9 @@ class Event(Base):
     summary = Column(Text, nullable=False)
     category = Column(String(100), nullable=False, index=True)  # natural_disaster, politics, security, economy, etc.
     subcategory = Column(String(100), nullable=True)
+    original_language = Column(String(10), nullable=True, default="en")
+    original_title = Column(String(512), nullable=True)
+    original_summary = Column(Text, nullable=True)
     
     # Geographic Data
     latitude = Column(Float, nullable=False, index=True)

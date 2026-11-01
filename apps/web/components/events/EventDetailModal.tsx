@@ -34,6 +34,14 @@ interface EventDetailModalProps {
   onSelectEvent: (eventId: string) => void;
 }
 
+const LANGUAGE_META: Record<string, { name: string; native: string; flag: string; badgeColor: string }> = {
+  bn: { name: "Bengali", native: "বাংলা", flag: "🇧🇩", badgeColor: "bg-emerald-500/10 text-emerald-300 border-emerald-500/30" },
+  hi: { name: "Hindi", native: "हिंदी", flag: "🇮🇳", badgeColor: "bg-orange-500/10 text-orange-300 border-orange-500/30" },
+  ur: { name: "Urdu", native: "اردو", flag: "🇵🇰", badgeColor: "bg-green-500/10 text-green-300 border-green-500/30" },
+  ar: { name: "Arabic", native: "العربية", flag: "🌍", badgeColor: "bg-amber-500/10 text-amber-300 border-amber-500/30" },
+  es: { name: "Spanish", native: "Español", flag: "🇪🇸", badgeColor: "bg-sky-500/10 text-sky-300 border-sky-500/30" },
+};
+
 function getSmartNewsSearchUrl(title: string, country?: string): string {
   if (!title) return "https://news.google.com";
   const cleanTerms = title
@@ -82,10 +90,12 @@ export default function EventDetailModal({
   const [nearby, setNearby] = useState<NearbyEventItem[]>([]);
   const [timeline, setTimeline] = useState<EventTimelineResponse | null>(null);
   const [activeTab, setActiveTab] = useState<"timeline" | "articles">("timeline");
+  const [showOriginal, setShowOriginal] = useState<boolean>(false);
   const [loading, setLoading] = useState<boolean>(true);
 
   useEffect(() => {
     if (!eventId) return;
+    setShowOriginal(false);
 
     let isMounted = true;
     setLoading(true);
@@ -211,10 +221,51 @@ export default function EventDetailModal({
               </div>
             </div>
 
+            {/* Native Local Language Translation Switcher */}
+            {detail.original_language && detail.original_language !== "en" && (
+              <div className="flex flex-wrap items-center justify-between gap-3 p-3.5 rounded-xl bg-slate-900/90 border border-slate-700/80 shadow-inner">
+                <div className="flex items-center gap-2">
+                  <span className={`inline-flex items-center gap-1.5 px-2.5 py-1 rounded-md text-xs font-bold border ${
+                    LANGUAGE_META[detail.original_language]?.badgeColor || "bg-cyan-500/10 text-cyan-300 border-cyan-500/30"
+                  }`}>
+                    <span>{LANGUAGE_META[detail.original_language]?.flag || "🌐"}</span>
+                    <span>{LANGUAGE_META[detail.original_language]?.native || detail.original_language.toUpperCase()} [{detail.original_language.toUpperCase()}] Source</span>
+                  </span>
+                  <span className="text-[11px] text-slate-400 hidden sm:inline">
+                    {showOriginal 
+                      ? `Viewing native report with municipal granularity` 
+                      : `AI-translated to English`}
+                  </span>
+                </div>
+                <div className="flex items-center rounded-lg bg-slate-950 p-1 border border-slate-800">
+                  <button
+                    onClick={() => setShowOriginal(false)}
+                    className={`px-3 py-1 text-xs font-semibold rounded-md transition-all ${
+                      !showOriginal
+                        ? "bg-sky-600 text-white shadow"
+                        : "text-slate-400 hover:text-white"
+                    }`}
+                  >
+                    English Translation
+                  </button>
+                  <button
+                    onClick={() => setShowOriginal(true)}
+                    className={`px-3 py-1 text-xs font-semibold rounded-md transition-all ${
+                      showOriginal
+                        ? "bg-emerald-600 text-white shadow"
+                        : "text-slate-400 hover:text-white"
+                    }`}
+                  >
+                    Original ({LANGUAGE_META[detail.original_language]?.native || detail.original_language.toUpperCase()})
+                  </button>
+                </div>
+              </div>
+            )}
+
             {/* Canonical Title & Summary */}
             <div>
               <h2 className="text-xl font-bold text-white leading-snug">
-                {detail.canonical_title}
+                {showOriginal && detail.original_title ? detail.original_title : detail.canonical_title}
               </h2>
               <div className="mt-2 flex items-center gap-2 text-xs text-slate-400">
                 <MapPin className="h-3.5 w-3.5 text-rose-400" />
@@ -229,7 +280,7 @@ export default function EventDetailModal({
                 </span>
               </div>
               <p className="mt-4 text-sm text-slate-300 leading-relaxed bg-slate-900/60 p-4 rounded-xl border border-slate-800/80">
-                {detail.summary}
+                {showOriginal && detail.original_summary ? detail.original_summary : detail.summary}
               </p>
             </div>
 

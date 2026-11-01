@@ -6,6 +6,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.orm import selectinload
 
 from apps.api.app.models import Event, EventArticle, Article
+from apps.api.app.redis_client import get_json_cache, set_json_cache
 from apps.api.app.schemas.briefing import (
     IntelligenceBriefingResponse,
     BriefingItem,
@@ -32,7 +33,16 @@ class BriefingService:
         Answers 'What should I read right now?' by synthesizing the highest-impact,
         high-velocity, and strategic global events into an executive intelligence memo.
         Enforces strict geographic/country diversity so no single country dominates the world briefing.
+        Cached in Redis with 60s TTL for sub-millisecond retrieval.
         """
+        cache_key = f"briefing:v1:limit:{limit_per_section}"
+        cached = await get_json_cache(cache_key)
+        if cached is not None:
+            try:
+                return IntelligenceBriefingResponse.model_validate(cached)
+            except Exception:
+                pass
+
         now = datetime.now(timezone.utc)
 
         # 1. Query candidate active and developing events ordered by importance & recency
@@ -87,6 +97,8 @@ class BriefingService:
                 velocity=evt.development_velocity_score,
                 summary=evt.summary[:240] + ("..." if len(evt.summary) > 240 else ""),
                 key_takeaway=key_takeaway,
+                original_language=evt.original_language or "en",
+                original_title=evt.original_title,
                 first_seen_at=evt.first_seen_at,
                 last_updated_at=evt.last_updated_at
             )
@@ -168,7 +180,7 @@ class BriefingService:
                 f"with {len(breaking_alerts)} high-velocity developing situations tracked across key continental theatres."
             )
 
-        return IntelligenceBriefingResponse(
+        briefing_response = IntelligenceBriefingResponse(
             generated_at=now,
             executive_summary=exec_summary,
             total_events_analyzed=total_analyzed,
@@ -177,6 +189,8 @@ class BriefingService:
             humanitarian_hazards=hazards,
             economic_disruptions=economic
         )
+        await set_json_cache(cache_key, briefing_response.model_dump(mode="json"), ttl_seconds=60)
+        return briefing_response
 
     @classmethod
     async def get_event_timeline(

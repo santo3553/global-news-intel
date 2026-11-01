@@ -8,6 +8,7 @@ from fastapi import APIRouter, Depends, Query, BackgroundTasks
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from apps.api.app.database import get_db
+from apps.api.app.redis_client import invalidate_patterns
 from workers.orchestrator.pipeline_orchestrator import (
     PipelineOrchestrator,
     get_pipeline_daemon
@@ -29,6 +30,7 @@ async def trigger_pipeline_run(
     """
     orchestrator = PipelineOrchestrator()
     telemetry = await orchestrator.run_cycle(session=db, max_feeds=max_feeds)
+    await invalidate_patterns(["briefing:*", "events:*"])
     return telemetry.to_dict()
 
 

@@ -13,6 +13,8 @@ class BriefingItem(BaseModel):
     velocity: float
     summary: str
     key_takeaway: str
+    original_language: Optional[str] = "en"
+    original_title: Optional[str] = None
     first_seen_at: Optional[datetime] = None
     last_updated_at: Optional[datetime] = None
 

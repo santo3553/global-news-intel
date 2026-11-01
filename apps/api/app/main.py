@@ -3,6 +3,7 @@ from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from apps.api.app.config import settings
 from apps.api.app.database import async_engine, Base
+from apps.api.app.redis_client import close_redis
 from apps.api.app.routes.health import router as health_router
 from apps.api.app.routes.sources import router as sources_router
 from apps.api.app.routes.articles import router as articles_router
@@ -32,6 +33,7 @@ async def lifespan(app: FastAPI):
 
     yield
     logger.info("Shutting down Global News Intelligence API...")
+    await close_redis()
     await async_engine.dispose()
 
 

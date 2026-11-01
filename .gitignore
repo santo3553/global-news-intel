@@ -32,6 +32,7 @@ venv.bak/
 *.db
 *.sqlite
 *.sqlite3
+redis_storage.json
 
 # Node / Next.js
 apps/web/node_modules/

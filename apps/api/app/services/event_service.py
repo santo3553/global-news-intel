@@ -5,6 +5,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.orm import selectinload
 
 from apps.api.app.models import Event, EventArticle, Article, Entity, EventEntity
+from apps.api.app.redis_client import get_json_cache, set_json_cache
 from workers.clustering.signals import haversine_distance_km
 
 logger = logging.getLogger("gni.services.events")
@@ -105,6 +106,9 @@ class EventService:
                 "summary": evt.summary,
                 "category": evt.category,
                 "subcategory": evt.subcategory,
+                "original_language": evt.original_language or "en",
+                "original_title": evt.original_title,
+                "original_summary": evt.original_summary,
                 "latitude": evt.latitude,
                 "longitude": evt.longitude,
                 "country": evt.country,
@@ -162,6 +166,9 @@ class EventService:
                     "published_at": art.published_at,
                     "fetched_at": art.fetched_at,
                     "language": art.language,
+                    "original_language": art.original_language,
+                    "original_title": art.original_title,
+                    "original_content": art.original_content,
                     "cleaned_content": art.cleaned_content,
                     "processing_status": art.processing_status,
                     "created_at": art.created_at,
@@ -185,6 +192,9 @@ class EventService:
             "summary": evt.summary,
             "category": evt.category,
             "subcategory": evt.subcategory,
+            "original_language": evt.original_language or "en",
+            "original_title": evt.original_title,
+            "original_summary": evt.original_summary,
             "latitude": evt.latitude,
             "longitude": evt.longitude,
             "country": evt.country,
@@ -272,6 +282,9 @@ class EventService:
                 "summary": evt.summary,
                 "category": evt.category,
                 "subcategory": evt.subcategory,
+                "original_language": evt.original_language or "en",
+                "original_title": evt.original_title,
+                "original_summary": evt.original_summary,
                 "latitude": evt.latitude,
                 "longitude": evt.longitude,
                 "country": evt.country,
@@ -299,7 +312,13 @@ class EventService:
     async def get_event_countries(cls, session: AsyncSession) -> List[Dict[str, Any]]:
         """
         Returns all unique countries with event counts across the database.
+        Cached in Redis for 120 seconds for sub-millisecond retrieval.
         """
+        cache_key = "events:v1:countries"
+        cached = await get_json_cache(cache_key)
+        if cached is not None:
+            return cached
+
         from sqlalchemy import func
         stmt = (
             select(Event.country, func.count(Event.id).label("count"))
@@ -308,5 +327,7 @@ class EventService:
             .order_by(func.count(Event.id).desc())
         )
         res = await session.execute(stmt)
-        return [{"name": row[0], "count": row[1]} for row in res.all()]
+        result = [{"name": row[0], "count": row[1]} for row in res.all()]
+        await set_json_cache(cache_key, result, ttl_seconds=120)
+        return result
 

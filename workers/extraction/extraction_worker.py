@@ -36,6 +36,21 @@ class ExtractionWorker:
         """
         content_for_ai = article.cleaned_content or article.raw_content or article.title
 
+        # Automated LLM Translation for native-language local sources
+        if article.original_language and article.original_language != "en":
+            try:
+                translated_title = await self.ai_provider.translate_to_english(
+                    article.title, article.original_language
+                )
+                translated_content = await self.ai_provider.translate_to_english(
+                    content_for_ai, article.original_language
+                )
+                article.title = translated_title
+                article.cleaned_content = translated_content
+                content_for_ai = translated_content
+            except Exception as e:
+                logger.warning("Translation error for article [%s]: %s", article.id, e)
+
         # 1. AI Extraction
         extracted_data = await self.ai_provider.extract_event(
             title=article.title,

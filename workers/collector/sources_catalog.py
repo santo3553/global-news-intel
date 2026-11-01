@@ -63,6 +63,217 @@ CURATED_SOURCES: List[Dict[str, Any]] = [
     },
 
     # ==========================================
+    # Multilingual & Native Local Feeds (BN, HI, UR, AR, ES)
+    # ==========================================
+    # Bengali (Bangladesh & West Bengal)
+    {
+        "id": "src-prothomalo-bn",
+        "name": "Prothom Alo (বাংলা)",
+        "domain": "prothomalo.com",
+        "feed_url": "https://www.prothomalo.com/feed",
+        "source_type": "rss",
+        "country": "BD",
+        "language": "bn",
+        "reliability_score": 0.90,
+        "active": True
+    },
+    {
+        "id": "src-kalerkantho-bn",
+        "name": "Kaler Kantho (বাংলা)",
+        "domain": "kalerkantho.com",
+        "feed_url": "https://www.kalerkantho.com/rss.xml",
+        "source_type": "rss",
+        "country": "BD",
+        "language": "bn",
+        "reliability_score": 0.86,
+        "active": True
+    },
+    {
+        "id": "src-jugantor-bn",
+        "name": "Jugantor (বাংলা)",
+        "domain": "jugantor.com",
+        "feed_url": "https://www.jugantor.com/feed/rss.xml",
+        "source_type": "rss",
+        "country": "BD",
+        "language": "bn",
+        "reliability_score": 0.86,
+        "active": True
+    },
+    {
+        "id": "src-bdnews24-bn",
+        "name": "bdnews24 (বাংলা)",
+        "domain": "bangla.bdnews24.com",
+        "feed_url": "https://bangla.bdnews24.com/feed",
+        "source_type": "rss",
+        "country": "BD",
+        "language": "bn",
+        "reliability_score": 0.88,
+        "active": True
+    },
+    {
+        "id": "src-anandabazar-bn",
+        "name": "Anandabazar Patrika (বাংলা)",
+        "domain": "anandabazar.com",
+        "feed_url": "https://www.anandabazar.com/rssfeed",
+        "source_type": "rss",
+        "country": "IN",
+        "language": "bn",
+        "reliability_score": 0.88,
+        "active": True
+    },
+
+    # Hindi (North India Municipalities)
+    {
+        "id": "src-bbchindi-hi",
+        "name": "BBC News Hindi (हिंदी)",
+        "domain": "bbc.com",
+        "feed_url": "https://feeds.bbci.co.uk/hindi/rss.xml",
+        "source_type": "rss",
+        "country": "IN",
+        "language": "hi",
+        "reliability_score": 0.92,
+        "active": True
+    },
+    {
+        "id": "src-jagran-hi",
+        "name": "Dainik Jagran (हिंदी)",
+        "domain": "jagran.com",
+        "feed_url": "https://rss.jagran.com/rss/news/national.xml",
+        "source_type": "rss",
+        "country": "IN",
+        "language": "hi",
+        "reliability_score": 0.87,
+        "active": True
+    },
+    {
+        "id": "src-amarujala-hi",
+        "name": "Amar Ujala (हिंदी)",
+        "domain": "amarujala.com",
+        "feed_url": "https://www.amarujala.com/rss/breaking-news.xml",
+        "source_type": "rss",
+        "country": "IN",
+        "language": "hi",
+        "reliability_score": 0.86,
+        "active": True
+    },
+    {
+        "id": "src-navbharat-hi",
+        "name": "Navbharat Times (हिंदी)",
+        "domain": "navbharattimes.indiatimes.com",
+        "feed_url": "https://navbharattimes.indiatimes.com/rssfeedsection/15635132.cms",
+        "source_type": "rss",
+        "country": "IN",
+        "language": "hi",
+        "reliability_score": 0.86,
+        "active": True
+    },
+
+    # Urdu (Pakistan & South Asia)
+    {
+        "id": "src-bbcurdu-ur",
+        "name": "BBC News Urdu (اردو)",
+        "domain": "bbc.com",
+        "feed_url": "https://feeds.bbci.co.uk/urdu/rss.xml",
+        "source_type": "rss",
+        "country": "PK",
+        "language": "ur",
+        "reliability_score": 0.92,
+        "active": True
+    },
+    {
+        "id": "src-dailyjang-ur",
+        "name": "Daily Jang (اردو)",
+        "domain": "jang.com.pk",
+        "feed_url": "https://jang.com.pk/rss/",
+        "source_type": "rss",
+        "country": "PK",
+        "language": "ur",
+        "reliability_score": 0.86,
+        "active": True
+    },
+    {
+        "id": "src-dawnurdu-ur",
+        "name": "Dawn Urdu (اردو)",
+        "domain": "dawnurdu.com",
+        "feed_url": "https://www.dawnurdu.com/feed/",
+        "source_type": "rss",
+        "country": "PK",
+        "language": "ur",
+        "reliability_score": 0.88,
+        "active": True
+    },
+
+    # Arabic (Middle East & North Africa)
+    {
+        "id": "src-bbcarabic-ar",
+        "name": "BBC Arabic (العربية)",
+        "domain": "bbc.com",
+        "feed_url": "https://feeds.bbci.co.uk/arabic/rss.xml",
+        "source_type": "rss",
+        "country": "GB",
+        "language": "ar",
+        "reliability_score": 0.92,
+        "active": True
+    },
+    {
+        "id": "src-aljazeera-ar",
+        "name": "Al Jazeera Arabic (العربية)",
+        "domain": "aljazeera.net",
+        "feed_url": "https://www.aljazeera.net/aljazeerarss/a7c6e0fb-2917-48f5-934c-d956894084f4.xml",
+        "source_type": "rss",
+        "country": "QA",
+        "language": "ar",
+        "reliability_score": 0.90,
+        "active": True
+    },
+    {
+        "id": "src-skynewsarabia-ar",
+        "name": "Sky News Arabia (العربية)",
+        "domain": "skynewsarabia.com",
+        "feed_url": "https://www.skynewsarabia.com/rss.xml",
+        "source_type": "rss",
+        "country": "AE",
+        "language": "ar",
+        "reliability_score": 0.89,
+        "active": True
+    },
+
+    # Spanish (Latin America & Europe)
+    {
+        "id": "src-bbcmundo-es",
+        "name": "BBC Mundo (Español)",
+        "domain": "bbc.com",
+        "feed_url": "https://feeds.bbci.co.uk/mundo/rss.xml",
+        "source_type": "rss",
+        "country": "GB",
+        "language": "es",
+        "reliability_score": 0.92,
+        "active": True
+    },
+    {
+        "id": "src-elpais-es",
+        "name": "El País (Español)",
+        "domain": "elpais.com",
+        "feed_url": "https://feeds.elpais.com/mrss-s/pages/ep/site/elpais.com/portada",
+        "source_type": "rss",
+        "country": "ES",
+        "language": "es",
+        "reliability_score": 0.91,
+        "active": True
+    },
+    {
+        "id": "src-infobae-es",
+        "name": "Infobae América (Español)",
+        "domain": "infobae.com",
+        "feed_url": "https://www.infobae.com/arc/outboundfeeds/rss/",
+        "source_type": "rss",
+        "country": "AR",
+        "language": "es",
+        "reliability_score": 0.87,
+        "active": True
+    },
+
+    # ==========================================
     # South Asia (Local & National)
     # ==========================================
     {

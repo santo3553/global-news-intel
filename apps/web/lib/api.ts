@@ -35,6 +35,9 @@ export interface ArticleItem {
   published_at?: string;
   fetched_at: string;
   language: string;
+  original_language?: string;
+  original_title?: string;
+  original_content?: string;
   cleaned_content?: string;
   processing_status: string;
 }
@@ -97,6 +100,9 @@ export interface EventItem {
   summary: string;
   category: string;
   subcategory?: string;
+  original_language?: string;
+  original_title?: string;
+  original_summary?: string;
   latitude: number;
   longitude: number;
   country?: string;
@@ -241,6 +247,8 @@ export interface BriefingItem {
   velocity: number;
   summary: string;
   key_takeaway: string;
+  original_language?: string;
+  original_title?: string;
   first_seen_at?: string;
   last_updated_at?: string;
 }

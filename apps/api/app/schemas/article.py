@@ -11,6 +11,9 @@ class ArticleBase(BaseModel):
     author: Optional[str] = Field(None, max_length=255)
     published_at: Optional[datetime] = None
     language: str = Field(default="en", max_length=10)
+    original_language: Optional[str] = Field(default="en", max_length=10)
+    original_title: Optional[str] = Field(default=None, max_length=512)
+    original_content: Optional[str] = None
     cleaned_content: Optional[str] = None
 
 
