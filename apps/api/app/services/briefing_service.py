@@ -31,31 +31,41 @@ class BriefingService:
         """
         Answers 'What should I read right now?' by synthesizing the highest-impact,
         high-velocity, and strategic global events into an executive intelligence memo.
-        Prioritizes active real-time events from the current monitoring window.
+        Enforces strict geographic/country diversity so no single country dominates the world briefing.
         """
-        from datetime import timedelta
         now = datetime.now(timezone.utc)
-        recent_cutoff = now - timedelta(days=2)
 
-        # 1. Query top active/developing events, prioritizing recent dispatches
+        # 1. Query candidate active and developing events ordered by importance & recency
         stmt = (
             select(Event)
             .options(selectinload(Event.article_associations))
             .where(Event.status.in_(["active", "developing"]))
-            .order_by(
-                Event.last_updated_at.desc(),
-                Event.development_velocity_score.desc(),
-                Event.importance_score.desc()
-            )
-            .limit(50)
+            .order_by(Event.importance_score.desc(), Event.last_updated_at.desc())
+            .limit(300)
         )
         res = await session.execute(stmt)
         events = res.scalars().all()
 
-        breaking_alerts: List[BriefingItem] = []
-        geopolitical: List[BriefingItem] = []
-        hazards: List[BriefingItem] = []
-        economic: List[BriefingItem] = []
+        # 2. Score candidates by Strategic Intelligence Priority
+        scored_events = []
+        for evt in events:
+            evt_time = evt.last_updated_at or evt.first_seen_at
+            if evt_time and evt_time.tzinfo is None:
+                evt_time = evt_time.replace(tzinfo=timezone.utc)
+            
+            hours_ago = (now - evt_time).total_seconds() / 3600.0 if evt_time else 72.0
+            recency_score = max(0.0, 10.0 - (hours_ago / 7.2))  # 10 for immediate, smoothly decays
+            
+            strategic_score = (
+                (evt.importance_score or 5.0) * 0.40 +
+                (evt.global_impact_score or 5.0) * 0.25 +
+                min(evt.development_velocity_score or 0.0, 10.0) * 0.20 +
+                recency_score * 0.15
+            )
+            scored_events.append((strategic_score, evt))
+
+        # Sort descending by strategic priority
+        scored_events.sort(key=lambda x: x[0], reverse=True)
 
         def to_briefing_item(evt: Event) -> BriefingItem:
             loc = evt.city or evt.country or "Global"
@@ -63,8 +73,8 @@ class BriefingService:
                 loc = f"{evt.city}, {evt.country}"
 
             key_takeaway = (
-                f"Significant {evt.category.replace('_', ' ')} incident with importance "
-                f"{evt.importance_score:.1f}/10 corroborated across {len(evt.article_associations)} reports."
+                f"Strategic {evt.category.replace('_', ' ')} development with global impact "
+                f"{evt.global_impact_score:.1f}/10 corroborated across {len(evt.article_associations)} reports."
             )
 
             return BriefingItem(
@@ -81,43 +91,81 @@ class BriefingService:
                 last_updated_at=evt.last_updated_at
             )
 
-        for evt in events:
+        breaking_alerts: List[BriefingItem] = []
+        geopolitical: List[BriefingItem] = []
+        hazards: List[BriefingItem] = []
+        economic: List[BriefingItem] = []
+
+        seen_breaking_countries = set()
+        seen_geo_countries = set()
+        seen_haz_countries = set()
+        seen_eco_countries = set()
+
+        for score, evt in scored_events:
+            c = (evt.country or "Global").strip().lower()
             item = to_briefing_item(evt)
-            evt_time = evt.last_updated_at or evt.first_seen_at
-            if evt_time and evt_time.tzinfo is None:
-                evt_time = evt_time.replace(tzinfo=timezone.utc)
-            is_recent = evt_time is not None and evt_time >= recent_cutoff
 
-            # Breaking alerts: rapid incoming reports from current window
-            if is_recent and evt.development_velocity_score >= 3.0 and len(breaking_alerts) < limit_per_section:
+            # 1. Breaking Alerts: Rapid developing reports, strictly distinct countries
+            if len(breaking_alerts) < limit_per_section and c not in seen_breaking_countries:
+                if evt.development_velocity_score >= 2.5 or score >= 7.0:
+                    breaking_alerts.append(item)
+                    seen_breaking_countries.add(c)
+
+            # 2. Critical Geopolitical: Politics, diplomacy, sovereignty, conflict, strictly distinct countries
+            if len(geopolitical) < limit_per_section and c not in seen_geo_countries:
+                if evt.category in ("politics", "diplomacy", "security", "conflict") or (evt.political_impact_score or 0) >= 4.5 or (evt.global_impact_score or 0) >= 6.0:
+                    geopolitical.append(item)
+                    seen_geo_countries.add(c)
+
+            # 3. Humanitarian Hazards & Environmental: Disasters, human impact, health, strictly distinct countries
+            if len(hazards) < limit_per_section and c not in seen_haz_countries:
+                if evt.category in ("natural_disaster", "environment", "health") or ((evt.human_impact_score or 0) >= 5.0 and evt.category in ("security", "conflict", "humanitarian")):
+                    hazards.append(item)
+                    seen_haz_countries.add(c)
+
+            # 4. Economic Disruptions & Technology: Economy, trade, crypto, markets, tech, strictly distinct countries
+            if len(economic) < limit_per_section and c not in seen_eco_countries:
+                is_eco = (
+                    evt.category in ("economy", "trade", "finance", "science_technology", "infrastructure") or
+                    (evt.economic_impact_score or 0) >= 5.0 or
+                    any(w in evt.canonical_title.lower() for w in ["market", "crypto", "hack", "billion", "trade", "dollar", "bank", "tech", "ai", "rail", "port", "tariff", "oil", "stocks"])
+                )
+                if is_eco:
+                    economic.append(item)
+                    seen_eco_countries.add(c)
+
+        # Fallback if any section is underfilled (e.g. sparse test database)
+        for score, evt in scored_events:
+            item = to_briefing_item(evt)
+            if len(breaking_alerts) < limit_per_section and item not in breaking_alerts:
                 breaking_alerts.append(item)
-
-            # Geopolitical: high global or political impact
-            if (evt.category == "politics" or evt.global_impact_score >= 5.5) and len(geopolitical) < limit_per_section:
+            if len(geopolitical) < limit_per_section and (evt.category in ("politics", "diplomacy", "security") or evt.global_impact_score >= 5.0) and item not in geopolitical:
                 geopolitical.append(item)
-
-            # Hazards / Natural Disasters / Conflict / Security
-            if (evt.category in ("natural_disaster", "security", "conflict") or evt.human_impact_score >= 5.5) and len(hazards) < limit_per_section:
+            if len(hazards) < limit_per_section and (evt.category in ("natural_disaster", "environment") or evt.human_impact_score >= 5.0) and item not in hazards:
                 hazards.append(item)
-
-            # Economic disruptions / Global Trade & Crypto
-            if (evt.category == "economy" or evt.economic_impact_score >= 5.0 or "hack" in evt.canonical_title.lower() or "crypto" in evt.canonical_title.lower()) and len(economic) < limit_per_section:
+            if len(economic) < limit_per_section and (evt.category in ("economy", "trade", "science_technology") or evt.economic_impact_score >= 5.0) and item not in economic:
                 economic.append(item)
 
-        # Fallback if breaking_alerts is empty (e.g. initial setup)
-        if len(breaking_alerts) == 0 and events:
-            for evt in events[:limit_per_section]:
-                breaking_alerts.append(to_briefing_item(evt))
-
+        all_briefing_items = breaking_alerts + geopolitical + hazards + economic
         total_analyzed = len(events)
+
         if total_analyzed == 0:
             exec_summary = "Global monitoring active. No high-severity anomalies detected in current surveillance window."
         else:
-            top_evt = breaking_alerts[0] if breaking_alerts else events[0]
+            # Pick highest strategic global impact event across briefing items for the memo headline
+            top_evt = max(
+                all_briefing_items,
+                key=lambda x: (x.importance * 0.40 + x.velocity * 0.30)
+            ) if all_briefing_items else (breaking_alerts[0] if breaking_alerts else to_briefing_item(events[0]))
+
+            distinct_nations = list(dict.fromkeys(
+                item.location.split(",")[-1].strip() for item in all_briefing_items if item.location
+            ))
+
             exec_summary = (
-                f"Global intelligence sweep analyzed {total_analyzed} active events in the current monitoring window. "
-                f"Primary focus centers on '{top_evt.title}' (Impact {top_evt.importance:.1f}/10) "
-                f"with {len(breaking_alerts)} high-velocity developing situations tracked across continents."
+                f"Global intelligence sweep analyzed {total_analyzed} active events across {len(distinct_nations)} nations. "
+                f"Primary strategic focus centers on '{top_evt.title}' ({top_evt.location}, Impact {top_evt.importance:.1f}/10) "
+                f"with {len(breaking_alerts)} high-velocity developing situations tracked across key continental theatres."
             )
 
         return IntelligenceBriefingResponse(
